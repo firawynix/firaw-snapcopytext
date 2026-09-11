@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-- Milestone M1: version 1.1.2 accepts Print Screen as a standalone custom shortcut and keeps the verified GitHub-based updater and x64/x86 packaging flow.
+- Milestone M1: version 1.1.3 prevents global shortcuts from intercepting Print Screen while the preferences field records it.
 
 ## Decisions
 

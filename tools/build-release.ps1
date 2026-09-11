@@ -1,6 +1,6 @@
 ﻿param(
-    [string]$Version = '1.1.2',
-    [string]$ReleaseNotes = 'Atalho personalizado agora aceita Print Screen ou PrtSc sem modificadores, além das combinações existentes.'
+    [string]$Version = '1.1.3',
+    [string]$ReleaseNotes = 'Corrige a gravação de Print Screen no campo de atalho suspendendo temporariamente os atalhos globais durante as preferências.'
 )
 
 $ErrorActionPreference = 'Stop'

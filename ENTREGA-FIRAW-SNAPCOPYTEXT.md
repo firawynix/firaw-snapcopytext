@@ -1,3 +1,11 @@
+# Correção — 1.1.3 (11 de setembro de 2026)
+
+- Corrigida a gravação do Print Screen dentro do campo de atalho.
+- Os atalhos globais deixam de interceptar a tecla enquanto a janela de preferências está aberta.
+- Notas completas: `C:\Users\Hugo\Firaw-SnapCopyText\UPDATE-1.1.3.md`.
+
+---
+
 # Ajuste — 1.1.2 (11 de setembro de 2026)
 
 - O campo **Atalho personalizado** agora reconhece `Print Screen`/`PrtSc` sozinha.

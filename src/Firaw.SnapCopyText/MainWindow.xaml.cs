@@ -54,16 +54,23 @@ public partial class MainWindow : Window
             settingsWindow.Owner = this;
         }
 
-        if (settingsWindow.ShowDialog() != true || settingsWindow.SavedPreferences is null)
+        _hotkeyService?.Suspend();
+        try
         {
-            return;
-        }
+            if (settingsWindow.ShowDialog() != true || settingsWindow.SavedPreferences is null)
+            {
+                return;
+            }
 
-        _preferences = settingsWindow.SavedPreferences;
-        _settingsService.Save(_preferences);
-        TryApplyStartupPreference(showError: true);
-        _hotkeyService?.Apply(_preferences);
-        RefreshHotkeyStatus();
+            _preferences = settingsWindow.SavedPreferences;
+            _settingsService.Save(_preferences);
+            TryApplyStartupPreference(showError: true);
+        }
+        finally
+        {
+            _hotkeyService?.Apply(_preferences);
+            RefreshHotkeyStatus();
+        }
     }
 
     private void TryApplyStartupPreference(bool showError)

@@ -95,6 +95,8 @@ public sealed class HotkeyService : IDisposable
         _source?.RemoveHook(WindowProcedure);
     }
 
+    public void Suspend() => UnregisterCurrentHotkeys();
+
     private void UnregisterCurrentHotkeys()
     {
         if (_windowHandle == nint.Zero)
