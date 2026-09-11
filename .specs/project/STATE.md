@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-- Milestone M1: editor startup fix published; interactive UI acceptance test pending.
+- Milestone M1: adjustable capture, full Firaw window hiding, and selectable OCR text implemented; publication and interactive acceptance test pending.
 
 ## Decisions
 
@@ -18,7 +18,8 @@
 
 ## Next Steps
 
-- User validates capture selection, annotations, clipboard, and OCR in the published build.
+- Publish the updated self-contained Windows build.
+- User validates that Firaw windows disappear before capture, the selected region moves/resizes, and both OCR copy modes work.
 - Adjust `FirawCyanColor` if the exact FirawSelector cyan differs from the initial `#19D3E6` token.
 
 ## Deferred Ideas

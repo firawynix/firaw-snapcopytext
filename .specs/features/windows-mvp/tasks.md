@@ -1,11 +1,11 @@
 # Windows MVP Tasks
 
 **Design:** `.specs/features/windows-mvp/design.md`
-**Status:** Done; interactive UAT pending
+**Status:** Done through T12; interactive UAT pending
 
 ## Execution Plan
 
-T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9
+T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12
 
 ## Task Breakdown
 
@@ -97,6 +97,33 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9
 **Requirements:** all
 **Done when:** clean restore, build, and tests pass; run instructions are documented.
 **Verify:** `dotnet restore`, `dotnet build`, and `dotnet test` all succeed.
+
+### T10: Keep capture selection adjustable
+
+**Status:** DONE
+
+**Where:** ResizeHandle model, SelectionGeometry service, capture overlay, and geometry tests.
+**Requirements:** CAP-01, CAP-04
+**Done when:** releasing the initial drag keeps the region active, movable, resizable, and confirmable.
+**Verify:** geometry tests plus overlay construction smoke test.
+
+### T11: Exclude Firaw windows from capture
+
+**Status:** DONE
+
+**Where:** MainWindow capture lifecycle.
+**Requirements:** CAP-03
+**Done when:** all visible Firaw windows are hidden before the snapshot and restored afterward.
+**Verify:** interactive test with an editor already open.
+
+### T12: Separate full-copy and text-selection OCR flows
+
+**Status:** DONE
+
+**Where:** editor and OCR preview views.
+**Requirements:** OCR-02, OCR-03
+**Done when:** Copy text copies all OCR directly and Select text copies the selected subsection.
+**Verify:** OCR smoke test plus interactive clipboard test.
 
 ## Tools
 

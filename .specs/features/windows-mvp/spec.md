@@ -6,9 +6,9 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 
 ## Goals
 
-- [ ] Capture and open a selected region in the editor.
-- [ ] Copy edited pixels or locally recognized text without network access.
-- [ ] Provide the most useful annotation and redaction tools without slowing the capture flow.
+- [x] Capture and open a selected region in the editor.
+- [x] Copy edited pixels or locally recognized text without network access.
+- [x] Provide the most useful annotation and redaction tools without slowing the capture flow.
 
 ## Out of Scope
 
@@ -26,11 +26,13 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 
 **Acceptance Criteria:**
 
-1. WHEN the user invokes capture THEN Firaw SHALL display a frozen desktop overlay.
-2. WHEN the user drags a non-empty rectangle THEN Firaw SHALL open that crop in the editor.
-3. WHEN the user presses Escape or makes an empty selection THEN Firaw SHALL cancel safely.
+1. WHEN the user invokes capture THEN Firaw SHALL hide every visible Firaw window before freezing the desktop.
+2. WHEN the user releases a non-empty initial rectangle THEN Firaw SHALL keep the selection active.
+3. WHEN the user drags the selection or one of its eight handles THEN Firaw SHALL move or resize it within the virtual desktop.
+4. WHEN the user confirms by button or Enter THEN Firaw SHALL open the adjusted crop in the editor.
+5. WHEN the user presses Escape THEN Firaw SHALL cancel safely and restore the previously visible Firaw windows.
 
-**Independent Test:** Invoke capture, drag over visible content, and verify the editor contains that crop.
+**Independent Test:** Leave an editor open, invoke capture, drag and release, move and resize the region, then confirm that no Firaw window appears in the crop.
 
 ### P1: Copy or save the image
 
@@ -51,9 +53,10 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 
 **Acceptance Criteria:**
 
-1. WHEN the user chooses Copy text THEN Firaw SHALL recognize the original crop using local Portuguese and English OCR data.
-2. WHEN OCR finds text THEN Firaw SHALL show an editable preview and allow copying it.
-3. WHEN OCR finds no text or fails THEN Firaw SHALL show a clear non-destructive message.
+1. WHEN the user chooses Copy text THEN Firaw SHALL recognize the original crop and copy all recognized text directly.
+2. WHEN the user chooses Select text THEN Firaw SHALL show an editable preview in which any subsection can be selected and copied.
+3. WHEN no subsection is selected in the preview THEN Firaw SHALL copy the full edited text.
+4. WHEN OCR finds no text or fails THEN Firaw SHALL show a clear non-destructive message.
 
 **Independent Test:** Capture a Portuguese sentence, run OCR, edit the preview, and copy the result.
 
@@ -70,15 +73,18 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 | --- | --- | --- |
 | CAP-01 | Select frozen region | Implemented; UAT pending |
 | CAP-02 | Cancel safely | Implemented; UAT pending |
+| CAP-03 | Hide all Firaw windows before freezing desktop | Implemented; UAT pending |
+| CAP-04 | Move and resize active selection | Implemented; geometry tests passed, UAT pending |
 | EDIT-01 | Draw annotations | Implemented; UAT pending |
 | EDIT-02 | Undo and redo | Implemented; automated test passed |
 | IMG-01 | Copy rendered image | Implemented; UAT pending |
 | IMG-02 | Save PNG | Implemented; UAT pending |
 | OCR-01 | Local Portuguese/English recognition | Verified by automated smoke test |
-| OCR-02 | Editable preview and copy | Implemented; UAT pending |
+| OCR-02 | Direct copy of all recognized text | Implemented; UAT pending |
+| OCR-03 | Select and copy an OCR subsection | Implemented; UAT pending |
 | HOTKEY-01 | Global shortcut with fallback | Implemented; UAT pending |
 
-**Coverage:** 9 total, 9 mapped to tasks, 0 unmapped.
+**Coverage:** 12 total, 12 mapped to tasks, 0 unmapped.
 
 ## Success Criteria
 

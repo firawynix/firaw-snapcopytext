@@ -5,11 +5,11 @@
 
 ## Architecture Overview
 
-The WPF process owns a small launcher window and registers capture hotkeys. A capture service snapshots the virtual desktop before a borderless overlay is shown. The overlay returns a cropped bitmap to an editor. The editor renders annotations over the image, delegates OCR to a local service, and writes image or Unicode text to the clipboard.
+The WPF process owns a small launcher window and registers capture hotkeys. Before the capture service snapshots the virtual desktop, the launcher records and hides every visible Firaw window, waits for the UI compositor to settle, and restores the same windows after selection. The borderless overlay keeps the selected rectangle active so it can be moved or resized through eight handles before confirmation. The editor renders annotations over the image, delegates OCR to a local service, and writes image or Unicode text to the clipboard.
 
 The presentation layer uses centralized Firaw theme resources: dark neutral backgrounds, white text, and cyan (`#19D3E6`) for primary actions, focus, selection borders, and active tools.
 
-Flow: Hotkey/Button -> Desktop capture -> Selection overlay -> Editor -> Clipboard/PNG or Local OCR -> Editable text -> Clipboard.
+Flow: Hotkey/Button -> Hide Firaw windows -> Desktop capture -> Adjustable selection overlay -> Restore windows -> Editor -> Clipboard/PNG or Local OCR -> Direct copy or selectable text -> Clipboard.
 
 ## Code Reuse Analysis
 
@@ -25,9 +25,9 @@ This is a greenfield project. It reuses Windows desktop, WPF rendering, clipboar
 
 ### CaptureOverlayWindow
 
-- **Purpose:** Present the frozen desktop and return the user's region selection.
+- **Purpose:** Present the frozen desktop, retain a live selection with movement and eight-direction resizing, and return the confirmed crop.
 - **Location:** `src/Firaw.SnapCopyText/Views/CaptureOverlayWindow.xaml(.cs)`
-- **Dependencies:** CaptureService output and WPF mouse input.
+- **Dependencies:** CaptureService output, SelectionGeometry, and WPF mouse/Thumb input.
 
 ### EditorWindow
 
