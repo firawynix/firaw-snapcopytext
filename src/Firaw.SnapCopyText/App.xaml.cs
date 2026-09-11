@@ -3,6 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows;
 using System.Windows.Resources;
+using Firaw.SnapCopyText.Services;
 using Application = System.Windows.Application;
 using ContextMenuStrip = System.Windows.Forms.ContextMenuStrip;
 using NotifyIcon = System.Windows.Forms.NotifyIcon;
@@ -21,6 +22,10 @@ public partial class App : Application
     {
         base.OnStartup(e);
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
+        EventManager.RegisterClassHandler(
+            typeof(Window),
+            FrameworkElement.LoadedEvent,
+            new RoutedEventHandler(Window_Loaded));
 
         _mainWindow = new MainWindow();
         MainWindow = _mainWindow;
@@ -37,6 +42,14 @@ public partial class App : Application
         _trayIcon.DoubleClick += (_, _) => Dispatcher.Invoke(ShowMainWindow);
 
         _mainWindow.Show();
+    }
+
+    private static void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is Window window)
+        {
+            WindowBrandingService.Apply(window);
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)
