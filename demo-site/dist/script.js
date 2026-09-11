@@ -25,9 +25,9 @@ const demos = {
   },
   atalhos: {
     number: "04",
-    title: "A combinação é sua",
-    description: "Grave o atalho que preferir, defina o modo padrão e use Print Screen quando essa tecla estiver disponível no Windows.",
-    points: ["Combinação personalizada", "Região, janela ou monitor como padrão", "Inicialização opcional com o Windows"],
+    title: "Três atalhos no Print Screen",
+    description: "Print Screen seleciona uma região, Alt + Print Screen captura um monitor e Ctrl + Print Screen captura uma janela. Cada combinação fica com o Firaw ou volta ao comportamento original do Windows.",
+    points: ["Perfil pronto: Aplicar os 3 do Firaw", "Firaw ou Windows original, linha a linha", "Atalho personalizado extra e início com o Windows"],
     image: "assets/firaw-settings.png",
     alt: "Preferências de atalho e inicialização do Firaw"
   }
