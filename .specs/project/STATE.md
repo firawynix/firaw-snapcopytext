@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-- Milestone M1: automated validation complete; interactive UI acceptance test pending.
+- Milestone M1: editor startup fix published; interactive UI acceptance test pending.
 
 ## Decisions
 
@@ -28,3 +28,10 @@
 ## Lessons Learned
 
 - The inspected Lightshot directory is a compiled installation, not a reusable source project.
+- WPF `Checked` events can fire inside `InitializeComponent()` before controls declared later in XAML are assigned; initialization-time handlers must tolerate incomplete named fields.
+
+## Quick Tasks Completed
+
+| # | Description | Date | Commit | Status |
+| --- | --- | --- | --- | --- |
+| 001 | Prevent editor startup event from accessing unloaded controls | 2026-09-11 | `8cf9352` | Done |
