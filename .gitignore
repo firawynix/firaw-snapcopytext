@@ -6,3 +6,5 @@ TestResults/
 *.suo
 *.nupkg
 artifacts/
+release/
+demo-site/dist/downloads/*.exe
