@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Firaw - SnapCopyText • Editor"
         Width="1180" Height="780" MinWidth="860" MinHeight="600"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen" PreviewKeyDown="Window_PreviewKeyDown">
     <Window.Resources>
         <Style x:Key="ToolButton" TargetType="ToggleButton">
             <Setter Property="Foreground" Value="{StaticResource FirawText}" />
@@ -77,20 +77,20 @@
             <DockPanel LastChildFill="True">
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                     <Button x:Name="CopyTextButton" Style="{StaticResource FirawButton}"
-                            Content="Copiar texto" Margin="4,0" Padding="15,8" />
+                            Content="Copiar texto" Margin="4,0" Padding="15,8" Click="CopyTextButton_Click" />
                     <Button x:Name="CopyImageButton" Style="{StaticResource FirawButton}"
-                            Content="Copiar imagem" Margin="4,0" Padding="15,8" />
-                    <Button x:Name="SaveButton" Style="{StaticResource SecondaryButton}" Content="Salvar PNG" />
+                            Content="Copiar imagem" Margin="4,0" Padding="15,8" Click="CopyImageButton_Click" />
+                    <Button x:Name="SaveButton" Style="{StaticResource SecondaryButton}" Content="Salvar PNG" Click="SaveButton_Click" />
                 </StackPanel>
 
-                <WrapPanel VerticalAlignment="Center">
-                    <ToggleButton x:Name="SelectTool" Style="{StaticResource ToolButton}" Tag="Select" Content="Selecionar" IsChecked="True" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Pencil" Content="Caneta" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Arrow" Content="Seta" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Rectangle" Content="Retângulo" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Highlight" Content="Marca-texto" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Text" Content="Texto" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Redact" Content="Censurar" />
+                <WrapPanel x:Name="ToolsPanel" VerticalAlignment="Center">
+                    <ToggleButton x:Name="SelectTool" Style="{StaticResource ToolButton}" Tag="Select" Content="Selecionar" IsChecked="True" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Pencil" Content="Caneta" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Arrow" Content="Seta" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Rectangle" Content="Retângulo" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Highlight" Content="Marca-texto" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Text" Content="Texto" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Redact" Content="Censurar" Checked="ToolButton_Checked" />
                 </WrapPanel>
             </DockPanel>
         </Border>
@@ -102,7 +102,10 @@
                         HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Grid x:Name="EditorSurface" Background="White">
                         <Image x:Name="CaptureImage" Stretch="Fill" IsHitTestVisible="False" />
-                        <Canvas x:Name="AnnotationCanvas" Background="Transparent" Cursor="Cross" />
+                        <Canvas x:Name="AnnotationCanvas" Background="Transparent" Cursor="Cross"
+                                MouseLeftButtonDown="AnnotationCanvas_MouseLeftButtonDown"
+                                MouseMove="AnnotationCanvas_MouseMove"
+                                MouseLeftButtonUp="AnnotationCanvas_MouseLeftButtonUp" />
                     </Grid>
                 </Border>
             </ScrollViewer>
@@ -115,8 +118,8 @@
                            Foreground="{StaticResource FirawMutedText}" VerticalAlignment="Center"
                            Text="Pronto" />
                 <StackPanel Orientation="Horizontal">
-                    <Button x:Name="UndoButton" Style="{StaticResource SecondaryButton}" Content="Desfazer" IsEnabled="False" />
-                    <Button x:Name="RedoButton" Style="{StaticResource SecondaryButton}" Content="Refazer" IsEnabled="False" />
+                    <Button x:Name="UndoButton" Style="{StaticResource SecondaryButton}" Content="Desfazer" IsEnabled="False" Click="UndoButton_Click" />
+                    <Button x:Name="RedoButton" Style="{StaticResource SecondaryButton}" Content="Refazer" IsEnabled="False" Click="RedoButton_Click" />
                     <Separator Margin="8,2" />
                     <TextBlock Text="Cor" VerticalAlignment="Center" Margin="0,0,6,0"
                                Foreground="{StaticResource FirawMutedText}" />
