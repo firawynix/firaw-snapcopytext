@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj" />
+    <ProjectReference Include="..\..\src\Firaw.SnapCopyText.Launcher\Firaw.SnapCopyText.Launcher.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\src\Firaw.SnapCopyText\tessdata\*.traineddata">
