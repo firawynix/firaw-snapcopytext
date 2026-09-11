@@ -81,6 +81,9 @@
                     <ToggleButton x:Name="SelectTextButton" Style="{StaticResource ToolButton}"
                                   Content="Selecionar texto" Margin="4,0" Padding="15,8"
                                   Click="SelectTextButton_Click" />
+                    <ToggleButton x:Name="TextHistoryToggle" Style="{StaticResource ToolButton}"
+                                  Content="Textos (0)" Margin="4,0" Padding="15,8"
+                                  Click="TextHistoryToggle_Click" />
                     <Button x:Name="CopyImageButton" Style="{StaticResource FirawButton}"
                             Content="Copiar imagem" Margin="4,0" Padding="15,8" Click="CopyImageButton_Click" />
                     <Button x:Name="SaveButton" Style="{StaticResource SecondaryButton}" Content="Salvar PNG" Click="SaveButton_Click" />
@@ -100,7 +103,13 @@
         </Border>
 
         <Grid Grid.Row="1" Background="#070A0E">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <ScrollViewer Grid.Column="0"
+                          HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                           Padding="28" Focusable="False">
                 <Border Background="#111820" BorderBrush="#334555" BorderThickness="1"
                         HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -113,6 +122,96 @@
                     </Grid>
                 </Border>
             </ScrollViewer>
+
+            <Border x:Name="TextHistoryDrawer" Grid.Column="1" Width="350"
+                    Visibility="Collapsed" Background="{StaticResource FirawSurface}"
+                    BorderBrush="{StaticResource FirawCyan}" BorderThickness="1,0,0,0"
+                    Padding="16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="Fechar"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Click="CloseTextHistoryButton_Click" />
+                            <TextBlock Text="Textos copiados" FontSize="19"
+                                       FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </DockPanel>
+                        <TextBlock Text="Use Ctrl ou Shift para selecionar vários textos."
+                                   Margin="0,8,0,12" TextWrapping="Wrap"
+                                   Foreground="{StaticResource FirawMutedText}" />
+                    </StackPanel>
+
+                    <Grid Grid.Row="1">
+                        <ListBox x:Name="CopiedTextList" SelectionMode="Extended"
+                                 Background="#0C1117" BorderThickness="0"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Foreground" Value="{StaticResource FirawText}" />
+                                    <Setter Property="Background" Value="{StaticResource FirawSurfaceRaised}" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="Margin" Value="0,0,0,8" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="ItemBorder" Background="{TemplateBinding Background}"
+                                                        CornerRadius="8" Padding="11,9">
+                                                    <ContentPresenter />
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource FirawCyan}" />
+                                                        <Setter TargetName="ItemBorder" Property="BorderThickness" Value="1" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter Property="Background" Value="{StaticResource FirawCyan}" />
+                                                        <Setter Property="Foreground" Value="#071014" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Preview}" TextWrapping="Wrap"
+                                                   FontWeight="SemiBold" MaxHeight="58" />
+                                        <TextBlock Text="{Binding Details}" Margin="0,5,0,0"
+                                                   FontSize="11" Opacity="0.72" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <TextBlock x:Name="EmptyHistoryText"
+                                   Text="Os textos copiados aparecerão aqui enquanto o Firaw estiver ativo."
+                                   TextAlignment="Center" TextWrapping="Wrap"
+                                   Foreground="{StaticResource FirawMutedText}"
+                                   VerticalAlignment="Center" Margin="24" />
+                    </Grid>
+
+                    <StackPanel Grid.Row="2" Margin="0,12,0,0">
+                        <Button Content="Copiar selecionados" Style="{StaticResource FirawButton}"
+                                Click="CopySelectedHistoryButton_Click" />
+                        <UniformGrid Columns="2" Margin="0,6,0,0">
+                            <Button Content="Importar atual" Style="{StaticResource SecondaryButton}"
+                                    Click="ImportClipboardButton_Click" />
+                            <Button Content="Limpar lista" Style="{StaticResource SecondaryButton}"
+                                    Click="ClearTextHistoryButton_Click" />
+                        </UniformGrid>
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Grid>
 
         <Border Grid.Row="2" Background="{StaticResource FirawSurface}" Padding="12,8"

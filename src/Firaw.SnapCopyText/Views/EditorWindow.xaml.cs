@@ -1,4 +1,5 @@
 using System.IO;
+using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -19,6 +20,7 @@ using Path = System.Windows.Shapes.Path;
 using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
+using TextDataFormat = System.Windows.TextDataFormat;
 
 namespace Firaw.SnapCopyText.Views;
 
@@ -27,6 +29,7 @@ public partial class EditorWindow : Window
     private readonly AnnotationHistory<UIElement> _history = new();
     private readonly OcrService _ocrService = new();
     private readonly CaptureService _captureService = new();
+    private readonly TextHistoryService _textHistory = TextHistoryService.Shared;
     private EditorTool _currentTool = EditorTool.Select;
     private Point _startPoint;
     private UIElement? _draft;
@@ -44,6 +47,10 @@ public partial class EditorWindow : Window
         CaptureImage.Source = image;
         EditorSurface.Width = image.PixelWidth;
         EditorSurface.Height = image.PixelHeight;
+        CopiedTextList.ItemsSource = _textHistory.Items;
+        _textHistory.Items.CollectionChanged += TextHistory_CollectionChanged;
+        Closed += (_, _) => _textHistory.Items.CollectionChanged -= TextHistory_CollectionChanged;
+        UpdateTextHistoryUi();
     }
 
     private void ToolButton_Checked(object sender, RoutedEventArgs e)
@@ -459,6 +466,9 @@ public partial class EditorWindow : Window
             string textToCopy = text.Trim();
             if (TryClipboard(() => System.Windows.Clipboard.SetText(textToCopy)))
             {
+                _textHistory.Add(
+                    textToCopy,
+                    isSelectedRegion ? "OCR selecionado" : "OCR completo");
                 EditorStatus.Text = isSelectedRegion
                     ? "Trecho selecionado copiado para a área de transferência."
                     : "Todo o texto reconhecido foi copiado.";
@@ -507,6 +517,74 @@ public partial class EditorWindow : Window
 
         EditorStatus.Text = "Não foi possível acessar a área de transferência. Tente novamente.";
         return false;
+    }
+
+    private void TextHistoryToggle_Click(object sender, RoutedEventArgs e)
+    {
+        TextHistoryDrawer.Visibility = TextHistoryToggle.IsChecked == true
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+    }
+
+    private void CloseTextHistoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        TextHistoryToggle.IsChecked = false;
+        TextHistoryDrawer.Visibility = Visibility.Collapsed;
+    }
+
+    private void ImportClipboardButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (!System.Windows.Clipboard.ContainsText(TextDataFormat.UnicodeText))
+            {
+                EditorStatus.Text = "A área de transferência não contém texto.";
+                return;
+            }
+
+            string text = System.Windows.Clipboard.GetText(TextDataFormat.UnicodeText);
+            _textHistory.Add(text, "Importado manualmente");
+            EditorStatus.Text = "Texto atual incluído na lista.";
+        }
+        catch (System.Runtime.InteropServices.COMException)
+        {
+            EditorStatus.Text = "A área de transferência está ocupada. Tente novamente.";
+        }
+    }
+
+    private void CopySelectedHistoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        CopiedTextEntry[] selected = CopiedTextList.SelectedItems
+            .OfType<CopiedTextEntry>()
+            .ToArray();
+        if (selected.Length == 0)
+        {
+            EditorStatus.Text = "Selecione pelo menos um texto na lista.";
+            return;
+        }
+
+        string combined = TextHistoryService.Combine(selected);
+        if (TryClipboard(() => System.Windows.Clipboard.SetText(combined)))
+        {
+            _textHistory.Add(combined, $"{selected.Length} textos combinados");
+            EditorStatus.Text = $"{selected.Length} texto(s) copiado(s) em conjunto.";
+        }
+    }
+
+    private void ClearTextHistoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        _textHistory.Items.Clear();
+        EditorStatus.Text = "Lista de textos limpa.";
+    }
+
+    private void TextHistory_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
+        UpdateTextHistoryUi();
+
+    private void UpdateTextHistoryUi()
+    {
+        int count = _textHistory.Items.Count;
+        TextHistoryToggle.Content = $"Textos ({count})";
+        EmptyHistoryText.Visibility = count == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void UpdateHistoryButtons()

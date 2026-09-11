@@ -33,7 +33,12 @@ public sealed class TextHistoryService
         CopiedTextEntry? duplicate = Items.FirstOrDefault(item => item.Text == normalized);
         if (duplicate is not null)
         {
-            Items.Remove(duplicate);
+            int currentIndex = Items.IndexOf(duplicate);
+            if (currentIndex > 0)
+            {
+                Items.Move(currentIndex, 0);
+            }
+            return duplicate;
         }
 
         var entry = new CopiedTextEntry(Guid.NewGuid(), normalized, source, DateTimeOffset.Now);
