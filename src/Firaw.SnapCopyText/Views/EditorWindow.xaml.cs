@@ -7,11 +7,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Firaw.SnapCopyText.Models;
+using Firaw.SnapCopyText.Services;
 using Microsoft.Win32;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
+using MessageBox = System.Windows.MessageBox;
 using Path = System.Windows.Shapes.Path;
 using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
@@ -22,6 +24,7 @@ namespace Firaw.SnapCopyText.Views;
 public partial class EditorWindow : Window
 {
     private readonly AnnotationHistory<UIElement> _history = new();
+    private readonly OcrService _ocrService = new();
     private EditorTool _currentTool = EditorTool.Select;
     private Point _startPoint;
     private UIElement? _draft;
@@ -294,8 +297,41 @@ public partial class EditorWindow : Window
         EditorStatus.Text = $"Salvo: {System.IO.Path.GetFileName(dialog.FileName)}";
     }
 
-    private void CopyTextButton_Click(object sender, RoutedEventArgs e) =>
-        EditorStatus.Text = "O mecanismo OCR será conectado na próxima etapa.";
+    private async void CopyTextButton_Click(object sender, RoutedEventArgs e)
+    {
+        CopyTextButton.IsEnabled = false;
+        EditorStatus.Text = "Reconhecendo texto localmente…";
+
+        try
+        {
+            string text = await _ocrService.RecognizeAsync(OriginalImage);
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                EditorStatus.Text = "Nenhum texto foi encontrado nessa captura.";
+                return;
+            }
+
+            var preview = new OcrPreviewWindow(text) { Owner = this };
+            if (preview.ShowDialog() == true && !string.IsNullOrWhiteSpace(preview.ResultText) &&
+                TryClipboard(() => System.Windows.Clipboard.SetText(preview.ResultText)))
+            {
+                EditorStatus.Text = "Texto copiado para a área de transferência.";
+            }
+            else
+            {
+                EditorStatus.Text = "Cópia de texto cancelada.";
+            }
+        }
+        catch (Exception exception)
+        {
+            EditorStatus.Text = "Não foi possível reconhecer o texto.";
+            MessageBox.Show(this, exception.Message, "Firaw - OCR", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        finally
+        {
+            CopyTextButton.IsEnabled = true;
+        }
+    }
 
     private BitmapSource RenderEditedImage()
     {

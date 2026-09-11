@@ -17,4 +17,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\src\Firaw.SnapCopyText\tessdata\*.traineddata">
+      <Link>tessdata\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
