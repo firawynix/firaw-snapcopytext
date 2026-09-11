@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-- Milestone M1: boxed annotations and DWM transition suppression published; user acceptance test pending for the capture artifact.
+- Milestone M1: tray lifecycle, Eye of Horus branding, cyan captions, and copied-text drawer implemented; publication and user acceptance test pending.
 
 ## Decisions
 
@@ -11,6 +11,7 @@
 - OCR is local and uses Tesseract language files for Portuguese and English so the prototype does not require MSIX package identity or an NPU.
 - No capture is uploaded automatically or implicitly.
 - Branding follows FirawSelector: dark surfaces, high contrast, and cyan as the primary accent. The initial theme token is `#19D3E6`, centralized so the exact Firaw cyan can be adjusted once without touching individual views.
+- Copied text history is kept in memory only, deduplicated, and limited to 100 entries; closing Firaw through the tray clears it.
 
 ## Blockers
 

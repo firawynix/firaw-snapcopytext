@@ -11,6 +11,8 @@ The presentation layer uses centralized Firaw theme resources: dark neutral back
 
 Flow: Hotkey/Button -> Hide Firaw windows -> Desktop capture -> Adjustable selection overlay -> Restore windows -> Editor -> Clipboard/PNG or Local OCR -> Full image or in-image text region -> Clipboard.
 
+Background flow: Windows clipboard update -> hidden launcher window message hook -> in-memory TextHistoryService -> editor drawer -> multi-selection -> combined clipboard text.
+
 ## Code Reuse Analysis
 
 This is a greenfield project. It reuses Windows desktop, WPF rendering, clipboard, and dialog APIs. No Lightshot binaries or assets are referenced.
@@ -48,6 +50,23 @@ This is a greenfield project. It reuses Windows desktop, WPF rendering, clipboar
 - **Purpose:** Register Print Screen and a fallback Ctrl+Shift+S shortcut and raise capture requests.
 - **Location:** `src/Firaw.SnapCopyText/Services/HotkeyService.cs`
 - **Dependencies:** Win32 `RegisterHotKey` and the main window handle.
+
+### ClipboardMonitorService and TextHistoryService
+
+- **Purpose:** Receive WM_CLIPBOARDUPDATE while the launcher is visible or hidden, deduplicate up to 100 text entries in memory, and expose them to every editor.
+- **Location:** `Services/ClipboardMonitorService.cs`, `Services/TextHistoryService.cs`.
+- **Dependencies:** Win32 clipboard format listener and the persistent launcher window handle.
+
+### App tray lifecycle
+
+- **Purpose:** Keep the process alive explicitly, hide the launcher on close/minimize, expose tray actions, and perform intentional shutdown.
+- **Location:** `App.xaml.cs`.
+- **Dependencies:** Windows Forms NotifyIcon using the multi-resolution Firaw ICO resource.
+
+### WindowBrandingService
+
+- **Purpose:** Apply Firaw cyan caption and dark caption text through supported Windows DWM attributes.
+- **Location:** `Services/WindowBrandingService.cs`.
 
 ## Data Models
 

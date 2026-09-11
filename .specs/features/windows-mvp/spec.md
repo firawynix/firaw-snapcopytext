@@ -63,6 +63,44 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 
 **Independent Test:** Capture several lines, use Select text to drag over one line, and verify only that line is copied without another window opening.
 
+### P1: Stay available in the system tray
+
+**User Story:** As a user, I want Firaw to remain ready in the Windows notification area so that capture shortcuts keep working without a window occupying the taskbar.
+
+**Acceptance Criteria:**
+
+1. WHEN the user closes or minimizes the launcher THEN Firaw SHALL hide it and remain active in the system tray.
+2. WHEN the user double-clicks the Eye of Horus tray icon THEN Firaw SHALL restore and activate the launcher.
+3. WHEN the user opens the tray menu THEN Firaw SHALL offer Open, New capture, and Exit actions.
+4. WHEN the launcher is hidden THEN global capture shortcuts SHALL remain active.
+
+**Independent Test:** Close the launcher, verify the process and tray icon remain, invoke capture, then exit through the tray menu.
+
+### P1: Reuse several copied texts
+
+**User Story:** As a user, I want a collapsible list of copied texts so that I can select and combine several excerpts.
+
+**Acceptance Criteria:**
+
+1. WHEN text enters the Windows clipboard while Firaw is active THEN Firaw SHALL add it to an in-memory history with newest items first.
+2. WHEN the user opens Texts THEN the editor SHALL show a right-side drawer without covering the image.
+3. WHEN the user selects multiple entries with Ctrl or Shift and chooses Copy selected THEN Firaw SHALL combine them with blank lines.
+4. WHEN the user chooses Import current THEN Firaw SHALL include the current text clipboard content.
+5. WHEN the user chooses Clear list THEN Firaw SHALL remove the in-memory entries without changing files on disk.
+
+**Independent Test:** Copy three texts in another app, open the drawer, select two, and verify the combined clipboard output.
+
+### P1: Firaw visual identity
+
+**User Story:** As a user, I want a recognizable Firaw identity so that the application and tray icon are easy to locate.
+
+**Acceptance Criteria:**
+
+1. WHEN Windows displays the executable, window, or tray entry THEN Firaw SHALL use the cyan Eye of Horus icon.
+2. WHEN Windows 11 supports caption-color attributes THEN standard Firaw title bars SHALL use cyan instead of white with dark caption text.
+
+**Independent Test:** Inspect the executable icon, notification area, launcher, editor, and dialog title bars.
+
 ## Edge Cases
 
 - WHEN capture is already active THEN Firaw SHALL ignore a duplicate invocation.
@@ -88,8 +126,14 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 | OCR-02 | Direct copy of all recognized text | Implemented; UAT pending |
 | OCR-03 | Select an image region and copy its OCR without a dialog | Implemented; UAT pending |
 | HOTKEY-01 | Global shortcut with fallback | Implemented; UAT pending |
+| TRAY-01 | Continue running when launcher closes or minimizes | Implemented; UAT pending |
+| TRAY-02 | Tray open, capture, and exit commands | Implemented; UAT pending |
+| HIST-01 | Monitor text clipboard changes in memory | Implemented; automated service tests passed |
+| HIST-02 | Collapsible multi-select text drawer | Implemented; UAT pending |
+| BRAND-01 | Eye of Horus icon for executable, app, and tray | Implemented; UAT pending |
+| BRAND-02 | Cyan Windows title bars where supported | Implemented; UAT pending |
 
-**Coverage:** 14 total, 14 mapped to tasks, 0 unmapped.
+**Coverage:** 20 total, 20 mapped to tasks, 0 unmapped.
 
 ## Success Criteria
 

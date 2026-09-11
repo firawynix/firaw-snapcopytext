@@ -1,11 +1,11 @@
 # Windows MVP Tasks
 
 **Design:** `.specs/features/windows-mvp/design.md`
-**Status:** Done through T14; interactive UAT pending
+**Status:** Done through T19; interactive UAT pending
 
 ## Execution Plan
 
-T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -> T14
+T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -> T14 -> T15 -> T16 -> T17 -> T18 -> T19
 
 ## Task Breakdown
 
@@ -142,6 +142,51 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -
 **Requirements:** CAP-05
 **Done when:** Firaw disables hide transitions, flushes pending DWM composition, and waits before reading desktop pixels.
 **Verify:** capture with an editor open and confirm no flattened window thumbnail appears.
+
+### T15: Add Firaw Eye of Horus identity
+
+**Status:** DONE
+
+**Where:** application assets, project icon metadata, and launcher branding.
+**Requirements:** BRAND-01
+**Done when:** PNG and multi-resolution ICO assets are embedded and used by the executable and launcher.
+**Verify:** release build plus visual inspection at application and tray sizes.
+
+### T16: Keep Firaw in the system tray
+
+**Status:** DONE
+
+**Where:** App lifecycle and launcher capture entry point.
+**Requirements:** TRAY-01, TRAY-02
+**Done when:** close/minimize hides the launcher, shortcuts remain active, and tray commands open, capture, or exit.
+**Verify:** background process and hidden-window shortcut smoke test.
+
+### T17: Apply cyan title bars
+
+**Status:** DONE
+
+**Where:** WindowBrandingService and application window-load handler.
+**Requirements:** BRAND-02
+**Done when:** supported standard captions report the Firaw cyan DWM color.
+**Verify:** query the live launcher caption attribute.
+
+### T18: Monitor copied text
+
+**Status:** DONE
+
+**Where:** CopiedTextEntry, TextHistoryService, ClipboardMonitorService, launcher lifecycle, and unit tests.
+**Requirements:** HIST-01
+**Done when:** clipboard text changes are captured, deduplicated, newest-first, and limited to 100 in-memory entries.
+**Verify:** text-history tests plus clipboard listener smoke test.
+
+### T19: Add copied-text drawer
+
+**Status:** DONE
+
+**Where:** editor layout and interactions.
+**Requirements:** HIST-02
+**Done when:** the drawer opens/closes, imports the clipboard, allows extended selection, copies combined text, and clears its list.
+**Verify:** editor construction plus interactive multi-select test.
 
 ## Tools
 

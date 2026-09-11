@@ -29,13 +29,20 @@
 - One-click copy of all recognized text.
 - Cyan in-image region selection to copy only the desired text without a dialog.
 
+**Background and copied text workflow** - COMPLETE
+
+- Eye of Horus notification-area icon with open, capture, and exit commands.
+- Launcher hides to the tray on close or minimize while shortcuts remain active.
+- In-memory copied-text drawer with automatic monitoring, import, multi-selection, combine, and clear actions.
+- Cyan Windows title bars on supported Windows 11 builds.
+
 ## M2 - Daily-use polish
 
 **Goal:** Make Firaw comfortable as a full-time screenshot utility.
 
 ### Features
 
-**System tray and preferences** - PLANNED
+**Preferences** - PLANNED
 **Local capture history** - PLANNED
 **Window and full-screen capture modes** - PLANNED
 **Mixed-DPI multi-monitor hardening** - PLANNED
