@@ -1,6 +1,8 @@
 using System.Windows;
+using System.Windows.Threading;
 using Firaw.SnapCopyText.Services;
 using Firaw.SnapCopyText.Views;
+using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
 
 namespace Firaw.SnapCopyText;
@@ -48,17 +50,20 @@ public partial class MainWindow : Window
             return;
         }
 
+        List<HiddenWindowState> hiddenWindows = [];
+
         try
         {
-            Hide();
-            await Task.Delay(120);
+            hiddenWindows = HideVisibleFirawWindows();
+            await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+            await Task.Delay(180);
 
             DesktopSnapshot snapshot = _captureService.CaptureVirtualScreen();
             var overlay = new CaptureOverlayWindow(snapshot, _captureService);
             bool selected = overlay.ShowDialog() == true && overlay.SelectedImage is not null;
 
-            Show();
-            Activate();
+            RestoreFirawWindows(hiddenWindows);
+            hiddenWindows.Clear();
 
             if (selected)
             {
@@ -73,14 +78,50 @@ public partial class MainWindow : Window
         }
         catch (Exception exception)
         {
-            Show();
-            Activate();
+            RestoreFirawWindows(hiddenWindows);
+            hiddenWindows.Clear();
             SetStatus("Não foi possível iniciar a captura.");
             MessageBox.Show(this, exception.Message, "Firaw - Captura", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         finally
         {
+            RestoreFirawWindows(hiddenWindows);
             _captureGate.Exit();
         }
     }
+
+    private static List<HiddenWindowState> HideVisibleFirawWindows()
+    {
+        List<HiddenWindowState> states = Application.Current.Windows
+            .OfType<Window>()
+            .Where(window => window.IsVisible)
+            .Select(window => new HiddenWindowState(window, window.WindowState, window.IsActive))
+            .ToList();
+
+        foreach (HiddenWindowState state in states.OrderByDescending(state => state.Window.Owner is not null))
+        {
+            state.Window.Hide();
+        }
+
+        return states;
+    }
+
+    private static void RestoreFirawWindows(IEnumerable<HiddenWindowState> states)
+    {
+        HiddenWindowState? activeWindow = null;
+
+        foreach (HiddenWindowState state in states.OrderBy(state => state.Window.Owner is null ? 0 : 1))
+        {
+            state.Window.Show();
+            state.Window.WindowState = state.WindowState;
+            if (state.WasActive)
+            {
+                activeWindow = state;
+            }
+        }
+
+        activeWindow?.Window.Activate();
+    }
+
+    private sealed record HiddenWindowState(Window Window, WindowState WindowState, bool WasActive);
 }
