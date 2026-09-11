@@ -1,11 +1,11 @@
 # Windows MVP Tasks
 
 **Design:** `.specs/features/windows-mvp/design.md`
-**Status:** Done through T26; interactive UAT pending
+**Status:** Done through T29; release validation passed
 
 ## Execution Plan
 
-T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -> T14 -> T15 -> T16 -> T17 -> T18 -> T19 -> T20 -> T21 -> T22 -> T23 -> T24 -> T25 -> T26
+T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -> T14 -> T15 -> T16 -> T17 -> T18 -> T19 -> T20 -> T21 -> T22 -> T23 -> T24 -> T25 -> T26 -> T27 -> T28 -> T29
 
 ## Task Breakdown
 
@@ -250,6 +250,33 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -
 **Requirements:** TRAY-03
 **Done when:** left, Ctrl+left, middle, and right clicks have distinct documented actions, and self-contained win-x64/win-x86 packages start successfully.
 **Verify:** tray interaction UAT and launch smoke test of both publish outputs.
+
+### T27: Add the self-updating launcher
+
+**Status:** DONE
+
+**Where:** launcher project, update client, startup service, and tests.
+**Requirements:** UPDATE-01, UPDATE-02
+**Done when:** the launcher compares versions, chooses the matching architecture, verifies same-host URL, size, and SHA-256, and still opens Firaw after update failures.
+**Verify:** launcher tests plus unavailable-server launch smoke test.
+
+### T28: Build Inno release packages
+
+**Status:** DONE
+
+**Where:** Inno script and release build script.
+**Requirements:** UPDATE-03
+**Done when:** one command produces x64/x86 installers and a server-ready manifest containing their hashes and sizes.
+**Verify:** compile both installers and validate the generated JSON against both files.
+
+### T29: Create the local demonstration page
+
+**Status:** DONE
+
+**Where:** `demo-site/dist` and release documentation.
+**Requirements:** SITE-01
+**Done when:** the responsive page demonstrates capture modes, OCR, annotations, privacy, and local installer downloads without being published.
+**Verify:** serve the static directory locally and inspect desktop and narrow layouts.
 
 ## Tools
 

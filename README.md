@@ -2,13 +2,15 @@
 
 Capturador de tela para Windows com edição rápida e extração local de texto em português e inglês.
 
-## Abrir a versão pronta
+## Instalar a versão pronta
 
-Execute:
+Os instaladores gerados ficam em:
 
-`artifacts\Firaw-SnapCopyText\Firaw.SnapCopyText.exe`
+`release\Firaw-SnapCopyText-1.1.0\installers`
 
-O pacote publicado é autocontido para Windows x64. Ele não precisa do SDK .NET instalado.
+Use o instalador x64 em computadores atuais ou o x86 para Windows de 32 bits. Os dois pacotes são autocontidos e não precisam do SDK .NET instalado.
+
+Depois da instalação, o atalho abre `Firaw.SnapCopyText.Launcher.exe`. Ele verifica `http://10.81.66.10/firaw-snapcopytext/update.json`, instala uma versão mais nova quando disponível e abre normalmente o Firaw se o servidor estiver fora do ar.
 
 ## Como usar
 
@@ -63,12 +65,13 @@ dotnet test Firaw.SnapCopyText.sln
 dotnet run --project src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj
 ```
 
-Publicações autocontidas x64 e x86:
+Release completa com publicações autocontidas, launcher, instaladores Inno, manifesto de atualização e página local:
 
 ```powershell
-dotnet publish src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj -c Release -r win-x64 --self-contained true -o artifacts\Firaw-SnapCopyText-x64
-dotnet publish src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj -c Release -r win-x86 --self-contained true -o artifacts\Firaw-SnapCopyText-x86
+.\tools\build-release.ps1 -Version 1.1.0
 ```
+
+O pacote que deve ser copiado para o servidor fica em `release\Firaw-SnapCopyText-1.1.0\update-server\firaw-snapcopytext`. A demonstração local abre em `demo-site\dist\index.html`.
 
 ## Identidade visual
 

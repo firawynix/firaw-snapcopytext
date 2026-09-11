@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-- Milestone M1: capture modes, in-app target pickers, custom shortcuts, tray lifecycle, Eye of Horus branding, cyan launcher, palette, and copied-text drawer implemented; final packaged UAT pending.
+- Milestone M1: product functionality implemented; version 1.1.0 release now includes a verified self-updating launcher, Inno x64/x86 installers, and local demonstration page.
 
 ## Decisions
 
@@ -16,6 +16,8 @@
 - Capture preferences persist per Windows user, while Print Screen registration remains opt-in and reports Windows conflicts.
 - Windows startup is optional and current-user scoped; the published deliverables are self-contained x64 and x86 packages.
 - Tray gestures map left click to Region, Ctrl+left to Window, middle/scroll click to Monitor, and right click to the full menu.
+- Installed shortcuts and Windows startup target the updater launcher; update failures never prevent the current application from opening.
+- Release packages target `http://10.81.66.10/firaw-snapcopytext/`, with the server directory generated locally because the host was unavailable during packaging.
 
 ## Blockers
 
@@ -23,8 +25,8 @@
 
 ## Next Steps
 
-- User validates covered-window capture, the custom shortcut, the larger tray artwork, and both OCR copy modes.
-- Adjust `FirawCyanColor` if the exact FirawSelector cyan differs from the initial `#19D3E6` token.
+- Copy the generated `update-server\firaw-snapcopytext` folder to the configured internal web server when it becomes reachable.
+- Obtain HTTPS and a code-signing certificate before external distribution.
 
 ## Deferred Ideas
 

@@ -136,6 +136,22 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 
 **Independent Test:** Inspect the executable icon, notification area, launcher, editor, and dialog title bars.
 
+### P1: Install and update safely
+
+**User Story:** As a user, I want Firaw to update itself when a newer release is available so that I receive improvements without replacing files manually.
+
+**Acceptance Criteria:**
+
+1. WHEN Firaw is opened through its installed shortcut or Windows startup THEN the launcher SHALL check the configured version manifest before starting the main app.
+2. WHEN the server is unavailable, the manifest is invalid, or no newer version exists THEN the launcher SHALL start the installed app without blocking the user.
+3. WHEN a newer release exists THEN the launcher SHALL choose the package matching the running x64 or x86 architecture.
+4. WHEN a package URL changes scheme or host from the manifest THEN the launcher SHALL reject it.
+5. WHEN the downloaded size or SHA-256 differs from the manifest THEN the launcher SHALL reject and remove that download.
+6. WHEN a verified package is ready THEN the launcher SHALL run the Inno update silently and restart Firaw in the tray without an update loop.
+7. WHEN a release is built THEN Firaw SHALL produce independent x64 and x86 installers plus a manifest ready for the configured server route.
+
+**Independent Test:** Serve a newer test manifest, verify architecture selection and hash validation, then confirm server failure still opens the current app.
+
 ## Edge Cases
 
 - WHEN capture is already active THEN Firaw SHALL ignore a duplicate invocation.
@@ -177,11 +193,15 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 | BRAND-02 | Cyan Windows title bars where supported | Implemented; UAT pending |
 | BRAND-03 | Cyan launcher background with dark contrast | Implemented; visual smoke test passed |
 | BRAND-04 | Enlarged Eye of Horus artwork within the fixed tray slot | Implemented; asset inspected |
+| UPDATE-01 | Launcher checks version and falls back to current app | Implemented; automated tests passed |
+| UPDATE-02 | Same-host, size, and SHA-256 package validation | Implemented; automated tests passed |
+| UPDATE-03 | Inno x64/x86 installers and server-ready manifest | Implemented; hashes and sizes validated |
+| SITE-01 | Responsive local-only product demonstration | Implemented; visual and interaction smoke tests passed |
 
-**Coverage:** 30 total, 30 mapped to tasks, 0 unmapped.
+**Coverage:** 34 total, 34 mapped to tasks, 0 unmapped.
 
 ## Success Criteria
 
-- [ ] The solution builds with no errors.
-- [ ] Automated tests cover crop normalization and annotation history behavior.
-- [ ] A user can complete capture-to-image-copy and capture-to-text-copy locally.
+- [x] The solution builds with no errors.
+- [x] Automated tests cover capture, settings, history, startup, and update behavior.
+- [x] A user can complete capture-to-image-copy and capture-to-text-copy locally.
