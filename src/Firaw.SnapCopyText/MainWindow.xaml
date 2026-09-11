@@ -5,39 +5,42 @@
         Width="520" Height="360"
         MinWidth="480" MinHeight="330"
         WindowStartupLocation="CenterScreen">
-    <Grid Margin="32">
+    <Grid Margin="0" Background="{StaticResource FirawCyan}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel>
+        <StackPanel Margin="32,32,32,0">
             <StackPanel Orientation="Horizontal">
-                <Border Width="48" Height="48" CornerRadius="12" Background="#1719D3E6" Padding="4">
+                <Border Width="48" Height="48" CornerRadius="12" Background="#E6071014" Padding="4">
                     <Image Source="/Assets/firaw-eye.png" Stretch="Uniform" />
                 </Border>
                 <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="Firaw" FontSize="22" FontWeight="SemiBold" />
-                    <TextBlock Text="SnapCopyText" Foreground="{StaticResource FirawCyan}" FontSize="14" />
+                    <TextBlock Text="Firaw" FontSize="22" FontWeight="SemiBold" Foreground="#071014" />
+                    <TextBlock Text="SnapCopyText" Foreground="#18333C" FontSize="14" />
                 </StackPanel>
             </StackPanel>
         </StackPanel>
 
         <StackPanel Grid.Row="1" VerticalAlignment="Center">
             <TextBlock Text="Capture, edite e copie textos da tela."
-                       FontSize="22" FontWeight="SemiBold" TextAlignment="Center" />
+                       FontSize="22" FontWeight="SemiBold" TextAlignment="Center"
+                       Foreground="#071014" />
             <TextBlock Text="O processamento é local. Suas capturas não são enviadas para a internet."
-                       Margin="24,12,24,24" Foreground="{StaticResource FirawMutedText}"
+                       Margin="24,12,24,24" Foreground="#234C56"
                        TextAlignment="Center" TextWrapping="Wrap" />
             <Button Style="{StaticResource FirawButton}" Content="Nova captura"
+                    Background="#151D26" Foreground="{StaticResource FirawCyan}"
                     Width="190" HorizontalAlignment="Center" Click="CaptureButton_Click" />
             <TextBlock Text="Print Screen  •  alternativa: Ctrl + Shift + S"
-                       Margin="0,14,0,0" Foreground="{StaticResource FirawMutedText}"
+                       Margin="0,14,0,0" Foreground="#234C56"
                        TextAlignment="Center" FontSize="12" />
         </StackPanel>
 
-        <Border Grid.Row="2" Background="{StaticResource FirawSurface}" CornerRadius="8" Padding="12,9">
+        <Border Grid.Row="2" Margin="32,0,32,32"
+                Background="{StaticResource FirawSurface}" CornerRadius="8" Padding="12,9">
             <TextBlock x:Name="StatusText" Text="Preparando o capturador…"
                        Foreground="{StaticResource FirawMutedText}" TextAlignment="Center" />
         </Border>
