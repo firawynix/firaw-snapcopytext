@@ -9,7 +9,7 @@ The WPF process owns a small launcher window and registers capture hotkeys. Befo
 
 The presentation layer uses centralized Firaw theme resources: dark neutral backgrounds, white text, and cyan (`#19D3E6`) for primary actions, focus, selection borders, and active tools.
 
-Flow: Hotkey/Button -> Hide Firaw windows -> Desktop capture -> Adjustable selection overlay -> Restore windows -> Editor -> Clipboard/PNG or Local OCR -> Direct copy or selectable text -> Clipboard.
+Flow: Hotkey/Button -> Hide Firaw windows -> Desktop capture -> Adjustable selection overlay -> Restore windows -> Editor -> Clipboard/PNG or Local OCR -> Full image or in-image text region -> Clipboard.
 
 ## Code Reuse Analysis
 
@@ -34,6 +34,7 @@ This is a greenfield project. It reuses Windows desktop, WPF rendering, clipboar
 - **Purpose:** Display the crop, create annotations, render output, and expose copy/save/OCR actions.
 - **Location:** `src/Firaw.SnapCopyText/Views/EditorWindow.xaml(.cs)`
 - **Dependencies:** AnnotationHistory and OcrService.
+- **Text-region interaction:** Select text activates a temporary cyan rectangle on the editor canvas. The rectangle is removed on release, its underlying original-image pixels are cropped, and OCR output is copied without a preview dialog.
 
 ### OcrService
 

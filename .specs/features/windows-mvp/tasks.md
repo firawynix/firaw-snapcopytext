@@ -120,10 +120,10 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12
 
 **Status:** DONE
 
-**Where:** editor and OCR preview views.
+**Where:** editor canvas and OCR service integration.
 **Requirements:** OCR-02, OCR-03
-**Done when:** Copy text copies all OCR directly and Select text copies the selected subsection.
-**Verify:** OCR smoke test plus interactive clipboard test.
+**Done when:** Copy text copies all OCR directly and Select text lets the user drag over the image, then copies that region without opening a dialog.
+**Verify:** crop/OCR tests plus interactive in-image selection and clipboard test.
 
 ## Tools
 

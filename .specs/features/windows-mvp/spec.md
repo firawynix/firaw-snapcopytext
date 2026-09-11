@@ -54,11 +54,12 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 **Acceptance Criteria:**
 
 1. WHEN the user chooses Copy text THEN Firaw SHALL recognize the original crop and copy all recognized text directly.
-2. WHEN the user chooses Select text THEN Firaw SHALL show an editable preview in which any subsection can be selected and copied.
-3. WHEN no subsection is selected in the preview THEN Firaw SHALL copy the full edited text.
-4. WHEN OCR finds no text or fails THEN Firaw SHALL show a clear non-destructive message.
+2. WHEN the user chooses Select text THEN Firaw SHALL activate a cyan region selector directly over the captured image.
+3. WHEN the user releases a valid text region THEN Firaw SHALL recognize and copy only that image area without opening another window.
+4. WHEN the user presses Escape while selecting text THEN Firaw SHALL cancel the mode without changing the image.
+5. WHEN OCR finds no text or fails THEN Firaw SHALL show a clear non-destructive message.
 
-**Independent Test:** Capture a Portuguese sentence, run OCR, edit the preview, and copy the result.
+**Independent Test:** Capture several lines, use Select text to drag over one line, and verify only that line is copied without another window opening.
 
 ## Edge Cases
 
@@ -81,7 +82,7 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 | IMG-02 | Save PNG | Implemented; UAT pending |
 | OCR-01 | Local Portuguese/English recognition | Verified by automated smoke test |
 | OCR-02 | Direct copy of all recognized text | Implemented; UAT pending |
-| OCR-03 | Select and copy an OCR subsection | Implemented; UAT pending |
+| OCR-03 | Select an image region and copy its OCR without a dialog | Implemented; UAT pending |
 | HOTKEY-01 | Global shortcut with fallback | Implemented; UAT pending |
 
 **Coverage:** 12 total, 12 mapped to tasks, 0 unmapped.

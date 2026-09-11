@@ -13,7 +13,8 @@
 **Capture and selection** - COMPLETE
 
 - Main capture action and global shortcut.
-- Frozen-screen region selection.
+- Frozen-screen region selection with movement and eight resize handles.
+- Firaw windows hidden before the desktop snapshot.
 - Cancel and retry flows.
 
 **Instant editor** - COMPLETE
@@ -24,7 +25,8 @@
 **Local OCR** - COMPLETE
 
 - Portuguese and English recognition.
-- Editable preview and one-click text copy.
+- One-click copy of all recognized text.
+- Cyan in-image region selection to copy only the desired text without a dialog.
 
 ## M2 - Daily-use polish
 

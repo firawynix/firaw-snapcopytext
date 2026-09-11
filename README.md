@@ -17,7 +17,7 @@ O pacote publicado é autocontido para Windows x64. Ele não precisa do SDK .NET
 3. Arraste sobre a região desejada e solte o mouse.
 4. Mova a região pela parte interna ou redimensione usando os oito pontos cianos; confirme em **Abrir editor** ou pressione **Enter**.
 5. No editor, faça anotações e escolha **Copiar imagem**, **Salvar PNG**, **Copiar texto** ou **Selecionar texto**.
-6. **Copiar texto** envia todo o OCR direto à área de transferência. **Selecionar texto** abre a prévia para copiar somente um trecho.
+6. **Copiar texto** envia todo o OCR direto à área de transferência. Em **Selecionar texto**, arraste uma moldura ciana sobre o texto na própria imagem; ao soltar, somente aquele trecho é reconhecido e copiado, sem abrir outra janela.
 
 Se o Lightshot ou o Recorte do Windows estiver usando `Print Screen`, o Firaw mostra o conflito e mantém o atalho alternativo e o botão disponíveis.
 
@@ -30,7 +30,7 @@ Se o Lightshot ou o Recorte do Windows estiver usando `Print Screen`, o Firaw mo
 - Desfazer e refazer.
 - Copiar imagem editada e salvar em PNG.
 - Região ajustável em tempo real, com movimentação e oito pontos de redimensionamento.
-- OCR local em português e inglês, com cópia integral ou seleção de um trecho.
+- OCR local em português e inglês, com cópia integral ou seleção ciana diretamente sobre a imagem.
 
 ## Privacidade
 
