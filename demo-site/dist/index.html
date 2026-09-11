@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Demonstração local do Firaw - SnapCopyText, captura de tela com edição e OCR local.">
+  <meta name="theme-color" content="#071116">
+  <title>Firaw - SnapCopyText</title>
+  <link rel="icon" href="assets/firaw-eye.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Firaw - início">
+      <img src="assets/firaw-eye.png" alt="" width="44" height="44">
+      <span><strong>Firaw</strong><small>SnapCopyText</small></span>
+    </a>
+    <nav aria-label="Navegação principal">
+      <a href="#demonstracao">Demonstração</a>
+      <a href="#recursos">Recursos</a>
+      <a href="#privacidade">Privacidade</a>
+    </nav>
+    <a class="button button-small" href="#download">Baixar</a>
+  </header>
+
+  <main id="top">
+    <section class="hero section-shell">
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span> captura inteligente no Windows</p>
+        <h1>Capture a tela.<br><em>Leve o texto junto.</em></h1>
+        <p class="hero-lead">Selecione uma região, janela ou monitor. Edite no ato e copie o texto da imagem com OCR local — sem enviar sua captura para a internet.</p>
+        <div class="hero-actions">
+          <a class="button" href="#download">Baixar para Windows</a>
+          <a class="text-link" href="#demonstracao">Ver como funciona <span aria-hidden="true">↓</span></a>
+        </div>
+        <dl class="hero-facts">
+          <div><dt>3</dt><dd>modos de captura</dd></div>
+          <div><dt>100%</dt><dd>OCR local</dd></div>
+          <div><dt>x64 + x86</dt><dd>instaladores</dd></div>
+        </dl>
+      </div>
+
+      <div class="product-stage" aria-label="Prévia do aplicativo Firaw">
+        <div class="stage-grid" aria-hidden="true"></div>
+        <div class="app-shot">
+          <div class="window-bar"><i></i><i></i><i></i><span>Firaw - SnapCopyText</span></div>
+          <img src="assets/firaw-app.png" alt="Janela principal do Firaw com os modos Região, Janela e Monitor">
+        </div>
+        <div class="floating-card capture-card">
+          <span class="capture-icon" aria-hidden="true">⌗</span>
+          <div><strong>Pronto para capturar</strong><small>Print Screen ou seu próprio atalho</small></div>
+        </div>
+        <div class="selection-corners" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      </div>
+    </section>
+
+    <section class="ticker" aria-label="Principais recursos">
+      <span>REGIÃO AJUSTÁVEL</span><i>✦</i><span>OCR LOCAL</span><i>✦</i><span>ANOTAÇÕES</span><i>✦</i><span>ATALHO PERSONALIZADO</span><i>✦</i><span>BANDEJA DO SISTEMA</span>
+    </section>
+
+    <section class="demo section-shell" id="demonstracao">
+      <div class="section-heading">
+        <p class="eyebrow"><span></span> demonstração</p>
+        <h2>Do clique ao conteúdo,<br>sem quebrar o ritmo.</h2>
+        <p>Escolha o modo que combina com o que está na sua tela. O Firaw oculta suas próprias janelas antes de capturar.</p>
+      </div>
+
+      <div class="demo-panel">
+        <div class="demo-tabs" role="tablist" aria-label="Modos do Firaw">
+          <button class="demo-tab is-active" role="tab" aria-selected="true" data-demo="regiao">01&nbsp; Região</button>
+          <button class="demo-tab" role="tab" aria-selected="false" data-demo="janela">02&nbsp; Janela</button>
+          <button class="demo-tab" role="tab" aria-selected="false" data-demo="monitor">03&nbsp; Monitor</button>
+          <button class="demo-tab" role="tab" aria-selected="false" data-demo="atalhos">04&nbsp; Atalhos</button>
+        </div>
+        <div class="demo-copy" aria-live="polite">
+          <p class="demo-number" id="demo-number">01</p>
+          <h3 id="demo-title">Ajuste antes de confirmar</h3>
+          <p id="demo-description">Arraste, mova e redimensione a área escolhida pelos oito pontos cianos. Confirme só quando o enquadramento estiver certo.</p>
+          <ul id="demo-points">
+            <li>Seleção em tempo real</li>
+            <li>Confirmação por Enter</li>
+            <li>Sem o Firaw aparecer na imagem</li>
+          </ul>
+        </div>
+        <div class="demo-visual">
+          <img id="demo-image" src="assets/firaw-app.png" alt="Tela do modo de captura por região">
+          <div class="cyan-frame" aria-hidden="true"><b></b><b></b><b></b><b></b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features section-shell" id="recursos">
+      <div class="section-heading compact">
+        <p class="eyebrow"><span></span> recursos</p>
+        <h2>Uma caixa de ferramentas<br>direto na captura.</h2>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card feature-wide">
+          <span class="feature-index">01</span>
+          <div>
+            <h3>Texto copiável na própria imagem</h3>
+            <p>Ative Selecionar texto, desenhe uma moldura sobre a imagem e receba somente aquele trecho na área de transferência.</p>
+          </div>
+          <div class="ocr-demo" aria-hidden="true">
+            <span>Captura e OCR trabalham localmente.</span>
+            <i></i>
+            <strong>texto selecionado</strong>
+          </div>
+        </article>
+        <article class="feature-card">
+          <span class="feature-index">02</span>
+          <h3>Anote no ato</h3>
+          <p>Caneta, seta, retângulo, marca-texto, texto, censura e caixas de anotação.</p>
+          <div class="tools-row" aria-hidden="true"><i>↗</i><i>□</i><i>T</i><i>✎</i></div>
+        </article>
+        <article class="feature-card feature-cyan">
+          <span class="feature-index">03</span>
+          <h3>Sua paleta, seu destaque</h3>
+          <p>O ciano Firaw é a cor principal, acompanhado por sete opções rápidas.</p>
+          <div class="swatches" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </article>
+        <article class="feature-card">
+          <span class="feature-index">04</span>
+          <h3>Sempre disponível</h3>
+          <p>Fica na bandeja, pode iniciar com o Windows e entende cliques rápidos no Olho de Hórus.</p>
+          <div class="tray-demo"><img src="assets/firaw-eye.png" alt="Ícone Olho de Hórus do Firaw"><span>Região · Janela · Monitor</span></div>
+        </article>
+        <article class="feature-card feature-wide">
+          <span class="feature-index">05</span>
+          <div>
+            <h3>Reúna vários textos</h3>
+            <p>A gaveta de histórico guarda até 100 cópias enquanto o Firaw está aberto. Selecione várias e copie tudo de uma vez.</p>
+          </div>
+          <div class="history-lines" aria-hidden="true"><span>Trecho reconhecido da captura</span><span>Texto copiado em outro programa</span><span>Anotação para reutilizar depois</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="privacy" id="privacidade">
+      <div class="section-shell privacy-inner">
+        <div>
+          <p class="eyebrow"><span></span> privacidade</p>
+          <h2>A imagem é sua.<br>Ela permanece aí.</h2>
+        </div>
+        <div class="privacy-copy">
+          <p>O OCR usa arquivos locais em português e inglês. Não há login, galeria na nuvem nem envio automático das capturas.</p>
+          <div class="privacy-badges"><span>Sem conta</span><span>Sem upload</span><span>Sem API externa</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="download section-shell" id="download">
+      <div class="download-copy">
+        <p class="eyebrow"><span></span> versão 1.1.0</p>
+        <h2>Seu próximo print<br>já pode trabalhar por você.</h2>
+        <p>Escolha a arquitetura do seu Windows. Para computadores atuais, use x64.</p>
+      </div>
+      <div class="download-options">
+        <a class="download-card primary" href="downloads/Firaw-SnapCopyText-Setup-x64.exe" download>
+          <span>Recomendado</span>
+          <strong>Windows x64</strong>
+          <small>Instalador autocontido · 64 bits</small>
+          <b>Baixar instalador <i aria-hidden="true">↘</i></b>
+        </a>
+        <a class="download-card" href="downloads/Firaw-SnapCopyText-Setup-x86.exe" download>
+          <span>Compatibilidade</span>
+          <strong>Windows x86</strong>
+          <small>Instalador autocontido · 32 bits</small>
+          <b>Baixar instalador <i aria-hidden="true">↘</i></b>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="brand footer-brand">
+      <img src="assets/firaw-eye.png" alt="" width="40" height="40">
+      <span><strong>Firaw</strong><small>SnapCopyText</small></span>
+    </div>
+    <p>Demonstração local · não publicada</p>
+    <a href="#top">Voltar ao topo ↑</a>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
