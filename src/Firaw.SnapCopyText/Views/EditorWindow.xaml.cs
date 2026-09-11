@@ -37,6 +37,7 @@ public partial class EditorWindow : Window
     private bool _drawing;
     private bool _selectingTextRegion;
     private bool _textSelectionMode;
+    private string _currentColor = "#19D3E6";
 
     public BitmapSource OriginalImage { get; }
 
@@ -366,10 +367,26 @@ public partial class EditorWindow : Window
 
     private Brush CurrentBrush()
     {
-        string color = (ColorPicker.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#19D3E6";
-        var brush = (SolidColorBrush)new BrushConverter().ConvertFromString(color)!;
+        var brush = (SolidColorBrush)new BrushConverter().ConvertFromString(_currentColor)!;
         brush.Freeze();
         return brush;
+    }
+
+    private void ColorSwatch_Checked(object sender, RoutedEventArgs e)
+    {
+        if (sender is not ToggleButton selected || ColorPalettePanel is null)
+        {
+            return;
+        }
+
+        _currentColor = selected.Tag?.ToString() ?? "#19D3E6";
+        foreach (ToggleButton swatch in ColorPalettePanel.Children.OfType<ToggleButton>())
+        {
+            if (!ReferenceEquals(swatch, selected))
+            {
+                swatch.IsChecked = false;
+            }
+        }
     }
 
     private void UndoButton_Click(object sender, RoutedEventArgs e)

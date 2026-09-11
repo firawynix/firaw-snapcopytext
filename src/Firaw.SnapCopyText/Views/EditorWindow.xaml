@@ -63,6 +63,35 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="ColorSwatch" TargetType="ToggleButton">
+            <Setter Property="Width" Value="27" />
+            <Setter Property="Height" Value="27" />
+            <Setter Property="Margin" Value="3,0" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid>
+                            <Ellipse Fill="{TemplateBinding Background}" Stroke="#607080"
+                                     StrokeThickness="1" Margin="4" />
+                            <Ellipse x:Name="SelectionRing" Stroke="Transparent"
+                                     StrokeThickness="2" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SelectionRing" Property="Stroke" Value="#80FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="SelectionRing" Property="Stroke" Value="{StaticResource FirawCyan}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -150,7 +179,8 @@
                     <Grid Grid.Row="1">
                         <ListBox x:Name="CopiedTextList" SelectionMode="Extended"
                                  Background="#0C1117" BorderThickness="0"
-                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="ListBoxItem">
                                     <Setter Property="Foreground" Value="{StaticResource FirawText}" />
@@ -226,13 +256,24 @@
                     <Separator Margin="8,2" />
                     <TextBlock Text="Cor" VerticalAlignment="Center" Margin="0,0,6,0"
                                Foreground="{StaticResource FirawMutedText}" />
-                    <ComboBox x:Name="ColorPicker" Width="112" SelectedIndex="0" Margin="0,2,10,2">
-                        <ComboBoxItem Tag="#19D3E6">Ciano Firaw</ComboBoxItem>
-                        <ComboBoxItem Tag="#FF3B5C">Vermelho</ComboBoxItem>
-                        <ComboBoxItem Tag="#FFD83D">Amarelo</ComboBoxItem>
-                        <ComboBoxItem Tag="#FFFFFF">Branco</ComboBoxItem>
-                        <ComboBoxItem Tag="#111111">Preto</ComboBoxItem>
-                    </ComboBox>
+                    <StackPanel x:Name="ColorPalettePanel" Orientation="Horizontal" Margin="0,0,10,0">
+                        <ToggleButton Style="{StaticResource ColorSwatch}" Tag="#19D3E6" Background="#19D3E6"
+                                      ToolTip="Ciano Firaw" IsChecked="True" Checked="ColorSwatch_Checked" />
+                        <ToggleButton Style="{StaticResource ColorSwatch}" Tag="#FF3B5C" Background="#FF3B5C"
+                                      ToolTip="Vermelho" Checked="ColorSwatch_Checked" />
+                        <ToggleButton Style="{StaticResource ColorSwatch}" Tag="#FFD83D" Background="#FFD83D"
+                                      ToolTip="Amarelo" Checked="ColorSwatch_Checked" />
+                        <ToggleButton Style="{StaticResource ColorSwatch}" Tag="#35E08D" Background="#35E08D"
+                                      ToolTip="Verde" Checked="ColorSwatch_Checked" />
+                        <ToggleButton Style="{StaticResource ColorSwatch}" Tag="#4C8DFF" Background="#4C8DFF"
+                                      ToolTip="Azul" Checked="ColorSwatch_Checked" />
+                        <ToggleButton Style="{StaticResource ColorSwatch}" Tag="#B56CFF" Background="#B56CFF"
+                                      ToolTip="Roxo" Checked="ColorSwatch_Checked" />
+                        <ToggleButton Style="{StaticResource ColorSwatch}" Tag="#FFFFFF" Background="#FFFFFF"
+                                      ToolTip="Branco" Checked="ColorSwatch_Checked" />
+                        <ToggleButton Style="{StaticResource ColorSwatch}" Tag="#111111" Background="#111111"
+                                      ToolTip="Preto" Checked="ColorSwatch_Checked" />
+                    </StackPanel>
                     <TextBlock Text="Espessura" VerticalAlignment="Center" Margin="0,0,6,0"
                                Foreground="{StaticResource FirawMutedText}" />
                     <Slider x:Name="ThicknessSlider" Width="110" Minimum="2" Maximum="16" Value="4"
