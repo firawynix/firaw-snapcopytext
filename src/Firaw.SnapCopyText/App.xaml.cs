@@ -40,9 +40,27 @@ public partial class App : Application
             Visible = true,
             ContextMenuStrip = CreateTrayMenu()
         };
-        _trayIcon.DoubleClick += (_, _) => Dispatcher.Invoke(ShowMainWindow);
+        _trayIcon.MouseClick += TrayIcon_MouseClick;
 
         _mainWindow.Show();
+    }
+
+    private void TrayIcon_MouseClick(object? sender, System.Windows.Forms.MouseEventArgs e)
+    {
+        if (e.Button == System.Windows.Forms.MouseButtons.Middle)
+        {
+            Dispatcher.Invoke(() => _mainWindow?.RequestCapture(CaptureMode.Monitor));
+            return;
+        }
+
+        if (e.Button != System.Windows.Forms.MouseButtons.Left)
+        {
+            return;
+        }
+
+        bool controlPressed = (System.Windows.Forms.Control.ModifierKeys & System.Windows.Forms.Keys.Control) != 0;
+        Dispatcher.Invoke(() => _mainWindow?.RequestCapture(
+            controlPressed ? CaptureMode.Window : CaptureMode.Region));
     }
 
     private static void Window_Loaded(object sender, RoutedEventArgs e)
@@ -137,7 +155,7 @@ public partial class App : Application
             _trayIcon.ShowBalloonTip(
                 2500,
                 "Firaw continua ativo",
-                "Use o Olho de Hórus na bandeja para abrir ou fazer uma nova captura.",
+                "Clique no olho para selecionar uma região; botão direito abre o menu completo.",
                 System.Windows.Forms.ToolTipIcon.Info);
         }
     }
