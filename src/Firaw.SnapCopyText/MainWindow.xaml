@@ -14,9 +14,8 @@
 
         <StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Border Width="42" Height="42" CornerRadius="12" Background="{StaticResource FirawCyan}">
-                    <TextBlock Text="F" FontSize="23" FontWeight="Bold" Foreground="#071014"
-                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <Border Width="48" Height="48" CornerRadius="12" Background="#1719D3E6" Padding="4">
+                    <Image Source="/Assets/firaw-eye.png" Stretch="Uniform" />
                 </Border>
                 <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
                     <TextBlock Text="Firaw" FontSize="22" FontWeight="SemiBold" />

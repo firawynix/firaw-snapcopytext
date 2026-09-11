@@ -8,11 +8,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\firaw-eye.ico</ApplicationIcon>
     <AssemblyName>Firaw.SnapCopyText</AssemblyName>
     <RootNamespace>Firaw.SnapCopyText</RootNamespace>
     <Product>Firaw - SnapCopyText</Product>
     <Company>Firawynix</Company>
   </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Assets\firaw-eye.ico" />
+    <Resource Include="Assets\firaw-eye.png" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Tesseract" Version="5.2.0" />
   </ItemGroup>
