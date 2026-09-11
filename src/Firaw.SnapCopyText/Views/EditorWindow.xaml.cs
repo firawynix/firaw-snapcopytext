@@ -85,9 +85,9 @@ public partial class EditorWindow : Window
             return;
         }
 
-        if (_currentTool == EditorTool.Text)
+        if (_currentTool is EditorTool.Text or EditorTool.Note)
         {
-            AddText(_startPoint);
+            AddText(_startPoint, asNote: _currentTool == EditorTool.Note);
             return;
         }
 
@@ -312,9 +312,12 @@ public partial class EditorWindow : Window
         return geometry;
     }
 
-    private void AddText(Point position)
+    private void AddText(Point position, bool asNote)
     {
-        var prompt = new TextPromptWindow { Owner = this };
+        var prompt = new TextPromptWindow(asNote ? "Escreva a anotação" : "Digite o texto")
+        {
+            Owner = this
+        };
         if (prompt.ShowDialog() != true || string.IsNullOrWhiteSpace(prompt.ResultText))
         {
             return;
@@ -329,10 +332,28 @@ public partial class EditorWindow : Window
             TextWrapping = TextWrapping.Wrap,
             MaxWidth = Math.Max(120, AnnotationCanvas.ActualWidth - position.X)
         };
-        Canvas.SetLeft(text, position.X);
-        Canvas.SetTop(text, position.Y);
-        AnnotationCanvas.Children.Add(text);
-        _history.Add(text);
+
+        UIElement annotation = text;
+        if (asNote)
+        {
+            double availableWidth = Math.Max(160, AnnotationCanvas.ActualWidth - position.X);
+            annotation = new Border
+            {
+                Width = Math.Min(320, availableWidth),
+                MinHeight = 76,
+                Padding = new Thickness(13, 11, 13, 12),
+                CornerRadius = new CornerRadius(9),
+                Background = new SolidColorBrush(Color.FromArgb(232, 21, 29, 38)),
+                BorderBrush = CurrentBrush(),
+                BorderThickness = new Thickness(2),
+                Child = text
+            };
+        }
+
+        Canvas.SetLeft(annotation, position.X);
+        Canvas.SetTop(annotation, position.Y);
+        AnnotationCanvas.Children.Add(annotation);
+        _history.Add(annotation);
         UpdateHistoryButtons();
     }
 

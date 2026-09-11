@@ -8,5 +8,6 @@ public enum EditorTool
     Rectangle,
     Highlight,
     Text,
+    Note,
     Redact
 }

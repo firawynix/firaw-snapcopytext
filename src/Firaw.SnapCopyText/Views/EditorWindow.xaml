@@ -93,6 +93,7 @@
                     <ToggleButton Style="{StaticResource ToolButton}" Tag="Rectangle" Content="Retângulo" Checked="ToolButton_Checked" />
                     <ToggleButton Style="{StaticResource ToolButton}" Tag="Highlight" Content="Marca-texto" Checked="ToolButton_Checked" />
                     <ToggleButton Style="{StaticResource ToolButton}" Tag="Text" Content="Texto" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Note" Content="Anotação" Checked="ToolButton_Checked" />
                     <ToggleButton Style="{StaticResource ToolButton}" Tag="Redact" Content="Censurar" Checked="ToolButton_Checked" />
                 </WrapPanel>
             </DockPanel>

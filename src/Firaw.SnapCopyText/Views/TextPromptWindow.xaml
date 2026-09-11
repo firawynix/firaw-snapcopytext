@@ -10,7 +10,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Digite o texto da anotação" FontSize="18" FontWeight="SemiBold" />
+        <TextBlock x:Name="PromptTitle" Text="Digite o texto" FontSize="18" FontWeight="SemiBold" />
         <TextBox x:Name="InputText" Grid.Row="1" Margin="0,12" Padding="11,8"
                  AcceptsReturn="True" TextWrapping="Wrap" FontSize="15"
                  Background="{StaticResource FirawSurface}" Foreground="{StaticResource FirawText}"

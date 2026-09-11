@@ -6,9 +6,10 @@ public partial class TextPromptWindow : Window
 {
     public string ResultText => InputText.Text.Trim();
 
-    public TextPromptWindow()
+    public TextPromptWindow(string heading = "Digite o texto")
     {
         InitializeComponent();
+        PromptTitle.Text = heading;
         Loaded += (_, _) => InputText.Focus();
     }
 
