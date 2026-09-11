@@ -15,6 +15,7 @@ public partial class MainWindow : Window
     private readonly CaptureService _captureService = new();
     private readonly CaptureRequestGate _captureGate = new();
     private HotkeyService? _hotkeyService;
+    private ClipboardMonitorService? _clipboardMonitorService;
 
     public event EventHandler? CaptureRequested;
 
@@ -23,7 +24,11 @@ public partial class MainWindow : Window
         InitializeComponent();
         CaptureRequested += async (_, _) => await BeginCaptureAsync();
         SourceInitialized += MainWindow_SourceInitialized;
-        Closed += (_, _) => _hotkeyService?.Dispose();
+        Closed += (_, _) =>
+        {
+            _hotkeyService?.Dispose();
+            _clipboardMonitorService?.Dispose();
+        };
     }
 
     public void SetStatus(string message) => StatusText.Text = message;
@@ -38,6 +43,8 @@ public partial class MainWindow : Window
         _hotkeyService = new HotkeyService(this);
         _hotkeyService.CaptureRequested += (_, _) => CaptureRequested?.Invoke(this, EventArgs.Empty);
         _hotkeyService.Initialize();
+        _clipboardMonitorService = new ClipboardMonitorService(this, TextHistoryService.Shared);
+        _clipboardMonitorService.Initialize();
 
         SetStatus((_hotkeyService.PrintScreenRegistered, _hotkeyService.FallbackRegistered) switch
         {
