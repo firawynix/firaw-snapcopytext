@@ -1,7 +1,7 @@
 # Roadmap
 
 **Current Milestone:** M1 - Working Windows MVP
-**Status:** In Progress
+**Status:** In Progress - automated validation complete; interactive UAT pending
 
 ## M1 - Working Windows MVP
 
@@ -10,18 +10,18 @@
 
 ### Features
 
-**Capture and selection** - IN PROGRESS
+**Capture and selection** - COMPLETE
 
 - Main capture action and global shortcut.
 - Frozen-screen region selection.
 - Cancel and retry flows.
 
-**Instant editor** - PLANNED
+**Instant editor** - COMPLETE
 
 - Basic annotations, redaction, colors, thickness, undo, and redo.
 - Copy rendered result or save as PNG.
 
-**Local OCR** - PLANNED
+**Local OCR** - COMPLETE
 
 - Portuguese and English recognition.
 - Editable preview and one-click text copy.

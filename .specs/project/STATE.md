@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-- Milestone M1: working Windows MVP.
+- Milestone M1: automated validation complete; interactive UI acceptance test pending.
 
 ## Decisions
 
@@ -15,6 +15,11 @@
 ## Blockers
 
 - None.
+
+## Next Steps
+
+- User validates capture selection, annotations, clipboard, and OCR in the published build.
+- Adjust `FirawCyanColor` if the exact FirawSelector cyan differs from the initial `#19D3E6` token.
 
 ## Deferred Ideas
 

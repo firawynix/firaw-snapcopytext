@@ -68,15 +68,15 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 
 | Requirement ID | Story | Status |
 | --- | --- | --- |
-| CAP-01 | Select frozen region | In Tasks |
-| CAP-02 | Cancel safely | In Tasks |
-| EDIT-01 | Draw annotations | In Tasks |
-| EDIT-02 | Undo and redo | In Tasks |
-| IMG-01 | Copy rendered image | In Tasks |
-| IMG-02 | Save PNG | In Tasks |
-| OCR-01 | Local Portuguese/English recognition | In Tasks |
-| OCR-02 | Editable preview and copy | In Tasks |
-| HOTKEY-01 | Global shortcut with fallback | In Tasks |
+| CAP-01 | Select frozen region | Implemented; UAT pending |
+| CAP-02 | Cancel safely | Implemented; UAT pending |
+| EDIT-01 | Draw annotations | Implemented; UAT pending |
+| EDIT-02 | Undo and redo | Implemented; automated test passed |
+| IMG-01 | Copy rendered image | Implemented; UAT pending |
+| IMG-02 | Save PNG | Implemented; UAT pending |
+| OCR-01 | Local Portuguese/English recognition | Verified by automated smoke test |
+| OCR-02 | Editable preview and copy | Implemented; UAT pending |
+| HOTKEY-01 | Global shortcut with fallback | Implemented; UAT pending |
 
 **Coverage:** 9 total, 9 mapped to tasks, 0 unmapped.
 

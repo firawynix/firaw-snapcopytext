@@ -1,7 +1,7 @@
 # Windows MVP Tasks
 
 **Design:** `.specs/features/windows-mvp/design.md`
-**Status:** In Progress
+**Status:** Done; interactive UAT pending
 
 ## Execution Plan
 
@@ -11,12 +11,16 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9
 
 ### T1: Create WPF application foundation
 
+**Status:** DONE
+
 **Where:** project file, app entry, manifest, centralized Firaw theme, launcher window.
 **Requirement:** HOTKEY-01
 **Done when:** solution restores and builds an empty launcher.
 **Verify:** `dotnet build Firaw.SnapCopyText.sln`
 
 ### T2: Create capture service and geometry tests
+
+**Status:** DONE
 
 **Where:** `Services/CaptureService.cs`, test project.
 **Depends on:** T1
@@ -26,6 +30,8 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9
 
 ### T3: Create capture overlay
 
+**Status:** DONE
+
 **Where:** `Views/CaptureOverlayWindow.xaml(.cs)`
 **Depends on:** T2
 **Requirements:** CAP-01, CAP-02
@@ -33,6 +39,8 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9
 **Verify:** build plus overlay logic tests.
 
 ### T4: Create annotation model and history tests
+
+**Status:** DONE
 
 **Where:** `Models/EditorTool.cs`, `Models/AnnotationHistory.cs`, tests.
 **Depends on:** T1
@@ -42,6 +50,8 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9
 
 ### T5: Create editor layout
 
+**Status:** DONE
+
 **Where:** `Views/EditorWindow.xaml`
 **Depends on:** T3, T4
 **Requirements:** EDIT-01, IMG-01, IMG-02, OCR-02
@@ -49,6 +59,8 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9
 **Verify:** solution builds.
 
 ### T6: Implement editor interactions and image output
+
+**Status:** DONE
 
 **Where:** `Views/EditorWindow.xaml.cs`
 **Depends on:** T5
@@ -58,6 +70,8 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9
 
 ### T7: Implement local OCR and preview
 
+**Status:** DONE
+
 **Where:** `Services/OcrService.cs`, OCR preview dialog, project dependencies.
 **Depends on:** T1
 **Requirements:** OCR-01, OCR-02
@@ -66,6 +80,8 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9
 
 ### T8: Integrate launcher and global shortcuts
 
+**Status:** DONE
+
 **Where:** `Services/HotkeyService.cs`, launcher code-behind.
 **Depends on:** T3, T6, T7
 **Requirements:** HOTKEY-01, CAP-01
@@ -73,6 +89,8 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9
 **Verify:** solution builds and duplicate-request guard is tested.
 
 ### T9: Package documentation and validate MVP
+
+**Status:** DONE
 
 **Where:** `README.md`, spec/task/state status.
 **Depends on:** T1-T8
