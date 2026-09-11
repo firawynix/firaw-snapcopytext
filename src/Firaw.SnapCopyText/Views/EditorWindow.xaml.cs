@@ -211,19 +211,15 @@ public partial class EditorWindow : Window
 
     private void AddText(Point position)
     {
-        string value = Microsoft.VisualBasic.Interaction.InputBox(
-            "Digite o texto da anotação:",
-            "Firaw - Adicionar texto",
-            string.Empty);
-
-        if (string.IsNullOrWhiteSpace(value))
+        var prompt = new TextPromptWindow { Owner = this };
+        if (prompt.ShowDialog() != true || string.IsNullOrWhiteSpace(prompt.ResultText))
         {
             return;
         }
 
         var text = new TextBlock
         {
-            Text = value,
+            Text = prompt.ResultText,
             Foreground = CurrentBrush(),
             FontSize = Math.Max(18, ThicknessSlider.Value * 4),
             FontWeight = FontWeights.SemiBold,
