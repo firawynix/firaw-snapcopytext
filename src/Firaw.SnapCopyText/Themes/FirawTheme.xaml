@@ -1,0 +1,58 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="FirawCyanColor">#19D3E6</Color>
+    <Color x:Key="FirawCyanHoverColor">#48E3F2</Color>
+    <Color x:Key="FirawBackgroundColor">#0C1117</Color>
+    <Color x:Key="FirawSurfaceColor">#151D26</Color>
+    <Color x:Key="FirawSurfaceRaisedColor">#202B36</Color>
+    <Color x:Key="FirawTextColor">#F4F8FA</Color>
+    <Color x:Key="FirawMutedTextColor">#9BAAB5</Color>
+    <Color x:Key="FirawDangerColor">#FF5570</Color>
+
+    <SolidColorBrush x:Key="FirawCyan" Color="{StaticResource FirawCyanColor}" />
+    <SolidColorBrush x:Key="FirawCyanHover" Color="{StaticResource FirawCyanHoverColor}" />
+    <SolidColorBrush x:Key="FirawBackground" Color="{StaticResource FirawBackgroundColor}" />
+    <SolidColorBrush x:Key="FirawSurface" Color="{StaticResource FirawSurfaceColor}" />
+    <SolidColorBrush x:Key="FirawSurfaceRaised" Color="{StaticResource FirawSurfaceRaisedColor}" />
+    <SolidColorBrush x:Key="FirawText" Color="{StaticResource FirawTextColor}" />
+    <SolidColorBrush x:Key="FirawMutedText" Color="{StaticResource FirawMutedTextColor}" />
+    <SolidColorBrush x:Key="FirawDanger" Color="{StaticResource FirawDangerColor}" />
+
+    <Style TargetType="Window">
+        <Setter Property="Background" Value="{StaticResource FirawBackground}" />
+        <Setter Property="Foreground" Value="{StaticResource FirawText}" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
+    </Style>
+
+    <Style x:Key="FirawButton" TargetType="Button">
+        <Setter Property="Foreground" Value="#071014" />
+        <Setter Property="Background" Value="{StaticResource FirawCyan}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="18,10" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="8"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource FirawCyanHover}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Border" Property="Opacity" Value="0.78" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Border" Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

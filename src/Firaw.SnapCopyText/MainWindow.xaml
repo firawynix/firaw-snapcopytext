@@ -1,0 +1,46 @@
+<Window x:Class="Firaw.SnapCopyText.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Firaw - SnapCopyText"
+        Width="520" Height="360"
+        MinWidth="480" MinHeight="330"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="32">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Border Width="42" Height="42" CornerRadius="12" Background="{StaticResource FirawCyan}">
+                    <TextBlock Text="F" FontSize="23" FontWeight="Bold" Foreground="#071014"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="Firaw" FontSize="22" FontWeight="SemiBold" />
+                    <TextBlock Text="SnapCopyText" Foreground="{StaticResource FirawCyan}" FontSize="14" />
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" VerticalAlignment="Center">
+            <TextBlock Text="Capture, edite e copie textos da tela."
+                       FontSize="22" FontWeight="SemiBold" TextAlignment="Center" />
+            <TextBlock Text="O processamento é local. Suas capturas não são enviadas para a internet."
+                       Margin="24,12,24,24" Foreground="{StaticResource FirawMutedText}"
+                       TextAlignment="Center" TextWrapping="Wrap" />
+            <Button Style="{StaticResource FirawButton}" Content="Nova captura"
+                    Width="190" HorizontalAlignment="Center" Click="CaptureButton_Click" />
+            <TextBlock Text="Print Screen  •  alternativa: Ctrl + Shift + S"
+                       Margin="0,14,0,0" Foreground="{StaticResource FirawMutedText}"
+                       TextAlignment="Center" FontSize="12" />
+        </StackPanel>
+
+        <Border Grid.Row="2" Background="{StaticResource FirawSurface}" CornerRadius="8" Padding="12,9">
+            <TextBlock x:Name="StatusText" Text="Preparando o capturador…"
+                       Foreground="{StaticResource FirawMutedText}" TextAlignment="Center" />
+        </Border>
+    </Grid>
+</Window>
