@@ -43,7 +43,7 @@ public partial class EditorWindow : Window
 
     private void ToolButton_Checked(object sender, RoutedEventArgs e)
     {
-        if (sender is not ToggleButton selected || ToolsPanel is null)
+        if (sender is not ToggleButton selected || ToolsPanel is null || EditorStatus is null)
         {
             return;
         }
