@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-- Milestone M1: adjustable capture, full Firaw window hiding, and selectable OCR text implemented; publication and interactive acceptance test pending.
+- Milestone M1: adjustable capture, full Firaw window hiding, and selectable OCR text published; user acceptance test pending.
 
 ## Decisions
 
@@ -18,7 +18,6 @@
 
 ## Next Steps
 
-- Publish the updated self-contained Windows build.
 - User validates that Firaw windows disappear before capture, the selected region moves/resizes, and both OCR copy modes work.
 - Adjust `FirawCyanColor` if the exact FirawSelector cyan differs from the initial `#19D3E6` token.
 
@@ -36,3 +35,4 @@
 | # | Description | Date | Commit | Status |
 | --- | --- | --- | --- | --- |
 | 001 | Prevent editor startup event from accessing unloaded controls | 2026-09-11 | `8cf9352` | Done |
+| 002 | Add adjustable Lightshot-style selection, hide Firaw windows, and split OCR copy modes | 2026-09-11 | `546422c`, `01199ba`, `045e0d3` | Done |
