@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Resources;
 using Firaw.SnapCopyText.Services;
+using Firaw.SnapCopyText.Models;
 using Application = System.Windows.Application;
 using ContextMenuStrip = System.Windows.Forms.ContextMenuStrip;
 using NotifyIcon = System.Windows.Forms.NotifyIcon;
@@ -71,9 +72,19 @@ public partial class App : Application
         openItem.Click += (_, _) => Dispatcher.Invoke(ShowMainWindow);
         menu.Items.Add(openItem);
 
-        var captureItem = new ToolStripMenuItem("Nova captura");
+        var captureItem = new ToolStripMenuItem("Nova captura (modo padrão)");
         captureItem.Click += (_, _) => Dispatcher.Invoke(() => _mainWindow?.RequestCapture());
         menu.Items.Add(captureItem);
+
+        var captureAsItem = new ToolStripMenuItem("Capturar como");
+        AddCaptureModeItem(captureAsItem, "Selecionar região", CaptureMode.Region);
+        AddCaptureModeItem(captureAsItem, "Escolher janela", CaptureMode.Window);
+        AddCaptureModeItem(captureAsItem, "Escolher monitor", CaptureMode.Monitor);
+        menu.Items.Add(captureAsItem);
+
+        var settingsItem = new ToolStripMenuItem("Atalhos e preferências");
+        settingsItem.Click += (_, _) => Dispatcher.Invoke(() => _mainWindow?.OpenSettings());
+        menu.Items.Add(settingsItem);
 
         menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
 
@@ -82,6 +93,13 @@ public partial class App : Application
         menu.Items.Add(exitItem);
 
         return menu;
+    }
+
+    private void AddCaptureModeItem(ToolStripMenuItem parent, string label, CaptureMode mode)
+    {
+        var item = new ToolStripMenuItem(label);
+        item.Click += (_, _) => Dispatcher.Invoke(() => _mainWindow?.RequestCapture(mode));
+        parent.DropDownItems.Add(item);
     }
 
     private void MainWindow_Closing(object? sender, CancelEventArgs e)

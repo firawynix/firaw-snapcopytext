@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using Firaw.SnapCopyText.Models;
 
 namespace Firaw.SnapCopyText.Services;
 
@@ -10,6 +11,8 @@ public sealed record DesktopSnapshot(BitmapSource Image, Rectangle ScreenBounds)
 
 public sealed class CaptureService
 {
+    private const uint PwRenderFullContent = 0x00000002;
+
     public DesktopSnapshot CaptureVirtualScreen()
     {
         Rectangle bounds = System.Windows.Forms.SystemInformation.VirtualScreen;
@@ -20,6 +23,37 @@ public sealed class CaptureService
             graphics.CopyFromScreen(bounds.Left, bounds.Top, 0, 0, bounds.Size, CopyPixelOperation.SourceCopy);
         }
 
+        return new DesktopSnapshot(CreateBitmapSource(bitmap), bounds);
+    }
+
+    public BitmapSource? CaptureWindow(CaptureTarget target)
+    {
+        if (target.WindowHandle == nint.Zero || target.Bounds.Width < 2 || target.Bounds.Height < 2)
+        {
+            return null;
+        }
+
+        using var bitmap = new Bitmap(
+            target.Bounds.Width,
+            target.Bounds.Height,
+            System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+        using Graphics graphics = Graphics.FromImage(bitmap);
+        nint deviceContext = graphics.GetHdc();
+        bool captured;
+        try
+        {
+            captured = PrintWindow(target.WindowHandle, deviceContext, PwRenderFullContent);
+        }
+        finally
+        {
+            graphics.ReleaseHdc(deviceContext);
+        }
+
+        return captured ? CreateBitmapSource(bitmap) : null;
+    }
+
+    private static BitmapSource CreateBitmapSource(Bitmap bitmap)
+    {
         nint handle = bitmap.GetHbitmap();
         try
         {
@@ -29,7 +63,7 @@ public sealed class CaptureService
                 Int32Rect.Empty,
                 BitmapSizeOptions.FromEmptyOptions());
             source.Freeze();
-            return new DesktopSnapshot(source, bounds);
+            return source;
         }
         finally
         {
@@ -49,6 +83,16 @@ public sealed class CaptureService
         var cropped = new CroppedBitmap(source, safeRegion);
         cropped.Freeze();
         return cropped;
+    }
+
+    public BitmapSource CropScreenBounds(DesktopSnapshot snapshot, Rectangle screenBounds)
+    {
+        var region = new Int32Rect(
+            screenBounds.Left - snapshot.ScreenBounds.Left,
+            screenBounds.Top - snapshot.ScreenBounds.Top,
+            screenBounds.Width,
+            screenBounds.Height);
+        return Crop(snapshot.Image, region);
     }
 
     public static Int32Rect NormalizeSelection(
@@ -81,4 +125,8 @@ public sealed class CaptureService
     [DllImport("gdi32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool DeleteObject(nint objectHandle);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool PrintWindow(nint windowHandle, nint deviceContext, uint flags);
 }

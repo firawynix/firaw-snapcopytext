@@ -12,6 +12,8 @@ using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
+using CaptureMode = Firaw.SnapCopyText.Models.CaptureMode;
+using Cursors = System.Windows.Input.Cursors;
 
 namespace Firaw.SnapCopyText.Views;
 
@@ -21,29 +23,47 @@ public partial class CaptureOverlayWindow : Window
     private const double MinimumSelectionSize = 16;
     private readonly DesktopSnapshot _snapshot;
     private readonly CaptureService _captureService;
+    private readonly CaptureMode _captureMode;
+    private readonly IReadOnlyList<CaptureTarget> _targets;
     private Point _start;
     private Rect _selection = Rect.Empty;
     private bool _drawing;
 
     public BitmapSource? SelectedImage { get; private set; }
 
-    public CaptureOverlayWindow(DesktopSnapshot snapshot, CaptureService captureService)
+    public CaptureOverlayWindow(
+        DesktopSnapshot snapshot,
+        CaptureService captureService,
+        CaptureMode captureMode = CaptureMode.Region,
+        IReadOnlyList<CaptureTarget>? windowTargets = null)
     {
         InitializeComponent();
         _snapshot = snapshot;
         _captureService = captureService;
+        _captureMode = captureMode;
+        _targets = captureMode == CaptureMode.Monitor
+            ? System.Windows.Forms.Screen.AllScreens
+                .Select(screen => new CaptureTarget(screen.Bounds, $"Monitor {screen.DeviceName.Replace("\\\\.\\DISPLAY", string.Empty)}"))
+                .ToArray()
+            : windowTargets ?? [];
 
         Left = SystemParameters.VirtualScreenLeft;
         Top = SystemParameters.VirtualScreenTop;
         Width = SystemParameters.VirtualScreenWidth;
         Height = SystemParameters.VirtualScreenHeight;
         DesktopImage.Source = snapshot.Image;
+        Cursor = captureMode == CaptureMode.Region ? Cursors.Cross : Cursors.Hand;
+        InstructionText.Text = InitialInstruction();
 
         Loaded += (_, _) =>
         {
             Activate();
             Focus();
             UpdateDimming(Rect.Empty);
+            if (_captureMode != CaptureMode.Region)
+            {
+                UpdateTargetAt(Mouse.GetPosition(Root));
+            }
         };
     }
 
@@ -51,6 +71,14 @@ public partial class CaptureOverlayWindow : Window
     {
         if (IsInteractiveElement(e.OriginalSource as DependencyObject))
         {
+            return;
+        }
+
+        if (_captureMode != CaptureMode.Region)
+        {
+            UpdateTargetAt(e.GetPosition(Root));
+            ConfirmSelection();
+            e.Handled = true;
             return;
         }
 
@@ -65,6 +93,12 @@ public partial class CaptureOverlayWindow : Window
 
     private void Window_MouseMove(object sender, MouseEventArgs e)
     {
+        if (_captureMode != CaptureMode.Region)
+        {
+            UpdateTargetAt(e.GetPosition(Root));
+            return;
+        }
+
         if (!_drawing)
         {
             return;
@@ -76,6 +110,11 @@ public partial class CaptureOverlayWindow : Window
 
     private void Window_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
+        if (_captureMode != CaptureMode.Region)
+        {
+            return;
+        }
+
         if (!_drawing)
         {
             return;
@@ -176,8 +215,42 @@ public partial class CaptureOverlayWindow : Window
         SizeBadge.Visibility = Visibility.Collapsed;
         ActionBar.Visibility = Visibility.Collapsed;
         SetControlVisibility(Visibility.Collapsed);
-        InstructionText.Text = "Arraste para selecionar  •  Esc para cancelar";
+        InstructionText.Text = InitialInstruction();
         UpdateDimming(Rect.Empty);
+    }
+
+    private string InitialInstruction() => _captureMode switch
+    {
+        CaptureMode.Window => "Passe o mouse e clique na janela  •  Esc para cancelar",
+        CaptureMode.Monitor => "Passe o mouse e clique no monitor  •  Esc para cancelar",
+        _ => "Arraste para selecionar  •  Esc para cancelar"
+    };
+
+    private void UpdateTargetAt(Point point)
+    {
+        CaptureTarget? target = _targets.FirstOrDefault(candidate =>
+            ScreenBoundsToOverlay(candidate.Bounds).Contains(point));
+        if (target is null)
+        {
+            ClearSelection();
+            return;
+        }
+
+        _selection = ScreenBoundsToOverlay(target.Bounds);
+        UpdateSelectionVisuals(showControls: false);
+        SizeText.Text = target.Label.Length > 52 ? $"{target.Label[..49]}…" : target.Label;
+    }
+
+    private Rect ScreenBoundsToOverlay(System.Drawing.Rectangle bounds)
+    {
+        double scaleX = ActualWidth / _snapshot.ScreenBounds.Width;
+        double scaleY = ActualHeight / _snapshot.ScreenBounds.Height;
+        Rect converted = new(
+            (bounds.Left - _snapshot.ScreenBounds.Left) * scaleX,
+            (bounds.Top - _snapshot.ScreenBounds.Top) * scaleY,
+            bounds.Width * scaleX,
+            bounds.Height * scaleY);
+        return Rect.Intersect(converted, SelectionBounds());
     }
 
     private void UpdateSelectionVisuals(bool showControls)
