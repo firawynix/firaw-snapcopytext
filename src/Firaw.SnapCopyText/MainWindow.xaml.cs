@@ -1,4 +1,6 @@
+using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using Firaw.SnapCopyText.Services;
 using Firaw.SnapCopyText.Views;
@@ -9,6 +11,7 @@ namespace Firaw.SnapCopyText;
 
 public partial class MainWindow : Window
 {
+    private const int DwmwaTransitionsForcedDisabled = 3;
     private readonly CaptureService _captureService = new();
     private readonly CaptureRequestGate _captureGate = new();
     private HotkeyService? _hotkeyService;
@@ -56,7 +59,8 @@ public partial class MainWindow : Window
         {
             hiddenWindows = HideVisibleFirawWindows();
             await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
-            await Task.Delay(180);
+            DwmFlush();
+            await Task.Delay(260);
 
             DesktopSnapshot snapshot = _captureService.CaptureVirtualScreen();
             var overlay = new CaptureOverlayWindow(snapshot, _captureService);
@@ -95,11 +99,16 @@ public partial class MainWindow : Window
         List<HiddenWindowState> states = Application.Current.Windows
             .OfType<Window>()
             .Where(window => window.IsVisible)
-            .Select(window => new HiddenWindowState(window, window.WindowState, window.IsActive))
+            .Select(window => new HiddenWindowState(
+                window,
+                window.WindowState,
+                window.IsActive,
+                AreTransitionsForcedDisabled(window)))
             .ToList();
 
         foreach (HiddenWindowState state in states.OrderByDescending(state => state.Window.Owner is not null))
         {
+            SetTransitionsForcedDisabled(state.Window, disabled: true);
             state.Window.Hide();
         }
 
@@ -114,6 +123,7 @@ public partial class MainWindow : Window
         {
             state.Window.Show();
             state.Window.WindowState = state.WindowState;
+            SetTransitionsForcedDisabled(state.Window, state.TransitionsWereDisabled);
             if (state.WasActive)
             {
                 activeWindow = state;
@@ -123,5 +133,55 @@ public partial class MainWindow : Window
         activeWindow?.Window.Activate();
     }
 
-    private sealed record HiddenWindowState(Window Window, WindowState WindowState, bool WasActive);
+    private static bool AreTransitionsForcedDisabled(Window window)
+    {
+        nint handle = new WindowInteropHelper(window).Handle;
+        int disabled = 0;
+        return handle != nint.Zero &&
+               DwmGetWindowAttribute(
+                   handle,
+                   DwmwaTransitionsForcedDisabled,
+                   out disabled,
+                   Marshal.SizeOf<int>()) == 0 &&
+               disabled != 0;
+    }
+
+    private static void SetTransitionsForcedDisabled(Window window, bool disabled)
+    {
+        nint handle = new WindowInteropHelper(window).Handle;
+        if (handle == nint.Zero)
+        {
+            return;
+        }
+
+        int value = disabled ? 1 : 0;
+        _ = DwmSetWindowAttribute(
+            handle,
+            DwmwaTransitionsForcedDisabled,
+            ref value,
+            Marshal.SizeOf<int>());
+    }
+
+    private sealed record HiddenWindowState(
+        Window Window,
+        WindowState WindowState,
+        bool WasActive,
+        bool TransitionsWereDisabled);
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmGetWindowAttribute(
+        nint windowHandle,
+        int attribute,
+        out int attributeValue,
+        int attributeSize);
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(
+        nint windowHandle,
+        int attribute,
+        ref int attributeValue,
+        int attributeSize);
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmFlush();
 }
