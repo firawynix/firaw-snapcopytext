@@ -7,28 +7,80 @@
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         MouseMove="Window_MouseMove"
         MouseLeftButtonUp="Window_MouseLeftButtonUp">
+    <Window.Resources>
+        <Style x:Key="ResizeThumb" TargetType="Thumb">
+            <Setter Property="Width" Value="12" />
+            <Setter Property="Height" Value="12" />
+            <Setter Property="Background" Value="{StaticResource FirawCyan}" />
+            <Setter Property="BorderBrush" Value="White" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Ellipse Fill="{TemplateBinding Background}"
+                                 Stroke="{TemplateBinding BorderBrush}"
+                                 StrokeThickness="{TemplateBinding BorderThickness}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Grid x:Name="Root">
         <Image x:Name="DesktopImage" Stretch="Fill" IsHitTestVisible="False" />
 
-        <Canvas x:Name="OverlayCanvas" IsHitTestVisible="False">
-            <Rectangle x:Name="DimTop" Fill="#A8000000" />
-            <Rectangle x:Name="DimLeft" Fill="#A8000000" />
-            <Rectangle x:Name="DimRight" Fill="#A8000000" />
-            <Rectangle x:Name="DimBottom" Fill="#A8000000" />
+        <Canvas x:Name="OverlayCanvas" Background="Transparent">
+            <Rectangle x:Name="DimTop" Fill="#A8000000" IsHitTestVisible="False" />
+            <Rectangle x:Name="DimLeft" Fill="#A8000000" IsHitTestVisible="False" />
+            <Rectangle x:Name="DimRight" Fill="#A8000000" IsHitTestVisible="False" />
+            <Rectangle x:Name="DimBottom" Fill="#A8000000" IsHitTestVisible="False" />
+
+            <Thumb x:Name="MoveThumb" Visibility="Collapsed" Cursor="SizeAll"
+                   Background="#01000000" DragDelta="MoveThumb_DragDelta">
+                <Thumb.Template>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border Background="{TemplateBinding Background}" />
+                    </ControlTemplate>
+                </Thumb.Template>
+            </Thumb>
 
             <Rectangle x:Name="SelectionBorder" Stroke="{StaticResource FirawCyan}"
-                       StrokeThickness="2" Fill="Transparent" Visibility="Collapsed" />
+                       StrokeThickness="2" Fill="Transparent" IsHitTestVisible="False"
+                       Visibility="Collapsed" />
+
+            <Thumb x:Name="TopLeftHandle" Tag="TopLeft" Cursor="SizeNWSE" Style="{StaticResource ResizeThumb}" DragDelta="ResizeThumb_DragDelta" />
+            <Thumb x:Name="TopHandle" Tag="Top" Cursor="SizeNS" Style="{StaticResource ResizeThumb}" DragDelta="ResizeThumb_DragDelta" />
+            <Thumb x:Name="TopRightHandle" Tag="TopRight" Cursor="SizeNESW" Style="{StaticResource ResizeThumb}" DragDelta="ResizeThumb_DragDelta" />
+            <Thumb x:Name="RightHandle" Tag="Right" Cursor="SizeWE" Style="{StaticResource ResizeThumb}" DragDelta="ResizeThumb_DragDelta" />
+            <Thumb x:Name="BottomRightHandle" Tag="BottomRight" Cursor="SizeNWSE" Style="{StaticResource ResizeThumb}" DragDelta="ResizeThumb_DragDelta" />
+            <Thumb x:Name="BottomHandle" Tag="Bottom" Cursor="SizeNS" Style="{StaticResource ResizeThumb}" DragDelta="ResizeThumb_DragDelta" />
+            <Thumb x:Name="BottomLeftHandle" Tag="BottomLeft" Cursor="SizeNESW" Style="{StaticResource ResizeThumb}" DragDelta="ResizeThumb_DragDelta" />
+            <Thumb x:Name="LeftHandle" Tag="Left" Cursor="SizeWE" Style="{StaticResource ResizeThumb}" DragDelta="ResizeThumb_DragDelta" />
 
             <Border x:Name="SizeBadge" Visibility="Collapsed"
-                    Background="#E6151D26" CornerRadius="6" Padding="8,4">
+                    Background="#F0151D26" CornerRadius="6" Padding="8,4">
                 <TextBlock x:Name="SizeText" Foreground="White" FontSize="12" />
+            </Border>
+
+            <Border x:Name="ActionBar" Visibility="Collapsed" Background="#F0151D26"
+                    BorderBrush="{StaticResource FirawCyan}" BorderThickness="1"
+                    CornerRadius="8" Padding="5">
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Cancelar" Style="{StaticResource FirawSecondaryButton}"
+                            Margin="0,0,5,0" Padding="11,7" Click="CancelButton_Click" />
+                    <Button Content="Abrir editor" Style="{StaticResource FirawButton}"
+                            Padding="13,7" Click="ConfirmButton_Click" />
+                </StackPanel>
             </Border>
         </Canvas>
 
         <Border VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,28,0,0"
                 Padding="16,10" CornerRadius="9" Background="#E6151D26"
-                BorderBrush="{StaticResource FirawCyan}" BorderThickness="1">
-            <TextBlock Text="Arraste para selecionar  •  Esc para cancelar"
+                BorderBrush="{StaticResource FirawCyan}" BorderThickness="1"
+                IsHitTestVisible="False">
+            <TextBlock x:Name="InstructionText"
+                       Text="Arraste para selecionar  •  Esc para cancelar"
                        Foreground="White" FontWeight="SemiBold" />
         </Border>
     </Grid>
