@@ -28,7 +28,7 @@ AppVersion={#MyVersion}
 AppVerName={#MyAppName} {#MyVersion}
 AppPublisher={#MyPublisher}
 AppPublisherURL=https://firawynix.com.br/
-AppUpdatesURL=http://10.81.66.10/firaw-snapcopytext/
+AppUpdatesURL=https://snapcopytext.firawynix.com.br/
 DefaultDirName={localappdata}\Programs\Firaw SnapCopyText
 DefaultGroupName=Firaw
 PrivilegesRequired=lowest
@@ -72,4 +72,12 @@ Filename: "{app}\{#MyLauncherExe}"; Parameters: "--background --no-update"; Flag
 function IsUpdateMode: Boolean;
 begin
   Result := ExpandConstant('{param:UPDATE|0}') = '1';
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  { O próprio app grava o início com o Windows (HKCU\...\Run). Sem isto, a
+    entrada ficaria apontando para um programa que não existe mais. }
+  if CurUninstallStep = usPostUninstall then
+    RegDeleteValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Run', 'Firaw SnapCopyText');
 end;

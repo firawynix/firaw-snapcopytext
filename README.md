@@ -4,13 +4,11 @@ Capturador de tela para Windows com edição rápida e extração local de texto
 
 ## Instalar a versão pronta
 
-Os instaladores gerados ficam em:
+Baixe em <https://snapcopytext.firawynix.com.br> ou nas [releases do GitHub](https://github.com/firawynix/firaw-snapcopytext/releases/latest). Também aparece na aba Projetos do Firawynix Center.
 
-`release\Firaw-SnapCopyText-1.1.0\installers`
+Use o instalador x64 em computadores atuais ou o x86 para Windows de 32 bits. Os dois pacotes são autocontidos, não precisam do SDK .NET e instalam só para o usuário (sem administrador).
 
-Use o instalador x64 em computadores atuais ou o x86 para Windows de 32 bits. Os dois pacotes são autocontidos e não precisam do SDK .NET instalado.
-
-Depois da instalação, o atalho abre `Firaw.SnapCopyText.Launcher.exe`. Ele verifica `http://10.81.66.10/firaw-snapcopytext/update.json`, instala uma versão mais nova quando disponível e abre normalmente o Firaw se o servidor estiver fora do ar.
+Depois da instalação, o atalho abre `Firaw.SnapCopyText.Launcher.exe`. Ele lê o `update.json` da release mais recente do GitHub (HTTPS), instala uma versão mais nova quando disponível — conferindo tamanho e SHA-256 — e abre normalmente o Firaw se o GitHub estiver fora do alcance.
 
 ## Como usar
 
@@ -65,13 +63,16 @@ dotnet test Firaw.SnapCopyText.sln
 dotnet run --project src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj
 ```
 
-Release completa com publicações autocontidas, launcher, instaladores Inno, manifesto de atualização e página local:
+Release completa com publicações autocontidas, launcher, instaladores Inno e manifesto de atualização:
 
 ```powershell
-.\tools\build-release.ps1 -Version 1.1.0
+.\tools\build-release.ps1 -Version 1.1.2 -ReleaseNotes "o que mudou"
+gh release create v1.1.2 -R firawynix/firaw-snapcopytext --title "Firaw - SnapCopyText 1.1.2" --notes "o que mudou" release\Firaw-SnapCopyText-1.1.2\github-release\*
 ```
 
-O pacote que deve ser copiado para o servidor fica em `release\Firaw-SnapCopyText-1.1.0\update-server\firaw-snapcopytext`. A demonstração local abre em `demo-site\dist\index.html`.
+Suba a versão também nos dois `.csproj` (o script grava `FileVersion` no executável, que é o que o launcher compara). A pasta `github-release` leva os dois instaladores, um `.sha256` de cada e o `update.json` — publique os cinco na mesma tag. O Firawynix Center pega a release nova sozinho (timer no servidor que confere o `.sha256`).
+
+O site fica em `demo-site/dist` e é publicado em <https://snapcopytext.firawynix.com.br> (ver `demo-site/deploy/README.md`).
 
 ## Identidade visual
 

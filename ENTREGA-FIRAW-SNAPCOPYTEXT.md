@@ -1,3 +1,21 @@
+# Atualização — 1.1.1 (11 de setembro de 2026)
+
+O endereço `http://10.81.66.10/firaw-snapcopytext/` só existe dentro da rede local
+e sem HTTPS: fora dela ninguém receberia atualização. Desde a 1.1.1:
+
+- o launcher lê o `update.json` da release mais recente do GitHub
+  (`firawynix/firaw-snapcopytext`, repositório público), por HTTPS;
+- o manifesto aponta para os instaladores da mesma tag e cada instalador tem o
+  seu `.sha256` publicado ao lado;
+- o site está no ar em <https://snapcopytext.firawynix.com.br>, com os botões
+  apontando para a release mais recente;
+- o programa aparece no portfólio (Projetos e Produtos) e no Firawynix Center;
+- a desinstalação remove o início automático com o Windows.
+
+A seção abaixo descreve a entrega original da 1.1.0.
+
+---
+
 # Entrega — Firaw SnapCopyText 1.1.0
 
 **Data:** 11 de setembro de 2026  

@@ -187,9 +187,24 @@ h1 em { color: var(--cyan); font-style: normal; }
 .download-card.primary > span, .download-card.primary small, .download-card.primary b i { color: #16434b; }
 .download-card.primary b { border-color: rgba(7,17,22,.35); }
 
-footer { min-height: 106px; padding: 0 max(24px, calc((100vw - 1180px) / 2)); display: flex; align-items: center; gap: 36px; border-top: 1px solid var(--line); background: #050c10; }
-footer p { margin: 0 auto; color: var(--muted); font-size: 13px; }
-footer > a { color: var(--cyan); font-size: 13px; font-weight: 750; }
+/* Rodapé preso ao pé da tela, como o do FirawSelector: baixar, código e apoiar sempre à mão. */
+.dock { position: sticky; bottom: 0; z-index: 14; background: rgba(5, 12, 16, .94); border-top: 1px solid var(--line); backdrop-filter: blur(14px); }
+.dock-row { width: min(1180px, calc(100% - 48px)); min-height: 64px; margin-inline: auto; padding-block: 10px; display: flex; align-items: center; gap: 22px; }
+.dock-meta { display: grid; gap: 2px; min-width: 0; }
+.dock-meta b { color: #d5e1e6; font-size: 13px; font-weight: 700; }
+.dock-meta span { color: var(--muted); font: 11px/1.4 ui-monospace, Consolas, monospace; }
+.dock-links { margin-left: auto; display: flex; flex-wrap: wrap; gap: 9px; }
+.dock-links a { min-height: 38px; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; color: var(--white); border: 1px solid var(--line); font-size: 13px; font-weight: 750; white-space: nowrap; transition: background .2s, border-color .2s; }
+.dock-links a:hover { border-color: var(--cyan); background: rgba(25, 211, 230, .08); }
+.dock-links a:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.dock-links a.pri { color: var(--ink); background: var(--cyan); border-color: var(--cyan); }
+.dock-links a.pri:hover { background: var(--cyan-soft); }
+/* O Apoiar é o único que se mexe sozinho: o brilho respira em 2,4 s (nada de pisca-pisca) e fica parado para quem pediu menos animação. */
+.dock-links a.apoiar { color: var(--ink); border-color: transparent; background: linear-gradient(100deg, var(--cyan), #7dd3fc 45%, #0891b2); animation: neonApoiar 2.4s ease-in-out infinite; }
+@keyframes neonApoiar {
+  0%, 100% { box-shadow: 0 0 12px rgba(25, 211, 230, .5), 0 0 26px rgba(25, 211, 230, .2); }
+  50% { box-shadow: 0 0 22px rgba(8, 145, 178, .65), 0 0 46px rgba(8, 145, 178, .3); }
+}
 
 @media (max-width: 980px) {
   .site-header nav { display: none; }
@@ -200,6 +215,9 @@ footer > a { color: var(--cyan); font-size: 13px; font-weight: 750; }
   .demo-panel { grid-template-columns: 165px 1fr; }
   .demo-visual { grid-column: 1 / -1; min-height: 380px; }
   .download-options { max-width: 700px; }
+  .dock-row { flex-wrap: wrap; }
+  .dock-links { width: 100%; margin-left: 0; }
+  .dock-links a { flex: 1 1 auto; justify-content: center; }
 }
 
 @media (max-width: 680px) {
@@ -227,11 +245,13 @@ footer > a { color: var(--cyan); font-size: 13px; font-weight: 750; }
   .feature-card.feature-wide { padding-top: 70px; }
   .download-options { grid-template-columns: 1fr; }
   .privacy { padding-block: 72px; }
-  footer { padding-block: 26px; flex-wrap: wrap; }
-  footer p { order: 3; width: 100%; }
+  /* no celular o rodapé embrulhado cobriria meia tela: vira rodapé comum */
+  .dock { position: static; }
+  .dock-row { width: min(100% - 28px, 1180px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: .01ms !important; }
+  .dock-links a.apoiar { animation: none; }
 }
