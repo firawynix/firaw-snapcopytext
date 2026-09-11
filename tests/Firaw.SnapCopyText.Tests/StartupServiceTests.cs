@@ -6,10 +6,10 @@ namespace Firaw.SnapCopyText.Tests;
 public sealed class StartupServiceTests
 {
     [Fact]
-    public void QuoteExecutablePath_ProtectsPathsWithSpaces()
+    public void BuildStartupCommand_QuotesPathAndStartsInBackground()
     {
-        string command = StartupService.QuoteExecutablePath(@"C:\Program Files\Firaw\Firaw.exe");
+        string command = StartupService.BuildStartupCommand(@"C:\Program Files\Firaw\Firaw.exe");
 
-        Assert.Equal("\"C:\\Program Files\\Firaw\\Firaw.exe\"", command);
+        Assert.Equal("\"C:\\Program Files\\Firaw\\Firaw.exe\" --background", command);
     }
 }

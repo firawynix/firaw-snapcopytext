@@ -22,7 +22,7 @@ O pacote publicado é autocontido para Windows x64. Ele não precisa do SDK .NET
 
 Em **Atalhos e preferências**, escolha o modo usado pelo atalho, clique no campo de atalho e pressione sua própria combinação. A mesma tela permite ativar o Print Screen e abrir diretamente as configurações de teclado do Windows caso a Ferramenta de Captura esteja ocupando essa tecla.
 
-Nessa tela também é possível marcar **Iniciar o Firaw junto com o Windows**. A configuração vale somente para o usuário atual e não precisa de permissão de administrador.
+Nessa tela também é possível marcar **Iniciar o Firaw junto com o Windows**. A configuração vale somente para o usuário atual, não precisa de permissão de administrador e inicia discretamente na bandeja.
 
 Ao fechar ou minimizar a janela principal, o Firaw continua ativo no Olho de Hórus da bandeja do Windows. No olho: clique esquerdo captura uma região; `Ctrl` + clique esquerdo abre as janelas; clique do botão do meio/scroll abre os monitores; botão direito abre o menu completo, inclusive **Abrir Firaw** e **Sair**.
 

@@ -19,8 +19,9 @@ public sealed class StartupService
 
         string executablePath = Environment.ProcessPath
             ?? throw new InvalidOperationException("Não foi possível localizar o executável do Firaw.");
-        key.SetValue(ValueName, QuoteExecutablePath(executablePath), RegistryValueKind.String);
+        key.SetValue(ValueName, BuildStartupCommand(executablePath), RegistryValueKind.String);
     }
 
-    public static string QuoteExecutablePath(string executablePath) => $"\"{executablePath.Trim('"')}\"";
+    public static string BuildStartupCommand(string executablePath) =>
+        $"\"{executablePath.Trim('"')}\" --background";
 }

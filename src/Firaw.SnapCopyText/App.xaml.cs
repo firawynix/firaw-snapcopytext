@@ -3,6 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows;
 using System.Windows.Resources;
+using System.Windows.Interop;
 using Firaw.SnapCopyText.Services;
 using Firaw.SnapCopyText.Models;
 using Application = System.Windows.Application;
@@ -42,7 +43,16 @@ public partial class App : Application
         };
         _trayIcon.MouseClick += TrayIcon_MouseClick;
 
-        _mainWindow.Show();
+        bool startInBackground = e.Args.Any(argument =>
+            argument.Equals("--background", StringComparison.OrdinalIgnoreCase));
+        if (startInBackground)
+        {
+            _ = new WindowInteropHelper(_mainWindow).EnsureHandle();
+        }
+        else
+        {
+            _mainWindow.Show();
+        }
     }
 
     private void TrayIcon_MouseClick(object? sender, System.Windows.Forms.MouseEventArgs e)

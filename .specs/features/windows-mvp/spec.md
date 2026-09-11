@@ -77,7 +77,7 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 4. WHEN Use Print Screen is selected THEN Firaw SHALL attempt to register Print Screen globally.
 5. WHEN Windows owns Print Screen THEN Firaw SHALL provide a direct path to Keyboard settings and explain which Windows option to disable.
 6. WHEN Firaw restarts THEN it SHALL restore saved capture preferences from the current user's local settings.
-7. WHEN Start with Windows is selected THEN Firaw SHALL register the current executable for the current Windows user without requiring administrator access.
+7. WHEN Start with Windows is selected THEN Firaw SHALL register the current executable for the current Windows user without requiring administrator access and start hidden in the tray at sign-in.
 
 **Independent Test:** Save Ctrl+Alt+F9 with Monitor as default, restart Firaw, and verify both values and the shortcut behavior.
 
