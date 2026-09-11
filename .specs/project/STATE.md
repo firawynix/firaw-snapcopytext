@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-- Milestone M1: boxed annotations and DWM transition suppression implemented; publication and user acceptance test pending.
+- Milestone M1: boxed annotations and DWM transition suppression published; user acceptance test pending for the capture artifact.
 
 ## Decisions
 
