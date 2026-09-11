@@ -6,30 +6,53 @@ using Firaw.SnapCopyText.Models;
 
 namespace Firaw.SnapCopyText.Services;
 
+using CaptureMode = Firaw.SnapCopyText.Models.CaptureMode;
+
 public sealed class HotkeyService : IDisposable
 {
     private const int PrintScreenId = 0x5343;
     private const int FallbackId = 0x5344;
+    private const int AltPrintScreenId = 0x5346;
+    private const int ControlPrintScreenId = 0x5347;
     private const int WmHotkey = 0x0312;
+    private const int WmKeyDown = 0x0100;
+    private const int WmKeyUp = 0x0101;
+    private const int WmSysKeyDown = 0x0104;
+    private const int WmSysKeyUp = 0x0105;
+    private const int WhKeyboardLl = 13;
+    private const int VkSnapshot = 0x2C;
+    private const int VkControl = 0x11;
+    private const int VkShift = 0x10;
+    private const int VkMenu = 0x12;
+    private const int VkLeftWindows = 0x5B;
+    private const int VkRightWindows = 0x5C;
+    private const uint LlkhfAltDown = 0x20;
     private const uint ModAlt = 0x0001;
     private const uint ModControl = 0x0002;
     private const uint ModShift = 0x0004;
     private const uint ModNoRepeat = 0x4000;
-    private const uint VkSnapshot = 0x2C;
 
     private readonly Window _window;
+    private readonly LowLevelKeyboardProcedure _keyboardProcedure;
+    private CapturePreferences _settings = new();
     private nint _windowHandle;
+    private nint _keyboardHook;
     private HwndSource? _source;
+    private bool _suppressPrintScreenUntilKeyUp;
     private bool _disposed;
 
-    public bool PrintScreenRegistered { get; private set; }
+    public bool RegionShortcutActive { get; private set; }
+    public bool MonitorShortcutActive { get; private set; }
+    public bool WindowShortcutActive { get; private set; }
     public bool FallbackRegistered { get; private set; }
+    public bool UsesKeyboardHook => _keyboardHook != nint.Zero;
     public string FallbackLabel { get; private set; } = "Ctrl + Shift + S";
-    public event EventHandler? CaptureRequested;
+    public event Action<CaptureMode>? CaptureRequested;
 
     public HotkeyService(Window window)
     {
         _window = window;
+        _keyboardProcedure = KeyboardProcedure;
     }
 
     public void Initialize(CapturePreferences settings)
@@ -47,7 +70,6 @@ public sealed class HotkeyService : IDisposable
 
         _source = HwndSource.FromHwnd(_windowHandle);
         _source?.AddHook(WindowProcedure);
-
         Apply(settings);
     }
 
@@ -59,20 +81,42 @@ public sealed class HotkeyService : IDisposable
         }
 
         UnregisterCurrentHotkeys();
+        _settings = settings.Clone();
 
         if (!TryParseShortcut(settings.Shortcut, out uint modifiers, out Key key, out string label))
         {
             TryParseShortcut("Ctrl + Shift + S", out modifiers, out key, out label);
         }
         FallbackLabel = label;
-        bool customShortcutIsPrintScreen = key == Key.PrintScreen && modifiers == 0;
 
-        if (settings.UsePrintScreen)
+        bool anyPresetEnabled = settings.UsePrintScreen ||
+                                settings.UseAltPrintScreen ||
+                                settings.UseControlPrintScreen;
+        if (anyPresetEnabled)
         {
-            PrintScreenRegistered = RegisterHotKey(_windowHandle, PrintScreenId, ModNoRepeat, VkSnapshot);
+            _keyboardHook = SetWindowsHookEx(
+                WhKeyboardLl,
+                _keyboardProcedure,
+                GetModuleHandle(null),
+                0);
         }
 
-        if (!customShortcutIsPrintScreen || !settings.UsePrintScreen)
+        if (_keyboardHook != nint.Zero)
+        {
+            RegionShortcutActive = settings.UsePrintScreen;
+            MonitorShortcutActive = settings.UseAltPrintScreen;
+            WindowShortcutActive = settings.UseControlPrintScreen;
+        }
+        else
+        {
+            RegionShortcutActive = RegisterPreset(settings.UsePrintScreen, PrintScreenId, 0);
+            MonitorShortcutActive = RegisterPreset(settings.UseAltPrintScreen, AltPrintScreenId, ModAlt);
+            WindowShortcutActive = RegisterPreset(settings.UseControlPrintScreen, ControlPrintScreenId, ModControl);
+        }
+
+        bool customShortcutIsManagedPrintScreen = key == Key.PrintScreen &&
+                                                  modifiers is 0 or ModAlt or ModControl;
+        if (!customShortcutIsManagedPrintScreen)
         {
             FallbackRegistered = RegisterHotKey(
                 _windowHandle,
@@ -91,29 +135,34 @@ public sealed class HotkeyService : IDisposable
 
         _disposed = true;
         UnregisterCurrentHotkeys();
-
         _source?.RemoveHook(WindowProcedure);
     }
 
     public void Suspend() => UnregisterCurrentHotkeys();
 
+    private bool RegisterPreset(bool enabled, int id, uint modifiers) =>
+        enabled && RegisterHotKey(_windowHandle, id, modifiers | ModNoRepeat, VkSnapshot);
+
     private void UnregisterCurrentHotkeys()
     {
-        if (_windowHandle == nint.Zero)
+        if (_keyboardHook != nint.Zero)
         {
-            return;
+            UnhookWindowsHookEx(_keyboardHook);
+            _keyboardHook = nint.Zero;
         }
 
-        if (PrintScreenRegistered)
+        if (_windowHandle != nint.Zero)
         {
             UnregisterHotKey(_windowHandle, PrintScreenId);
-        }
-        if (FallbackRegistered)
-        {
+            UnregisterHotKey(_windowHandle, AltPrintScreenId);
+            UnregisterHotKey(_windowHandle, ControlPrintScreenId);
             UnregisterHotKey(_windowHandle, FallbackId);
         }
 
-        PrintScreenRegistered = false;
+        _suppressPrintScreenUntilKeyUp = false;
+        RegionShortcutActive = false;
+        MonitorShortcutActive = false;
+        WindowShortcutActive = false;
         FallbackRegistered = false;
     }
 
@@ -195,16 +244,114 @@ public sealed class HotkeyService : IDisposable
         return true;
     }
 
+    public static bool TryGetPresetMode(
+        CapturePreferences settings,
+        ModifierKeys modifiers,
+        out CaptureMode mode)
+    {
+        ModifierKeys relevant = modifiers &
+                                (ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Windows);
+        if (relevant == ModifierKeys.None && settings.UsePrintScreen)
+        {
+            mode = CaptureMode.Region;
+            return true;
+        }
+        if (relevant == ModifierKeys.Alt && settings.UseAltPrintScreen)
+        {
+            mode = CaptureMode.Monitor;
+            return true;
+        }
+        if (relevant == ModifierKeys.Control && settings.UseControlPrintScreen)
+        {
+            mode = CaptureMode.Window;
+            return true;
+        }
+
+        mode = default;
+        return false;
+    }
+
+    private nint KeyboardProcedure(int code, nint message, nint dataPointer)
+    {
+        if (code >= 0)
+        {
+            int keyboardMessage = message.ToInt32();
+            KeyboardHookData data = Marshal.PtrToStructure<KeyboardHookData>(dataPointer);
+            if (data.VirtualKeyCode == VkSnapshot)
+            {
+                if (keyboardMessage is WmKeyDown or WmSysKeyDown)
+                {
+                    if (_suppressPrintScreenUntilKeyUp)
+                    {
+                        return 1;
+                    }
+
+                    ModifierKeys modifiers = ReadModifiers(data.Flags);
+                    if (TryGetPresetMode(_settings, modifiers, out CaptureMode mode))
+                    {
+                        _suppressPrintScreenUntilKeyUp = true;
+                        _window.Dispatcher.BeginInvoke(() => CaptureRequested?.Invoke(mode));
+                        return 1;
+                    }
+                }
+                else if (keyboardMessage is WmKeyUp or WmSysKeyUp && _suppressPrintScreenUntilKeyUp)
+                {
+                    _suppressPrintScreenUntilKeyUp = false;
+                    return 1;
+                }
+            }
+        }
+
+        return CallNextHookEx(_keyboardHook, code, message, dataPointer);
+    }
+
+    private static ModifierKeys ReadModifiers(uint flags)
+    {
+        ModifierKeys modifiers = ModifierKeys.None;
+        if ((flags & LlkhfAltDown) != 0 || IsKeyDown(VkMenu)) modifiers |= ModifierKeys.Alt;
+        if (IsKeyDown(VkControl)) modifiers |= ModifierKeys.Control;
+        if (IsKeyDown(VkShift)) modifiers |= ModifierKeys.Shift;
+        if (IsKeyDown(VkLeftWindows) || IsKeyDown(VkRightWindows)) modifiers |= ModifierKeys.Windows;
+        return modifiers;
+    }
+
+    private static bool IsKeyDown(int virtualKey) => (GetAsyncKeyState(virtualKey) & 0x8000) != 0;
+
     private nint WindowProcedure(nint hwnd, int message, nint wParam, nint lParam, ref bool handled)
     {
-        if (message == WmHotkey && (wParam.ToInt32() == PrintScreenId || wParam.ToInt32() == FallbackId))
+        if (message != WmHotkey)
+        {
+            return nint.Zero;
+        }
+
+        CaptureMode? mode = wParam.ToInt32() switch
+        {
+            PrintScreenId => CaptureMode.Region,
+            AltPrintScreenId => CaptureMode.Monitor,
+            ControlPrintScreenId => CaptureMode.Window,
+            FallbackId => _settings.DefaultMode,
+            _ => null
+        };
+        if (mode.HasValue)
         {
             handled = true;
-            CaptureRequested?.Invoke(this, EventArgs.Empty);
+            CaptureRequested?.Invoke(mode.Value);
         }
 
         return nint.Zero;
     }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private readonly struct KeyboardHookData
+    {
+        public readonly uint VirtualKeyCode;
+        public readonly uint ScanCode;
+        public readonly uint Flags;
+        public readonly uint Time;
+        public readonly nuint ExtraInfo;
+    }
+
+    private delegate nint LowLevelKeyboardProcedure(int code, nint message, nint dataPointer);
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -213,4 +360,24 @@ public sealed class HotkeyService : IDisposable
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool UnregisterHotKey(nint windowHandle, int id);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern nint SetWindowsHookEx(
+        int hookType,
+        LowLevelKeyboardProcedure callback,
+        nint moduleHandle,
+        uint threadId);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool UnhookWindowsHookEx(nint hookHandle);
+
+    [DllImport("user32.dll")]
+    private static extern nint CallNextHookEx(nint hookHandle, int code, nint message, nint dataPointer);
+
+    [DllImport("user32.dll")]
+    private static extern short GetAsyncKeyState(int virtualKey);
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+    private static extern nint GetModuleHandle(string? moduleName);
 }

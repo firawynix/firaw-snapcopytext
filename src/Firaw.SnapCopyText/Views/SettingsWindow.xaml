@@ -2,65 +2,137 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Firaw - Atalhos e preferências"
-        Width="510" Height="590" ResizeMode="NoResize"
+        Width="600" Height="750" MinHeight="620" ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
-    <Grid Background="{StaticResource FirawBackground}" Margin="0">
+    <Grid Background="{StaticResource FirawBackground}">
         <Grid.Resources>
             <Style TargetType="TextBlock">
                 <Setter Property="Foreground" Value="{StaticResource FirawText}" />
             </Style>
         </Grid.Resources>
         <Grid Margin="28">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <StackPanel>
-            <TextBlock Text="Atalhos e captura" FontSize="22" FontWeight="SemiBold" />
-            <TextBlock Text="Escolha o que o Firaw faz quando você usa o atalho."
-                       Margin="0,6,0,0" Foreground="{StaticResource FirawMutedText}" />
-        </StackPanel>
+            <StackPanel>
+                <TextBlock Text="Atalhos e captura" FontSize="22" FontWeight="SemiBold" />
+                <TextBlock Text="Escolha quais combinações pertencem ao Firaw e quais continuam no Windows."
+                           Margin="0,6,0,0" Foreground="{StaticResource FirawMutedText}" />
+            </StackPanel>
 
-        <StackPanel Grid.Row="1" Margin="0,24,0,20">
-            <TextBlock Text="Modo padrão do atalho" FontWeight="SemiBold" />
-            <ComboBox x:Name="DefaultModeCombo" Height="36" Margin="0,7,0,18"
-                      DisplayMemberPath="Label" SelectedValuePath="Value"
-                      Background="White" Foreground="#071014" />
+            <ScrollViewer Grid.Row="1" Margin="0,22,0,20" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="0,0,10,0">
+                    <TextBlock Text="Perfil Print Screen" FontWeight="SemiBold" FontSize="15" />
+                    <TextBlock Text="O modo Firaw usa tratamento direto da tecla, semelhante aos capturadores dedicados."
+                               Margin="0,4,0,10" Foreground="{StaticResource FirawMutedText}"
+                               TextWrapping="Wrap" />
 
-            <TextBlock Text="Atalho personalizado" FontWeight="SemiBold" />
-            <TextBox x:Name="ShortcutInput" Height="38" Margin="0,7,0,4"
-                     IsReadOnly="True" FontSize="15" VerticalContentAlignment="Center"
-                     HorizontalContentAlignment="Center" Cursor="Hand"
-                     Background="White" Foreground="#071014" BorderBrush="#7B8A94"
-                     PreviewKeyDown="ShortcutInput_PreviewKeyDown" PreviewKeyUp="ShortcutInput_PreviewKeyUp"
-                     GotKeyboardFocus="ShortcutInput_GotKeyboardFocus"
-                     LostKeyboardFocus="ShortcutInput_LostKeyboardFocus" />
-            <TextBlock Text="Clique no campo e pressione a combinação — Print Screen também pode ser usada sozinha."
-                       Margin="0,0,0,16" Foreground="{StaticResource FirawMutedText}" FontSize="12" />
+                    <Border Background="{StaticResource FirawSurfaceRaised}" CornerRadius="8" Padding="12">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="150" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Print Screen" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                <RadioButton x:Name="RegionFirawRadio" Grid.Column="1" GroupName="RegionPrint"
+                                             Content="Firaw: região" Foreground="{StaticResource FirawText}"
+                                             VerticalAlignment="Center" />
+                                <RadioButton x:Name="RegionWindowsRadio" Grid.Column="2" GroupName="RegionPrint"
+                                             Content="Windows original" Foreground="{StaticResource FirawText}"
+                                             VerticalAlignment="Center" />
+                            </Grid>
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="150" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Alt + Print Screen" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                <RadioButton x:Name="MonitorFirawRadio" Grid.Column="1" GroupName="MonitorPrint"
+                                             Content="Firaw: monitor" Foreground="{StaticResource FirawText}"
+                                             VerticalAlignment="Center" />
+                                <RadioButton x:Name="MonitorWindowsRadio" Grid.Column="2" GroupName="MonitorPrint"
+                                             Content="Windows original" Foreground="{StaticResource FirawText}"
+                                             VerticalAlignment="Center" />
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="150" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Ctrl + Print Screen" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                <RadioButton x:Name="WindowFirawRadio" Grid.Column="1" GroupName="WindowPrint"
+                                             Content="Firaw: janela" Foreground="{StaticResource FirawText}"
+                                             VerticalAlignment="Center" />
+                                <RadioButton x:Name="WindowWindowsRadio" Grid.Column="2" GroupName="WindowPrint"
+                                             Content="Windows original" Foreground="{StaticResource FirawText}"
+                                             VerticalAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
 
-            <CheckBox x:Name="UsePrintScreenCheck" Content="Usar também a tecla Print Screen"
-                      FontWeight="SemiBold" Foreground="{StaticResource FirawText}" />
-            <CheckBox x:Name="StartWithWindowsCheck" Content="Iniciar o Firaw junto com o Windows"
-                      Margin="0,14,0,0" FontWeight="SemiBold"
-                      Foreground="{StaticResource FirawText}" />
-            <Border Background="{StaticResource FirawSurfaceRaised}" CornerRadius="8"
-                    Padding="12" Margin="0,10,0,0">
-                <TextBlock Foreground="{StaticResource FirawMutedText}" TextWrapping="Wrap"
-                           Text="Se o Windows mantiver a tecla ocupada, desative a opção ‘Usar Print Screen para abrir a captura de tela’ em Configurações › Acessibilidade › Teclado." />
-            </Border>
-            <Button Content="Abrir configurações do teclado do Windows"
-                    Style="{StaticResource FirawSecondaryButton}" Margin="0,8,0,0"
-                    HorizontalAlignment="Left" Click="OpenKeyboardSettingsButton_Click" />
-        </StackPanel>
+                    <WrapPanel Margin="0,8,0,18">
+                        <Button Content="Aplicar os 3 do Firaw" Style="{StaticResource FirawSecondaryButton}"
+                                Margin="0,0,8,8" Click="ApplyFirawPresetButton_Click" />
+                        <Button Content="Usar os 3 originais do Windows" Style="{StaticResource FirawSecondaryButton}"
+                                Margin="0,0,0,8" Click="RestoreWindowsPresetButton_Click" />
+                    </WrapPanel>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Cancelar" Style="{StaticResource FirawSecondaryButton}"
-                    Margin="0,0,8,0" Click="CancelButton_Click" />
-            <Button Content="Salvar" Style="{StaticResource FirawButton}"
-                    Click="SaveButton_Click" />
-        </StackPanel>
+                    <TextBlock Text="Atalho personalizado adicional" FontWeight="SemiBold" />
+                    <TextBox x:Name="ShortcutInput" Height="38" Margin="0,7,0,4"
+                             IsReadOnly="True" FontSize="15" VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Center" Cursor="Hand"
+                             Background="White" Foreground="#071014" BorderBrush="#7B8A94"
+                             PreviewKeyDown="ShortcutInput_PreviewKeyDown" PreviewKeyUp="ShortcutInput_PreviewKeyUp"
+                             GotKeyboardFocus="ShortcutInput_GotKeyboardFocus"
+                             LostKeyboardFocus="ShortcutInput_LostKeyboardFocus" />
+                    <TextBlock Text="As três combinações de Print Screen são controladas pelo perfil acima."
+                               Margin="0,0,0,14" Foreground="{StaticResource FirawMutedText}" FontSize="12" />
+
+                    <TextBlock Text="Modo do atalho personalizado" FontWeight="SemiBold" />
+                    <ComboBox x:Name="DefaultModeCombo" Height="36" Margin="0,7,0,16"
+                              DisplayMemberPath="Label" SelectedValuePath="Value"
+                              Background="White" Foreground="#071014" />
+
+                    <CheckBox x:Name="StartWithWindowsCheck" Content="Iniciar o Firaw junto com o Windows"
+                              FontWeight="SemiBold" Foreground="{StaticResource FirawText}" />
+
+                    <Border Background="{StaticResource FirawSurfaceRaised}" CornerRadius="8"
+                            Padding="12" Margin="0,14,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Integração com o Windows" FontWeight="SemiBold" />
+                            <TextBlock x:Name="WindowsShortcutStatus"
+                                       Text="Se o recorte do Windows continuar abrindo, use o botão para liberar o Print Screen."
+                                       Margin="0,5,0,9" Foreground="{StaticResource FirawMutedText}"
+                                       TextWrapping="Wrap" />
+                            <WrapPanel>
+                                <Button Content="Liberar Print Screen no Windows"
+                                        Style="{StaticResource FirawSecondaryButton}" Margin="0,0,8,8"
+                                        Click="DisableWindowsSnippingButton_Click" />
+                                <Button Content="Restaurar recorte do Windows"
+                                        Style="{StaticResource FirawSecondaryButton}" Margin="0,0,0,8"
+                                        Click="EnableWindowsSnippingButton_Click" />
+                            </WrapPanel>
+                            <Button Content="Abrir configurações do teclado do Windows"
+                                    Style="{StaticResource FirawSecondaryButton}" Margin="0,2,0,0"
+                                    HorizontalAlignment="Left" Click="OpenKeyboardSettingsButton_Click" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Cancelar" Style="{StaticResource FirawSecondaryButton}"
+                        Margin="0,0,8,0" Click="CancelButton_Click" />
+                <Button Content="Salvar" Style="{StaticResource FirawButton}"
+                        Click="SaveButton_Click" />
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>

@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-- Milestone M1: version 1.1.3 prevents global shortcuts from intercepting Print Screen while the preferences field records it.
+- Milestone M1: version 1.1.4 adds a Lightshot-style Print Screen profile with independent Region, Monitor, Window, and Windows-original routes.
 
 ## Decisions
 
@@ -13,11 +13,11 @@
 - Branding follows FirawSelector: dark surfaces, high contrast, and cyan as the primary accent. The initial theme token is `#19D3E6`, centralized so the exact Firaw cyan can be adjusted once without touching individual views.
 - Copied text history is kept in memory only, deduplicated, and limited to 100 entries; closing Firaw through the tray clears it.
 - Region capture remains adjustable; Window and Monitor use an in-app named target picker.
-- Capture preferences persist per Windows user, while Print Screen registration remains opt-in and reports Windows conflicts.
+- Capture preferences persist per Windows user. Print Screen combinations use a low-level keyboard hook with `RegisterHotKey` fallback, and only suppress combinations assigned to Firaw.
 - Windows startup is optional and current-user scoped; the published deliverables are self-contained x64 and x86 packages.
 - Tray gestures map left click to Region, Ctrl+left to Window, middle/scroll click to Monitor, and right click to the full menu.
 - Installed shortcuts and Windows startup target the updater launcher; update failures never prevent the current application from opening.
-- Release packages target `http://10.81.66.10/firaw-snapcopytext/`, with the server directory generated locally because the host was unavailable during packaging.
+- Releases and the automatic update manifest are published on GitHub over HTTPS.
 
 ## Blockers
 
@@ -25,7 +25,6 @@
 
 ## Next Steps
 
-- Copy the generated `update-server\firaw-snapcopytext` folder to the configured internal web server when it becomes reachable.
 - Obtain HTTPS and a code-signing certificate before external distribution.
 
 ## Deferred Ideas

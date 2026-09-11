@@ -1,6 +1,6 @@
 ﻿param(
-    [string]$Version = '1.1.3',
-    [string]$ReleaseNotes = 'Corrige a gravação de Print Screen no campo de atalho suspendendo temporariamente os atalhos globais durante as preferências.'
+    [string]$Version = '1.1.4',
+    [string]$ReleaseNotes = 'Adiciona o perfil Print Screen: seleção, monitor e janela, com opção de devolver cada combinação ao Windows.'
 )
 
 $ErrorActionPreference = 'Stop'

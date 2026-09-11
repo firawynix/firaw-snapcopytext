@@ -38,7 +38,12 @@ public partial class SettingsWindow : Window
         DefaultModeCombo.SelectedValue = preferences.DefaultMode;
         _shortcut = preferences.Shortcut;
         ShortcutInput.Text = _shortcut;
-        UsePrintScreenCheck.IsChecked = preferences.UsePrintScreen;
+        RegionFirawRadio.IsChecked = preferences.UsePrintScreen;
+        RegionWindowsRadio.IsChecked = !preferences.UsePrintScreen;
+        MonitorFirawRadio.IsChecked = preferences.UseAltPrintScreen;
+        MonitorWindowsRadio.IsChecked = !preferences.UseAltPrintScreen;
+        WindowFirawRadio.IsChecked = preferences.UseControlPrintScreen;
+        WindowWindowsRadio.IsChecked = !preferences.UseControlPrintScreen;
         StartWithWindowsCheck.IsChecked = preferences.StartWithWindows;
     }
 
@@ -71,7 +76,9 @@ public partial class SettingsWindow : Window
         {
             DefaultMode = DefaultModeCombo.SelectedValue is CaptureMode mode ? mode : CaptureMode.Region,
             Shortcut = _shortcut,
-            UsePrintScreen = UsePrintScreenCheck.IsChecked == true,
+            UsePrintScreen = RegionFirawRadio.IsChecked == true,
+            UseAltPrintScreen = MonitorFirawRadio.IsChecked == true,
+            UseControlPrintScreen = WindowFirawRadio.IsChecked == true,
             StartWithWindows = StartWithWindowsCheck.IsChecked == true
         };
         DialogResult = true;
@@ -85,6 +92,51 @@ public partial class SettingsWindow : Window
         {
             UseShellExecute = true
         });
+    }
+
+    private void ApplyFirawPresetButton_Click(object sender, RoutedEventArgs e)
+    {
+        RegionFirawRadio.IsChecked = true;
+        MonitorFirawRadio.IsChecked = true;
+        WindowFirawRadio.IsChecked = true;
+        WindowsShortcutStatus.Text = "Perfil Firaw selecionado. Clique em Salvar para aplicar.";
+    }
+
+    private void RestoreWindowsPresetButton_Click(object sender, RoutedEventArgs e)
+    {
+        RegionWindowsRadio.IsChecked = true;
+        MonitorWindowsRadio.IsChecked = true;
+        WindowWindowsRadio.IsChecked = true;
+        WindowsShortcutStatus.Text = "As três combinações serão devolvidas ao Windows ao salvar.";
+    }
+
+    private void DisableWindowsSnippingButton_Click(object sender, RoutedEventArgs e) =>
+        SetWindowsSnipping(enabled: false);
+
+    private void EnableWindowsSnippingButton_Click(object sender, RoutedEventArgs e) =>
+        SetWindowsSnipping(enabled: true);
+
+    private void SetWindowsSnipping(bool enabled)
+    {
+        try
+        {
+            WindowsPrintScreenService.SetScreenSnippingEnabled(enabled);
+            if (enabled)
+            {
+                RegionWindowsRadio.IsChecked = true;
+            }
+            else
+            {
+                RegionFirawRadio.IsChecked = true;
+            }
+            WindowsShortcutStatus.Text = enabled
+                ? "O recorte nativo foi restaurado e Print Screen foi marcado como Windows. Clique em Salvar."
+                : "O recorte nativo foi desativado e Print Screen foi marcado como Firaw. Clique em Salvar.";
+        }
+        catch (Exception exception)
+        {
+            WindowsShortcutStatus.Text = $"Não foi possível alterar o Windows: {exception.Message}";
+        }
     }
 
     private void ShortcutInput_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
@@ -112,6 +164,18 @@ public partial class SettingsWindow : Window
 
     private void RecordShortcut(ModifierKeys modifiers, Key key)
     {
+        ModifierKeys relevant = modifiers & (ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt);
+        if (key == Key.PrintScreen && relevant is ModifierKeys.None or ModifierKeys.Alt or ModifierKeys.Control)
+        {
+            if (relevant == ModifierKeys.None) RegionFirawRadio.IsChecked = true;
+            if (relevant == ModifierKeys.Alt) MonitorFirawRadio.IsChecked = true;
+            if (relevant == ModifierKeys.Control) WindowFirawRadio.IsChecked = true;
+            ShortcutInput.Text = _shortcut;
+            WindowsShortcutStatus.Text = "Combinação ativada no perfil Print Screen acima.";
+            Keyboard.ClearFocus();
+            return;
+        }
+
         if (HotkeyService.TryCreateShortcutLabel(modifiers, key, out string shortcut))
         {
             _shortcut = shortcut;

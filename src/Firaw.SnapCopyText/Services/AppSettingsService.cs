@@ -61,6 +61,8 @@ public sealed class AppSettingsService
                 ? normalized
                 : "Ctrl + Shift + S",
             UsePrintScreen = settings?.UsePrintScreen ?? true,
+            UseAltPrintScreen = settings?.UseAltPrintScreen ?? true,
+            UseControlPrintScreen = settings?.UseControlPrintScreen ?? true,
             StartWithWindows = settings?.StartWithWindows ?? false
         };
     }

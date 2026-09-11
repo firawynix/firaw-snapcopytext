@@ -1,8 +1,11 @@
 using System.Windows.Input;
+using Firaw.SnapCopyText.Models;
 using Firaw.SnapCopyText.Services;
 using Xunit;
 
 namespace Firaw.SnapCopyText.Tests;
+
+using CaptureMode = Firaw.SnapCopyText.Models.CaptureMode;
 
 public sealed class HotkeyServiceTests
 {
@@ -57,5 +60,40 @@ public sealed class HotkeyServiceTests
     public void TryParseShortcut_RejectsUnsafeOrIncompleteShortcut(string shortcut)
     {
         Assert.False(HotkeyService.TryParseShortcut(shortcut, out _, out _, out _));
+    }
+
+    [Theory]
+    [InlineData(ModifierKeys.None, CaptureMode.Region)]
+    [InlineData(ModifierKeys.Alt, CaptureMode.Monitor)]
+    [InlineData(ModifierKeys.Control, CaptureMode.Window)]
+    public void TryGetPresetMode_MapsFirawPrintScreenProfile(
+        ModifierKeys modifiers,
+        CaptureMode expectedMode)
+    {
+        bool found = HotkeyService.TryGetPresetMode(
+            new CapturePreferences(),
+            modifiers,
+            out CaptureMode mode);
+
+        Assert.True(found);
+        Assert.Equal(expectedMode, mode);
+    }
+
+    [Theory]
+    [InlineData(ModifierKeys.None)]
+    [InlineData(ModifierKeys.Alt)]
+    [InlineData(ModifierKeys.Control)]
+    [InlineData(ModifierKeys.Shift)]
+    [InlineData(ModifierKeys.Control | ModifierKeys.Alt)]
+    public void TryGetPresetMode_PassesOriginalWindowsCombinations(ModifierKeys modifiers)
+    {
+        var settings = new CapturePreferences
+        {
+            UsePrintScreen = false,
+            UseAltPrintScreen = false,
+            UseControlPrintScreen = false
+        };
+
+        Assert.False(HotkeyService.TryGetPresetMode(settings, modifiers, out _));
     }
 }

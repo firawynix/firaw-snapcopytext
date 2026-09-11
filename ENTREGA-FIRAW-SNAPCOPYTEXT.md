@@ -1,3 +1,15 @@
+# Perfil Print Screen — 1.1.4 (11 de setembro de 2026)
+
+- `Print Screen` abre a seleção de região.
+- `Alt + Print Screen` abre a escolha de monitor.
+- `Ctrl + Print Screen` abre a escolha de janela.
+- Cada combinação pode pertencer ao Firaw ou manter o comportamento original do Windows.
+- Um tratamento direto de teclado contorna conflitos em que o registro global comum fica ocupado.
+- As preferências incluem botões para liberar ou restaurar o recorte nativo do Windows.
+- Notas completas: `C:\Users\Hugo\Firaw-SnapCopyText\UPDATE-1.1.4.md`.
+
+---
+
 # Correção — 1.1.3 (11 de setembro de 2026)
 
 - Corrigida a gravação do Print Screen dentro do campo de atalho.

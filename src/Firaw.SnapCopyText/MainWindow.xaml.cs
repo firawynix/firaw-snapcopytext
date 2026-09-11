@@ -108,7 +108,7 @@ public partial class MainWindow : Window
     private void MainWindow_SourceInitialized(object? sender, EventArgs e)
     {
         _hotkeyService = new HotkeyService(this);
-        _hotkeyService.CaptureRequested += (_, _) => RequestCapture();
+        _hotkeyService.CaptureRequested += RequestCapture;
         _hotkeyService.Initialize(_preferences);
         _clipboardMonitorService = new ClipboardMonitorService(this, TextHistoryService.Shared);
         _clipboardMonitorService.Initialize();
@@ -123,17 +123,31 @@ public partial class MainWindow : Window
             return;
         }
 
-        string modeLabel = ModeLabel(_preferences.DefaultMode);
-        SetStatus((_hotkeyService.PrintScreenRegistered, _hotkeyService.FallbackRegistered, _preferences.UsePrintScreen) switch
+        List<string> activeShortcuts = [];
+        if (_hotkeyService.RegionShortcutActive)
         {
-            (true, true, _) => $"Pronto • Print Screen ou {_hotkeyService.FallbackLabel} • padrão: {modeLabel}",
-            (true, false, _) => $"Pronto • Print Screen • padrão: {modeLabel}",
-            (false, true, true) => $"Print Screen está ocupado • use {_hotkeyService.FallbackLabel}",
-            (false, true, false) => $"Pronto • {_hotkeyService.FallbackLabel} • padrão: {modeLabel}",
-            (false, false, _) when _hotkeyService.FallbackLabel == "Print Screen" =>
-                "Print Screen está ocupado • escolha outro atalho ou ajuste o Windows",
-            _ => "Atalhos ocupados • use um dos botões de captura"
-        });
+            activeShortcuts.Add("Print Screen: região");
+        }
+        if (_hotkeyService.MonitorShortcutActive)
+        {
+            activeShortcuts.Add("Alt + Print Screen: monitor");
+        }
+        if (_hotkeyService.WindowShortcutActive)
+        {
+            activeShortcuts.Add("Ctrl + Print Screen: janela");
+        }
+        if (_hotkeyService.FallbackRegistered)
+        {
+            activeShortcuts.Add($"{_hotkeyService.FallbackLabel}: {ModeLabel(_preferences.DefaultMode).ToLowerInvariant()}");
+        }
+
+        bool presetFailed = (_preferences.UsePrintScreen && !_hotkeyService.RegionShortcutActive) ||
+                            (_preferences.UseAltPrintScreen && !_hotkeyService.MonitorShortcutActive) ||
+                            (_preferences.UseControlPrintScreen && !_hotkeyService.WindowShortcutActive);
+        string prefix = presetFailed ? "Alguns atalhos estão ocupados" : "Pronto";
+        SetStatus(activeShortcuts.Count > 0
+            ? $"{prefix} • {string.Join(" • ", activeShortcuts)}"
+            : "Atalhos devolvidos ao Windows • use os botões de captura");
     }
 
     private async Task BeginCaptureAsync(CaptureMode mode)

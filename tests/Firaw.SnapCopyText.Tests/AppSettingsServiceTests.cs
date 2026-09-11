@@ -20,6 +20,8 @@ public sealed class AppSettingsServiceTests
                 DefaultMode = CaptureMode.Monitor,
                 Shortcut = "Ctrl + Alt + F9",
                 UsePrintScreen = false,
+                UseAltPrintScreen = false,
+                UseControlPrintScreen = true,
                 StartWithWindows = true
             });
 
@@ -28,6 +30,8 @@ public sealed class AppSettingsServiceTests
             Assert.Equal(CaptureMode.Monitor, loaded.DefaultMode);
             Assert.Equal("Ctrl + Alt + F9", loaded.Shortcut);
             Assert.False(loaded.UsePrintScreen);
+            Assert.False(loaded.UseAltPrintScreen);
+            Assert.True(loaded.UseControlPrintScreen);
             Assert.True(loaded.StartWithWindows);
         }
         finally
@@ -51,7 +55,36 @@ public sealed class AppSettingsServiceTests
             Assert.Equal(CaptureMode.Region, loaded.DefaultMode);
             Assert.Equal("Ctrl + Shift + S", loaded.Shortcut);
             Assert.True(loaded.UsePrintScreen);
+            Assert.True(loaded.UseAltPrintScreen);
+            Assert.True(loaded.UseControlPrintScreen);
             Assert.False(loaded.StartWithWindows);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void Load_EnablesNewPrintScreenProfileForLegacySettings()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"firaw-settings-{Guid.NewGuid():N}.json");
+        try
+        {
+            File.WriteAllText(path, """
+                {
+                  "DefaultMode": 0,
+                  "Shortcut": "Ctrl + Shift + S",
+                  "UsePrintScreen": true,
+                  "StartWithWindows": true
+                }
+                """);
+
+            CapturePreferences loaded = new AppSettingsService(path).Load();
+
+            Assert.True(loaded.UsePrintScreen);
+            Assert.True(loaded.UseAltPrintScreen);
+            Assert.True(loaded.UseControlPrintScreen);
         }
         finally
         {
