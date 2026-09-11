@@ -293,9 +293,16 @@ public partial class EditorWindow : Window
         EditorStatus.Text = $"Salvo: {System.IO.Path.GetFileName(dialog.FileName)}";
     }
 
-    private async void CopyTextButton_Click(object sender, RoutedEventArgs e)
+    private async void CopyTextButton_Click(object sender, RoutedEventArgs e) =>
+        await RecognizeAndCopyTextAsync(allowSelection: false);
+
+    private async void SelectTextButton_Click(object sender, RoutedEventArgs e) =>
+        await RecognizeAndCopyTextAsync(allowSelection: true);
+
+    private async Task RecognizeAndCopyTextAsync(bool allowSelection)
     {
         CopyTextButton.IsEnabled = false;
+        SelectTextButton.IsEnabled = false;
         EditorStatus.Text = "Reconhecendo texto localmente…";
 
         try
@@ -307,15 +314,29 @@ public partial class EditorWindow : Window
                 return;
             }
 
-            var preview = new OcrPreviewWindow(text) { Owner = this };
-            if (preview.ShowDialog() == true && !string.IsNullOrWhiteSpace(preview.ResultText) &&
-                TryClipboard(() => System.Windows.Clipboard.SetText(preview.ResultText)))
+            string textToCopy = text.Trim();
+            if (allowSelection)
             {
-                EditorStatus.Text = "Texto copiado para a área de transferência.";
+                var preview = new OcrPreviewWindow(text) { Owner = this };
+                if (preview.ShowDialog() != true)
+                {
+                    EditorStatus.Text = "Seleção de texto cancelada.";
+                    return;
+                }
+
+                textToCopy = preview.ResultText;
+                if (string.IsNullOrWhiteSpace(textToCopy))
+                {
+                    EditorStatus.Text = "Nenhum texto foi selecionado.";
+                    return;
+                }
             }
-            else
+
+            if (TryClipboard(() => System.Windows.Clipboard.SetText(textToCopy)))
             {
-                EditorStatus.Text = "Cópia de texto cancelada.";
+                EditorStatus.Text = allowSelection
+                    ? "Trecho selecionado copiado para a área de transferência."
+                    : "Todo o texto reconhecido foi copiado.";
             }
         }
         catch (Exception exception)
@@ -326,6 +347,7 @@ public partial class EditorWindow : Window
         finally
         {
             CopyTextButton.IsEnabled = true;
+            SelectTextButton.IsEnabled = true;
         }
     }
 
