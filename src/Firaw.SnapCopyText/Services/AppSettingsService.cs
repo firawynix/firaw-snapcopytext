@@ -60,7 +60,8 @@ public sealed class AppSettingsService
             Shortcut = HotkeyService.TryParseShortcut(shortcut, out _, out _, out string normalized)
                 ? normalized
                 : "Ctrl + Shift + S",
-            UsePrintScreen = settings?.UsePrintScreen ?? true
+            UsePrintScreen = settings?.UsePrintScreen ?? true,
+            StartWithWindows = settings?.StartWithWindows ?? false
         };
     }
 }

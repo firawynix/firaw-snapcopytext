@@ -19,6 +19,7 @@ public partial class MainWindow : Window
     private readonly CaptureRequestGate _captureGate = new();
     private readonly WindowSelectionService _windowSelectionService = new();
     private readonly AppSettingsService _settingsService = new();
+    private readonly StartupService _startupService = new();
     private CapturePreferences _preferences;
     private HotkeyService? _hotkeyService;
     private ClipboardMonitorService? _clipboardMonitorService;
@@ -27,6 +28,10 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         _preferences = _settingsService.Load();
+        if (_preferences.StartWithWindows)
+        {
+            TryApplyStartupPreference(showError: false);
+        }
         SourceInitialized += MainWindow_SourceInitialized;
         Closed += (_, _) =>
         {
@@ -56,8 +61,30 @@ public partial class MainWindow : Window
 
         _preferences = settingsWindow.SavedPreferences;
         _settingsService.Save(_preferences);
+        TryApplyStartupPreference(showError: true);
         _hotkeyService?.Apply(_preferences);
         RefreshHotkeyStatus();
+    }
+
+    private void TryApplyStartupPreference(bool showError)
+    {
+        try
+        {
+            _startupService.SetEnabled(_preferences.StartWithWindows);
+        }
+        catch (Exception exception) when (!showError)
+        {
+            System.Diagnostics.Debug.WriteLine(exception);
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(
+                this,
+                $"Não foi possível alterar a inicialização com o Windows.\n\n{exception.Message}",
+                "Firaw - Inicialização",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
     }
 
     private void CaptureModeButton_Click(object sender, RoutedEventArgs e)

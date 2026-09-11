@@ -29,6 +29,7 @@ public partial class SettingsWindow : Window
         _shortcut = preferences.Shortcut;
         ShortcutInput.Text = _shortcut;
         UsePrintScreenCheck.IsChecked = preferences.UsePrintScreen;
+        StartWithWindowsCheck.IsChecked = preferences.StartWithWindows;
     }
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -37,7 +38,8 @@ public partial class SettingsWindow : Window
         {
             DefaultMode = DefaultModeCombo.SelectedValue is CaptureMode mode ? mode : CaptureMode.Region,
             Shortcut = _shortcut,
-            UsePrintScreen = UsePrintScreenCheck.IsChecked == true
+            UsePrintScreen = UsePrintScreenCheck.IsChecked == true,
+            StartWithWindows = StartWithWindowsCheck.IsChecked == true
         };
         DialogResult = true;
     }

@@ -2,9 +2,15 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Firaw - Atalhos e preferências"
-        Width="490" Height="465" ResizeMode="NoResize"
+        Width="510" Height="590" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
-    <Grid Margin="28">
+    <Grid Background="{StaticResource FirawBackground}" Margin="0">
+        <Grid.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource FirawText}" />
+            </Style>
+        </Grid.Resources>
+        <Grid Margin="28">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -20,12 +26,14 @@
         <StackPanel Grid.Row="1" Margin="0,24,0,20">
             <TextBlock Text="Modo padrão do atalho" FontWeight="SemiBold" />
             <ComboBox x:Name="DefaultModeCombo" Height="36" Margin="0,7,0,18"
-                      DisplayMemberPath="Label" SelectedValuePath="Value" />
+                      DisplayMemberPath="Label" SelectedValuePath="Value"
+                      Background="White" Foreground="#071014" />
 
             <TextBlock Text="Atalho personalizado" FontWeight="SemiBold" />
             <TextBox x:Name="ShortcutInput" Height="38" Margin="0,7,0,4"
                      IsReadOnly="True" FontSize="15" VerticalContentAlignment="Center"
                      HorizontalContentAlignment="Center" Cursor="Hand"
+                     Background="White" Foreground="#071014" BorderBrush="#7B8A94"
                      PreviewKeyDown="ShortcutInput_PreviewKeyDown" GotKeyboardFocus="ShortcutInput_GotKeyboardFocus"
                      LostKeyboardFocus="ShortcutInput_LostKeyboardFocus" />
             <TextBlock Text="Clique no campo e pressione a nova combinação."
@@ -33,6 +41,9 @@
 
             <CheckBox x:Name="UsePrintScreenCheck" Content="Usar também a tecla Print Screen"
                       FontWeight="SemiBold" Foreground="{StaticResource FirawText}" />
+            <CheckBox x:Name="StartWithWindowsCheck" Content="Iniciar o Firaw junto com o Windows"
+                      Margin="0,14,0,0" FontWeight="SemiBold"
+                      Foreground="{StaticResource FirawText}" />
             <Border Background="{StaticResource FirawSurfaceRaised}" CornerRadius="8"
                     Padding="12" Margin="0,10,0,0">
                 <TextBlock Foreground="{StaticResource FirawMutedText}" TextWrapping="Wrap"
@@ -49,5 +60,6 @@
             <Button Content="Salvar" Style="{StaticResource FirawButton}"
                     Click="SaveButton_Click" />
         </StackPanel>
+        </Grid>
     </Grid>
 </Window>

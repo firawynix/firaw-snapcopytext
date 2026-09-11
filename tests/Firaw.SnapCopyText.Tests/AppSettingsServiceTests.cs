@@ -19,7 +19,8 @@ public sealed class AppSettingsServiceTests
             {
                 DefaultMode = CaptureMode.Monitor,
                 Shortcut = "Ctrl + Alt + F9",
-                UsePrintScreen = false
+                UsePrintScreen = false,
+                StartWithWindows = true
             });
 
             CapturePreferences loaded = service.Load();
@@ -27,6 +28,7 @@ public sealed class AppSettingsServiceTests
             Assert.Equal(CaptureMode.Monitor, loaded.DefaultMode);
             Assert.Equal("Ctrl + Alt + F9", loaded.Shortcut);
             Assert.False(loaded.UsePrintScreen);
+            Assert.True(loaded.StartWithWindows);
         }
         finally
         {
@@ -49,6 +51,7 @@ public sealed class AppSettingsServiceTests
             Assert.Equal(CaptureMode.Region, loaded.DefaultMode);
             Assert.Equal("Ctrl + Shift + S", loaded.Shortcut);
             Assert.True(loaded.UsePrintScreen);
+            Assert.False(loaded.StartWithWindows);
         }
         finally
         {
