@@ -77,6 +77,7 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 4. WHEN Use Print Screen is selected THEN Firaw SHALL attempt to register Print Screen globally.
 5. WHEN Windows owns Print Screen THEN Firaw SHALL provide a direct path to Keyboard settings and explain which Windows option to disable.
 6. WHEN Firaw restarts THEN it SHALL restore saved capture preferences from the current user's local settings.
+7. WHEN Start with Windows is selected THEN Firaw SHALL register the current executable for the current Windows user without requiring administrator access.
 
 **Independent Test:** Save Ctrl+Alt+F9 with Monitor as default, restart Firaw, and verify both values and the shortcut behavior.
 
@@ -101,10 +102,11 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 **Acceptance Criteria:**
 
 1. WHEN the user closes or minimizes the launcher THEN Firaw SHALL hide it and remain active in the system tray.
-2. WHEN the user double-clicks the Eye of Horus tray icon THEN Firaw SHALL restore and activate the launcher.
+2. WHEN the user selects Open Firaw from the Eye of Horus menu THEN Firaw SHALL restore and activate the launcher.
 3. WHEN the user opens the tray menu THEN Firaw SHALL offer Open, New capture, and Exit actions.
 4. WHEN the launcher is hidden THEN global capture shortcuts SHALL remain active.
 5. WHEN the Eye of Horus is shown in the fixed Windows tray slot THEN its artwork SHALL minimize transparent padding to remain clearly visible.
+6. WHEN the user left-clicks the tray eye THEN Firaw SHALL start Region capture; Ctrl+left-click SHALL open the Window picker; middle-click SHALL open the Monitor picker; right-click SHALL preserve the full menu.
 
 **Independent Test:** Close the launcher, verify the process and tray icon remain, invoke capture, then exit through the tray menu.
 
@@ -165,8 +167,10 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 | HOTKEY-01 | Global shortcut with fallback | Implemented; UAT pending |
 | HOTKEY-02 | Persistent custom shortcut and default capture mode | Implemented; automated tests passed |
 | HOTKEY-03 | Optional Print Screen registration and Windows settings path | Implemented; UAT pending |
+| START-01 | Optional per-user startup with Windows | Implemented; automated path test passed |
 | TRAY-01 | Continue running when launcher closes or minimizes | Implemented; UAT pending |
 | TRAY-02 | Tray open, capture, and exit commands | Implemented; UAT pending |
+| TRAY-03 | Tray mouse gestures for region, window, and monitor capture | Implemented; UAT pending |
 | HIST-01 | Monitor text clipboard changes in memory | Implemented; automated service tests passed |
 | HIST-02 | Collapsible multi-select text drawer | Implemented; UAT pending |
 | BRAND-01 | Eye of Horus icon for executable, app, and tray | Implemented; UAT pending |
@@ -174,7 +178,7 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 | BRAND-03 | Cyan launcher background with dark contrast | Implemented; visual smoke test passed |
 | BRAND-04 | Enlarged Eye of Horus artwork within the fixed tray slot | Implemented; asset inspected |
 
-**Coverage:** 28 total, 28 mapped to tasks, 0 unmapped.
+**Coverage:** 30 total, 30 mapped to tasks, 0 unmapped.
 
 ## Success Criteria
 

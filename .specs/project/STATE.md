@@ -14,6 +14,8 @@
 - Copied text history is kept in memory only, deduplicated, and limited to 100 entries; closing Firaw through the tray clears it.
 - Region capture remains adjustable; Window and Monitor use an in-app named target picker.
 - Capture preferences persist per Windows user, while Print Screen registration remains opt-in and reports Windows conflicts.
+- Windows startup is optional and current-user scoped; the published deliverables are self-contained x64 and x86 packages.
+- Tray gestures map left click to Region, Ctrl+left to Window, middle/scroll click to Monitor, and right click to the full menu.
 
 ## Blockers
 

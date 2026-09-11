@@ -1,11 +1,11 @@
 # Windows MVP Tasks
 
 **Design:** `.specs/features/windows-mvp/design.md`
-**Status:** Done through T24; interactive UAT pending
+**Status:** Done through T26; interactive UAT pending
 
 ## Execution Plan
 
-T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -> T14 -> T15 -> T16 -> T17 -> T18 -> T19 -> T20 -> T21 -> T22 -> T23 -> T24
+T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -> T14 -> T15 -> T16 -> T17 -> T18 -> T19 -> T20 -> T21 -> T22 -> T23 -> T24 -> T25 -> T26
 
 ## Task Breakdown
 
@@ -232,6 +232,24 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -
 **Requirements:** BRAND-04
 **Done when:** transparent padding is reduced while the Horus silhouette remains intact at all packaged icon sizes.
 **Verify:** original-resolution asset inspection and tray UAT.
+
+### T25: Polish preferences and add Windows startup
+
+**Status:** DONE
+
+**Where:** preferences window, CapturePreferences, StartupService, and tests.
+**Requirements:** START-01
+**Done when:** preferences use readable dark/cyan contrast and a saved checkbox adds/removes the current executable from the current-user Windows startup list.
+**Verify:** visual settings inspection, path quoting test, and restart UAT.
+
+### T26: Add direct tray capture gestures and dual architecture packages
+
+**Status:** DONE
+
+**Where:** tray lifecycle and publish outputs.
+**Requirements:** TRAY-03
+**Done when:** left, Ctrl+left, middle, and right clicks have distinct documented actions, and self-contained win-x64/win-x86 packages start successfully.
+**Verify:** tray interaction UAT and launch smoke test of both publish outputs.
 
 ## Tools
 

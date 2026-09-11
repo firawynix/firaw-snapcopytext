@@ -22,7 +22,9 @@ O pacote publicado é autocontido para Windows x64. Ele não precisa do SDK .NET
 
 Em **Atalhos e preferências**, escolha o modo usado pelo atalho, clique no campo de atalho e pressione sua própria combinação. A mesma tela permite ativar o Print Screen e abrir diretamente as configurações de teclado do Windows caso a Ferramenta de Captura esteja ocupando essa tecla.
 
-Ao fechar ou minimizar a janela principal, o Firaw continua ativo no Olho de Hórus da bandeja do Windows. Clique duas vezes para abrir; clique com o botão direito para abrir, iniciar uma captura ou sair.
+Nessa tela também é possível marcar **Iniciar o Firaw junto com o Windows**. A configuração vale somente para o usuário atual e não precisa de permissão de administrador.
+
+Ao fechar ou minimizar a janela principal, o Firaw continua ativo no Olho de Hórus da bandeja do Windows. No olho: clique esquerdo captura uma região; `Ctrl` + clique esquerdo abre as janelas; clique do botão do meio/scroll abre os monitores; botão direito abre o menu completo, inclusive **Abrir Firaw** e **Sair**.
 
 Se o Lightshot ou o Recorte do Windows estiver usando `Print Screen`, o Firaw mostra o conflito e mantém o atalho alternativo e o botão disponíveis.
 
@@ -61,10 +63,11 @@ dotnet test Firaw.SnapCopyText.sln
 dotnet run --project src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj
 ```
 
-Publicação autocontida:
+Publicações autocontidas x64 e x86:
 
 ```powershell
-dotnet publish src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj -c Release -r win-x64 --self-contained true -o artifacts\Firaw-SnapCopyText
+dotnet publish src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj -c Release -r win-x64 --self-contained true -o artifacts\Firaw-SnapCopyText-x64
+dotnet publish src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj -c Release -r win-x86 --self-contained true -o artifacts\Firaw-SnapCopyText-x86
 ```
 
 ## Identidade visual

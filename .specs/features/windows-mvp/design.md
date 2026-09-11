@@ -59,7 +59,7 @@ This is a greenfield project. It reuses Windows desktop, WPF rendering, clipboar
 
 ### App tray lifecycle
 
-- **Purpose:** Keep the process alive explicitly, hide the launcher on close/minimize, expose tray actions, and perform intentional shutdown.
+- **Purpose:** Keep the process alive explicitly, hide the launcher on close/minimize, expose the full context menu, map left/Ctrl+left/middle clicks to Region/Window/Monitor, and perform intentional shutdown.
 - **Location:** `App.xaml.cs`.
 - **Dependencies:** Windows Forms NotifyIcon using the multi-resolution Firaw ICO resource.
 
@@ -73,6 +73,12 @@ This is a greenfield project. It reuses Windows desktop, WPF rendering, clipboar
 - **Purpose:** Persist per-user capture preferences, enumerate visible windows and monitors, and expose named/dimensioned targets to the picker.
 - **Location:** `Services/AppSettingsService.cs`, `Services/WindowSelectionService.cs`, and `Views/CaptureTargetPickerWindow.xaml(.cs)`.
 - **Storage:** `%LOCALAPPDATA%\Firaw\SnapCopyText\settings.json`; clipboard text history remains memory-only.
+
+### StartupService
+
+- **Purpose:** Add or remove the exact running executable from the current user's Windows Run entry.
+- **Location:** `Services/StartupService.cs`.
+- **Scope:** Current user only, avoiding administrator elevation; the selected architecture registers its own executable path.
 
 ## Data Models
 
