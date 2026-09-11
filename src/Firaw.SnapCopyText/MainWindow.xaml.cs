@@ -28,8 +28,10 @@ public partial class MainWindow : Window
 
     public void SetStatus(string message) => StatusText.Text = message;
 
+    public void RequestCapture() => CaptureRequested?.Invoke(this, EventArgs.Empty);
+
     private void CaptureButton_Click(object sender, RoutedEventArgs e) =>
-        CaptureRequested?.Invoke(this, EventArgs.Empty);
+        RequestCapture();
 
     private void MainWindow_SourceInitialized(object? sender, EventArgs e)
     {
@@ -71,7 +73,11 @@ public partial class MainWindow : Window
 
             if (selected)
             {
-                var editor = new EditorWindow(overlay.SelectedImage!) { Owner = this };
+                var editor = new EditorWindow(overlay.SelectedImage!);
+                if (IsVisible)
+                {
+                    editor.Owner = this;
+                }
                 editor.Show();
                 SetStatus("Captura aberta no editor.");
             }
