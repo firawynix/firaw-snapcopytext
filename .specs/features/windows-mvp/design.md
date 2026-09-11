@@ -5,11 +5,11 @@
 
 ## Architecture Overview
 
-The WPF process owns a small launcher window and registers capture hotkeys. Before the capture service snapshots the virtual desktop, the launcher records every visible Firaw window, temporarily disables its DWM transitions, hides it, waits for the UI compositor to settle, and restores the window plus its original transition setting after selection. The borderless overlay keeps the selected rectangle active so it can be moved or resized through eight handles before confirmation. The editor renders annotations over the image, delegates OCR to a local service, and writes image or Unicode text to the clipboard.
+The WPF process owns a small launcher window and registers user-configurable capture hotkeys. Region capture uses the adjustable borderless overlay. Window and monitor capture first open a Firaw target picker containing the available programs or screens. Before pixels are read, the launcher records every visible Firaw window, marks it excluded from capture, disables DWM transitions, hides it, waits for the compositor, and restores the original state afterward. Window capture uses the selected native handle so overlapping foreground windows are not flattened into the result; screen crop remains the compatibility fallback. The editor renders annotations over the image, delegates OCR to a local service, and writes image or Unicode text to the clipboard.
 
 The presentation layer uses centralized Firaw theme resources: dark neutral backgrounds, white text, and cyan (`#19D3E6`) for primary actions, focus, selection borders, and active tools.
 
-Flow: Hotkey/Button -> Hide Firaw windows -> Desktop capture -> Adjustable selection overlay -> Restore windows -> Editor -> Clipboard/PNG or Local OCR -> Full image or in-image text region -> Clipboard.
+Flow: Hotkey/Button -> Default or explicit capture mode -> Optional in-app target picker -> Hide Firaw windows -> Region overlay / monitor crop / native window render -> Restore windows -> Editor -> Clipboard/PNG or local OCR.
 
 Background flow: Windows clipboard update -> hidden launcher window message hook -> in-memory TextHistoryService -> editor drawer -> multi-selection -> combined clipboard text.
 
@@ -47,7 +47,7 @@ This is a greenfield project. It reuses Windows desktop, WPF rendering, clipboar
 
 ### HotkeyService
 
-- **Purpose:** Register Print Screen and a fallback Ctrl+Shift+S shortcut and raise capture requests.
+- **Purpose:** Register optional Print Screen plus the user's recorded combination and raise capture requests in the saved default mode.
 - **Location:** `src/Firaw.SnapCopyText/Services/HotkeyService.cs`
 - **Dependencies:** Win32 `RegisterHotKey` and the main window handle.
 
@@ -67,6 +67,12 @@ This is a greenfield project. It reuses Windows desktop, WPF rendering, clipboar
 
 - **Purpose:** Apply Firaw cyan caption and dark caption text through supported Windows DWM attributes.
 - **Location:** `Services/WindowBrandingService.cs`.
+
+### AppSettingsService and capture target services
+
+- **Purpose:** Persist per-user capture preferences, enumerate visible windows and monitors, and expose named/dimensioned targets to the picker.
+- **Location:** `Services/AppSettingsService.cs`, `Services/WindowSelectionService.cs`, and `Views/CaptureTargetPickerWindow.xaml(.cs)`.
+- **Storage:** `%LOCALAPPDATA%\Firaw\SnapCopyText\settings.json`; clipboard text history remains memory-only.
 
 ## Data Models
 
@@ -89,5 +95,7 @@ This is a greenfield project. It reuses Windows desktop, WPF rendering, clipboar
 | --- | --- | --- |
 | Desktop UI | WPF on .NET 9 | Installed toolchain, mature overlay/rendering APIs |
 | Region capture | Frozen virtual-screen bitmap | Matches the fast Lightshot-style drag interaction |
+| Covered window capture | Win32 PrintWindow with visible-screen fallback | Requests the selected window's pixels instead of flattening windows in front |
+| Preferences | Small per-user JSON file | Keeps default mode, custom shortcut, and Print Screen choice across restarts |
 | OCR | Tesseract 5 local models | Offline, no NPU requirement, no automatic upload |
 | Output | WPF RenderTargetBitmap | Captures the base image and annotations together |

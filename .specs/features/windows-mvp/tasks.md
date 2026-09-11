@@ -1,11 +1,11 @@
 # Windows MVP Tasks
 
 **Design:** `.specs/features/windows-mvp/design.md`
-**Status:** Done through T19; interactive UAT pending
+**Status:** Done through T24; interactive UAT pending
 
 ## Execution Plan
 
-T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -> T14 -> T15 -> T16 -> T17 -> T18 -> T19
+T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -> T14 -> T15 -> T16 -> T17 -> T18 -> T19 -> T20 -> T21 -> T22 -> T23 -> T24
 
 ## Task Breakdown
 
@@ -187,6 +187,51 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -
 **Requirements:** HIST-02
 **Done when:** the drawer opens/closes, imports the clipboard, allows extended selection, copies combined text, and clears its list.
 **Verify:** editor construction plus interactive multi-select test.
+
+### T20: Replace the launcher white background
+
+**Status:** DONE
+
+**Where:** launcher layout and brand documentation.
+**Requirements:** BRAND-03
+**Done when:** the launcher client area is cyan and its content keeps readable dark contrast.
+**Verify:** rendered launcher screenshot inspection.
+
+### T21: Add capture source modes and pickers
+
+**Status:** DONE
+
+**Where:** launcher, capture target models/services, target picker, capture lifecycle.
+**Requirements:** CAP-06, CAP-07, CAP-08
+**Done when:** Region retains the overlay, Monitor lists every screen, Window lists programs and captures the chosen handle even when covered.
+**Verify:** tests, picker inspection, and interactive capture of a covered window.
+
+### T22: Add persistent custom capture preferences
+
+**Status:** DONE
+
+**Where:** CapturePreferences, AppSettingsService, HotkeyService, SettingsWindow, tray menu, and tests.
+**Requirements:** HOTKEY-02, HOTKEY-03
+**Done when:** a recorded combination, default mode, and optional Print Screen preference survive restart and registration conflicts remain non-destructive.
+**Verify:** settings and shortcut parser tests plus settings-window smoke test.
+
+### T23: Replace color dropdown with swatch palette
+
+**Status:** DONE
+
+**Where:** editor footer and brush selection.
+**Requirements:** EDIT-04
+**Done when:** eight predefined swatches are visible and mutually exclusive, with Firaw cyan selected first.
+**Verify:** editor screenshot inspection and drawing smoke test.
+
+### T24: Increase tray-eye visual size
+
+**Status:** DONE
+
+**Where:** PNG and multi-resolution ICO assets.
+**Requirements:** BRAND-04
+**Done when:** transparent padding is reduced while the Horus silhouette remains intact at all packaged icon sizes.
+**Verify:** original-resolution asset inspection and tray UAT.
 
 ## Tools
 

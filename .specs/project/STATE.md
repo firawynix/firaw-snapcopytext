@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-- Milestone M1: tray lifecycle, Eye of Horus branding, cyan captions, and copied-text drawer implemented; publication and user acceptance test pending.
+- Milestone M1: capture modes, in-app target pickers, custom shortcuts, tray lifecycle, Eye of Horus branding, cyan launcher, palette, and copied-text drawer implemented; final packaged UAT pending.
 
 ## Decisions
 
@@ -12,6 +12,8 @@
 - No capture is uploaded automatically or implicitly.
 - Branding follows FirawSelector: dark surfaces, high contrast, and cyan as the primary accent. The initial theme token is `#19D3E6`, centralized so the exact Firaw cyan can be adjusted once without touching individual views.
 - Copied text history is kept in memory only, deduplicated, and limited to 100 entries; closing Firaw through the tray clears it.
+- Region capture remains adjustable; Window and Monitor use an in-app named target picker.
+- Capture preferences persist per Windows user, while Print Screen registration remains opt-in and reports Windows conflicts.
 
 ## Blockers
 
@@ -19,7 +21,7 @@
 
 ## Next Steps
 
-- User validates that Firaw windows disappear before capture, the selected region moves/resizes, and both OCR copy modes work.
+- User validates covered-window capture, the custom shortcut, the larger tray artwork, and both OCR copy modes.
 - Adjust `FirawCyanColor` if the exact FirawSelector cyan differs from the initial `#19D3E6` token.
 
 ## Deferred Ideas

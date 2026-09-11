@@ -46,8 +46,39 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 3. WHEN the user chooses Save THEN Firaw SHALL write a PNG selected by the user.
 4. WHEN the user chooses Undo or Redo THEN Firaw SHALL update the latest annotation accordingly.
 5. WHEN the user chooses Annotation and clicks the image THEN Firaw SHALL add the entered note as a dark box with a cyan-colored border and text.
+6. WHEN the user chooses an annotation color THEN Firaw SHALL show a preset visual palette whose initially selected primary color is Firaw cyan.
 
 **Independent Test:** Draw a rectangle, undo, redo, copy, and paste into another application.
+
+### P1: Choose a capture source
+
+**User Story:** As a user, I want to capture a free region, an open window, or an entire monitor so that the capture matches what I intend to reuse.
+
+**Acceptance Criteria:**
+
+1. WHEN the launcher is visible THEN Firaw SHALL offer Region, Window, and Monitor capture actions.
+2. WHEN the user chooses Window THEN Firaw SHALL show an in-app list of available program windows with their names and dimensions.
+3. WHEN the user chooses Monitor THEN Firaw SHALL show an in-app list of every available monitor, identify the primary monitor, and show dimensions.
+4. WHEN a monitor is confirmed THEN Firaw SHALL capture that complete monitor.
+5. WHEN a window is confirmed THEN Firaw SHALL request pixels from that window so content is not replaced by another window positioned in front of it.
+6. WHEN the user chooses Region THEN Firaw SHALL retain the adjustable Lightshot-style overlay.
+
+**Independent Test:** Capture one target through each mode, including a partially covered window, and verify the resulting editor image.
+
+### P1: Configure capture shortcuts
+
+**User Story:** As a user, I want to choose the default capture mode and record my own shortcut so that Firaw fits my workflow.
+
+**Acceptance Criteria:**
+
+1. WHEN preferences open THEN Firaw SHALL let the user choose the default Region, Window, or Monitor mode used by global shortcuts.
+2. WHEN the shortcut field has focus and the user presses a valid combination THEN Firaw SHALL display, save, and register that combination.
+3. WHEN a shortcut is incomplete, reserved, or occupied THEN Firaw SHALL keep capture buttons usable and report the conflict.
+4. WHEN Use Print Screen is selected THEN Firaw SHALL attempt to register Print Screen globally.
+5. WHEN Windows owns Print Screen THEN Firaw SHALL provide a direct path to Keyboard settings and explain which Windows option to disable.
+6. WHEN Firaw restarts THEN it SHALL restore saved capture preferences from the current user's local settings.
+
+**Independent Test:** Save Ctrl+Alt+F9 with Monitor as default, restart Firaw, and verify both values and the shortcut behavior.
 
 ### P1: Copy text with local OCR
 
@@ -73,6 +104,7 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 2. WHEN the user double-clicks the Eye of Horus tray icon THEN Firaw SHALL restore and activate the launcher.
 3. WHEN the user opens the tray menu THEN Firaw SHALL offer Open, New capture, and Exit actions.
 4. WHEN the launcher is hidden THEN global capture shortcuts SHALL remain active.
+5. WHEN the Eye of Horus is shown in the fixed Windows tray slot THEN its artwork SHALL minimize transparent padding to remain clearly visible.
 
 **Independent Test:** Close the launcher, verify the process and tray icon remain, invoke capture, then exit through the tray menu.
 
@@ -98,6 +130,7 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 
 1. WHEN Windows displays the executable, window, or tray entry THEN Firaw SHALL use the cyan Eye of Horus icon.
 2. WHEN Windows 11 supports caption-color attributes THEN standard Firaw title bars SHALL use cyan instead of white with dark caption text.
+3. WHEN the launcher is shown THEN its former white client background SHALL use Firaw cyan with dark high-contrast controls.
 
 **Independent Test:** Inspect the executable icon, notification area, launcher, editor, and dialog title bars.
 
@@ -117,23 +150,31 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 | CAP-03 | Hide all Firaw windows before freezing desktop | Implemented; UAT pending |
 | CAP-04 | Move and resize active selection | Implemented; geometry tests passed, UAT pending |
 | CAP-05 | Prevent DWM hide-transition ghosts in the snapshot | Implemented; UAT pending |
+| CAP-06 | Region, window, and monitor capture modes | Implemented; UAT pending |
+| CAP-07 | In-app target picker for windows and monitors | Implemented; visual smoke test passed |
+| CAP-08 | Capture obscured window content through its window handle | Implemented; UAT pending |
 | EDIT-01 | Draw annotations | Implemented; UAT pending |
 | EDIT-02 | Undo and redo | Implemented; automated test passed |
 | EDIT-03 | Add boxed notes to the image | Implemented; UAT pending |
+| EDIT-04 | Preset visual color palette with Firaw cyan selected | Implemented; visual smoke test passed |
 | IMG-01 | Copy rendered image | Implemented; UAT pending |
 | IMG-02 | Save PNG | Implemented; UAT pending |
 | OCR-01 | Local Portuguese/English recognition | Verified by automated smoke test |
 | OCR-02 | Direct copy of all recognized text | Implemented; UAT pending |
 | OCR-03 | Select an image region and copy its OCR without a dialog | Implemented; UAT pending |
 | HOTKEY-01 | Global shortcut with fallback | Implemented; UAT pending |
+| HOTKEY-02 | Persistent custom shortcut and default capture mode | Implemented; automated tests passed |
+| HOTKEY-03 | Optional Print Screen registration and Windows settings path | Implemented; UAT pending |
 | TRAY-01 | Continue running when launcher closes or minimizes | Implemented; UAT pending |
 | TRAY-02 | Tray open, capture, and exit commands | Implemented; UAT pending |
 | HIST-01 | Monitor text clipboard changes in memory | Implemented; automated service tests passed |
 | HIST-02 | Collapsible multi-select text drawer | Implemented; UAT pending |
 | BRAND-01 | Eye of Horus icon for executable, app, and tray | Implemented; UAT pending |
 | BRAND-02 | Cyan Windows title bars where supported | Implemented; UAT pending |
+| BRAND-03 | Cyan launcher background with dark contrast | Implemented; visual smoke test passed |
+| BRAND-04 | Enlarged Eye of Horus artwork within the fixed tray slot | Implemented; asset inspected |
 
-**Coverage:** 20 total, 20 mapped to tasks, 0 unmapped.
+**Coverage:** 28 total, 28 mapped to tasks, 0 unmapped.
 
 ## Success Criteria
 
