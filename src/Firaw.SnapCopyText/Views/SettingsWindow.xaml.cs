@@ -71,7 +71,7 @@ public partial class SettingsWindow : Window
         }
         else if (key is not (Key.LeftCtrl or Key.RightCtrl or Key.LeftShift or Key.RightShift or Key.LeftAlt or Key.RightAlt))
         {
-            ShortcutInput.Text = "Use Ctrl, Shift ou Alt + uma tecla";
+            ShortcutInput.Text = "Use uma combinação ou pressione Print Screen";
         }
 
         e.Handled = true;

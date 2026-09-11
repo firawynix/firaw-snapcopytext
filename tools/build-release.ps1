@@ -1,6 +1,6 @@
 ﻿param(
-    [string]$Version = '1.1.1',
-    [string]$ReleaseNotes = 'Atualização automática pelas releases do GitHub (HTTPS) e remoção do início automático ao desinstalar.'
+    [string]$Version = '1.1.2',
+    [string]$ReleaseNotes = 'Atalho personalizado agora aceita Print Screen ou PrtSc sem modificadores, além das combinações existentes.'
 )
 
 $ErrorActionPreference = 'Stop'

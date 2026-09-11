@@ -36,7 +36,7 @@
                      Background="White" Foreground="#071014" BorderBrush="#7B8A94"
                      PreviewKeyDown="ShortcutInput_PreviewKeyDown" GotKeyboardFocus="ShortcutInput_GotKeyboardFocus"
                      LostKeyboardFocus="ShortcutInput_LostKeyboardFocus" />
-            <TextBlock Text="Clique no campo e pressione a nova combinação."
+            <TextBlock Text="Clique no campo e pressione a combinação — Print Screen também pode ser usada sozinha."
                        Margin="0,0,0,16" Foreground="{StaticResource FirawMutedText}" FontSize="12" />
 
             <CheckBox x:Name="UsePrintScreenCheck" Content="Usar também a tecla Print Screen"

@@ -78,6 +78,7 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 5. WHEN Windows owns Print Screen THEN Firaw SHALL provide a direct path to Keyboard settings and explain which Windows option to disable.
 6. WHEN Firaw restarts THEN it SHALL restore saved capture preferences from the current user's local settings.
 7. WHEN Start with Windows is selected THEN Firaw SHALL register the current executable for the current Windows user without requiring administrator access and start hidden in the tray at sign-in.
+8. WHEN Print Screen is pressed while recording the custom shortcut THEN Firaw SHALL accept it without Ctrl, Shift, or Alt and avoid registering the same key twice.
 
 **Independent Test:** Save Ctrl+Alt+F9 with Monitor as default, restart Firaw, and verify both values and the shortcut behavior.
 
@@ -183,6 +184,7 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 | HOTKEY-01 | Global shortcut with fallback | Implemented; UAT pending |
 | HOTKEY-02 | Persistent custom shortcut and default capture mode | Implemented; automated tests passed |
 | HOTKEY-03 | Optional Print Screen registration and Windows settings path | Implemented; UAT pending |
+| HOTKEY-04 | Print Screen as a standalone custom shortcut | Implemented; automated tests passed |
 | START-01 | Optional per-user startup with Windows | Implemented; automated path test passed |
 | TRAY-01 | Continue running when launcher closes or minimizes | Implemented; UAT pending |
 | TRAY-02 | Tray open, capture, and exit commands | Implemented; UAT pending |
@@ -198,7 +200,7 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 | UPDATE-03 | Inno x64/x86 installers and server-ready manifest | Implemented; hashes and sizes validated |
 | SITE-01 | Responsive local-only product demonstration | Implemented; visual and interaction smoke tests passed |
 
-**Coverage:** 34 total, 34 mapped to tasks, 0 unmapped.
+**Coverage:** 35 total, 35 mapped to tasks, 0 unmapped.
 
 ## Success Criteria
 

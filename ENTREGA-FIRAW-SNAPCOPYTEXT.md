@@ -1,3 +1,17 @@
+# Ajuste — 1.1.2 (11 de setembro de 2026)
+
+- O campo **Atalho personalizado** agora reconhece `Print Screen`/`PrtSc` sozinha.
+- `Ctrl`, `Shift` e `Alt` continuam opcionais para a tecla Print Screen e obrigatórios para teclas comuns.
+- Se **Usar também a tecla Print Screen** estiver marcado, o Firaw evita registrar a mesma tecla duas vezes.
+- Quando o Windows ou outro aplicativo ocupa a tecla, o status orienta escolher outro atalho ou ajustar o Windows.
+- Pacote local para a próxima release: `C:\Users\Hugo\Firaw-SnapCopyText\release\Firaw-SnapCopyText-1.1.2\github-release`.
+- Notas completas: `C:\Users\Hugo\Firaw-SnapCopyText\UPDATE-1.1.2.md`.
+- 30 de 30 testes aprovados; hashes x64 e x86 conferidos com o manifesto.
+
+Esta versão não é publicada automaticamente pelo script de geração.
+
+---
+
 # Atualização — 1.1.1 (11 de setembro de 2026)
 
 O endereço `http://10.81.66.10/firaw-snapcopytext/` só existe dentro da rede local

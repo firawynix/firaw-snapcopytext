@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-- Milestone M1: product functionality implemented; version 1.1.0 release now includes a verified self-updating launcher, Inno x64/x86 installers, and local demonstration page.
+- Milestone M1: version 1.1.2 accepts Print Screen as a standalone custom shortcut and keeps the verified GitHub-based updater and x64/x86 packaging flow.
 
 ## Decisions
 

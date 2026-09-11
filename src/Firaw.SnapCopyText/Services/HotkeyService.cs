@@ -60,21 +60,26 @@ public sealed class HotkeyService : IDisposable
 
         UnregisterCurrentHotkeys();
 
-        if (settings.UsePrintScreen)
-        {
-            PrintScreenRegistered = RegisterHotKey(_windowHandle, PrintScreenId, ModNoRepeat, VkSnapshot);
-        }
-
         if (!TryParseShortcut(settings.Shortcut, out uint modifiers, out Key key, out string label))
         {
             TryParseShortcut("Ctrl + Shift + S", out modifiers, out key, out label);
         }
         FallbackLabel = label;
-        FallbackRegistered = RegisterHotKey(
-            _windowHandle,
-            FallbackId,
-            modifiers | ModNoRepeat,
-            (uint)KeyInterop.VirtualKeyFromKey(key));
+        bool customShortcutIsPrintScreen = key == Key.PrintScreen && modifiers == 0;
+
+        if (settings.UsePrintScreen)
+        {
+            PrintScreenRegistered = RegisterHotKey(_windowHandle, PrintScreenId, ModNoRepeat, VkSnapshot);
+        }
+
+        if (!customShortcutIsPrintScreen || !settings.UsePrintScreen)
+        {
+            FallbackRegistered = RegisterHotKey(
+                _windowHandle,
+                FallbackId,
+                modifiers | ModNoRepeat,
+                (uint)KeyInterop.VirtualKeyFromKey(key));
+        }
     }
 
     public void Dispose()
@@ -114,14 +119,15 @@ public sealed class HotkeyService : IDisposable
     {
         label = string.Empty;
         if (key is Key.None or Key.LeftCtrl or Key.RightCtrl or Key.LeftShift or Key.RightShift or
-            Key.LeftAlt or Key.RightAlt or Key.LWin or Key.RWin or Key.Escape or Key.Tab or Key.Enter or Key.PrintScreen)
+            Key.LeftAlt or Key.RightAlt or Key.LWin or Key.RWin or Key.Escape or Key.Tab or Key.Enter)
         {
             return false;
         }
 
         bool isFunctionKey = key >= Key.F1 && key <= Key.F24;
+        bool isDedicatedShortcutKey = key == Key.PrintScreen;
         ModifierKeys allowed = modifiers & (ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt);
-        if (allowed == ModifierKeys.None && !isFunctionKey)
+        if (allowed == ModifierKeys.None && !isFunctionKey && !isDedicatedShortcutKey)
         {
             return false;
         }
@@ -130,7 +136,7 @@ public sealed class HotkeyService : IDisposable
         if (allowed.HasFlag(ModifierKeys.Control)) parts.Add("Ctrl");
         if (allowed.HasFlag(ModifierKeys.Shift)) parts.Add("Shift");
         if (allowed.HasFlag(ModifierKeys.Alt)) parts.Add("Alt");
-        parts.Add(key.ToString().ToUpperInvariant());
+        parts.Add(key == Key.PrintScreen ? "Print Screen" : key.ToString().ToUpperInvariant());
         label = string.Join(" + ", parts);
         return true;
     }
@@ -164,6 +170,11 @@ public sealed class HotkeyService : IDisposable
             else if (rawPart.Equals("Alt", StringComparison.OrdinalIgnoreCase))
             {
                 modifierKeys |= ModifierKeys.Alt;
+            }
+            else if (rawPart.Equals("Print Screen", StringComparison.OrdinalIgnoreCase) ||
+                     rawPart.Equals("PrtSc", StringComparison.OrdinalIgnoreCase))
+            {
+                key = Key.PrintScreen;
             }
             else if (!Enum.TryParse(rawPart, ignoreCase: true, out key))
             {

@@ -1,11 +1,11 @@
 # Windows MVP Tasks
 
 **Design:** `.specs/features/windows-mvp/design.md`
-**Status:** Done through T29; release validation passed
+**Status:** Done through T30; release validation passed
 
 ## Execution Plan
 
-T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -> T14 -> T15 -> T16 -> T17 -> T18 -> T19 -> T20 -> T21 -> T22 -> T23 -> T24 -> T25 -> T26 -> T27 -> T28 -> T29
+T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -> T14 -> T15 -> T16 -> T17 -> T18 -> T19 -> T20 -> T21 -> T22 -> T23 -> T24 -> T25 -> T26 -> T27 -> T28 -> T29 -> T30
 
 ## Task Breakdown
 
@@ -277,6 +277,15 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -
 **Requirements:** SITE-01
 **Done when:** the responsive page demonstrates capture modes, OCR, annotations, privacy, and local installer downloads without being published.
 **Verify:** serve the static directory locally and inspect desktop and narrow layouts.
+
+### T30: Accept Print Screen as the custom shortcut
+
+**Status:** DONE
+
+**Where:** hotkey service, preferences recorder, tests, and release 1.1.2.
+**Requirements:** HOTKEY-04
+**Done when:** pressing Print Screen in the shortcut field saves a normalized standalone shortcut and registration does not duplicate the separate Print Screen preference.
+**Verify:** shortcut parsing tests, full test suite, and packaged application smoke test.
 
 ## Tools
 

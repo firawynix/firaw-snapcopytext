@@ -123,6 +123,8 @@ public partial class MainWindow : Window
             (true, false, _) => $"Pronto • Print Screen • padrão: {modeLabel}",
             (false, true, true) => $"Print Screen está ocupado • use {_hotkeyService.FallbackLabel}",
             (false, true, false) => $"Pronto • {_hotkeyService.FallbackLabel} • padrão: {modeLabel}",
+            (false, false, _) when _hotkeyService.FallbackLabel == "Print Screen" =>
+                "Print Screen está ocupado • escolha outro atalho ou ajuste o Windows",
             _ => "Atalhos ocupados • use um dos botões de captura"
         });
     }

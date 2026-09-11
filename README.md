@@ -20,7 +20,7 @@ Depois da instalação, o atalho abre `Firaw.SnapCopyText.Launcher.exe`. Ele lê
 6. **Copiar texto** envia todo o OCR direto à área de transferência. Em **Selecionar texto**, arraste uma moldura ciana sobre o texto na própria imagem; ao soltar, somente aquele trecho é reconhecido e copiado, sem abrir outra janela.
 7. Abra **Textos** para ver o histórico desta execução. Use Ctrl ou Shift para marcar vários trechos e **Copiar selecionados** para juntá-los.
 
-Em **Atalhos e preferências**, escolha o modo usado pelo atalho, clique no campo de atalho e pressione sua própria combinação. A mesma tela permite ativar o Print Screen e abrir diretamente as configurações de teclado do Windows caso a Ferramenta de Captura esteja ocupando essa tecla.
+Em **Atalhos e preferências**, escolha o modo usado pelo atalho, clique no campo e pressione sua própria combinação. `Print Screen` também pode ser gravada sozinha como atalho personalizado. A mesma tela permite ativá-la como atalho adicional e abrir diretamente as configurações de teclado do Windows caso a Ferramenta de Captura esteja ocupando essa tecla.
 
 Nessa tela também é possível marcar **Iniciar o Firaw junto com o Windows**. A configuração vale somente para o usuário atual, não precisa de permissão de administrador e inicia discretamente na bandeja.
 

@@ -8,4 +8,6 @@ The capture entry point receives an explicit `CaptureMode`, while global shortcu
 
 Before every pixel read, visible Firaw windows receive `WDA_EXCLUDEFROMCAPTURE`, have DWM transitions disabled, and are hidden. Their previous settings are restored after selection.
 
-Custom shortcuts are stored as normalized labels such as `Ctrl + Alt + F9`. `HotkeyService` parses and validates the label before calling `RegisterHotKey`; incomplete chords and PrintScreen in the custom field are rejected. Print Screen has its own preference and registration result.
+Custom shortcuts are stored as normalized labels such as `Ctrl + Alt + F9`. `HotkeyService` parses and validates the label before calling `RegisterHotKey`; ordinary keys still require Ctrl, Shift, or Alt, while the dedicated Print Screen key and function keys may be used alone. Print Screen accepts `PrintScreen`, `Print Screen`, and `PrtSc`, normalizes them to `Print Screen`, and avoids duplicate registration when the separate Print Screen preference is also enabled.
+
+Updated: 2026-09-11
