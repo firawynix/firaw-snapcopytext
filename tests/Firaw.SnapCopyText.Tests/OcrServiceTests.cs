@@ -21,6 +21,21 @@ public sealed class OcrServiceTests
         Assert.Contains("123", result, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Fact]
+    public async Task RecognizeTextRegionsAsync_ReturnsTextAndImageBounds()
+    {
+        BitmapSource source = CreateTextImage("FIRAW 123");
+        var service = new OcrService(Path.Combine(AppContext.BaseDirectory, "tessdata"));
+
+        var regions = await service.RecognizeTextRegionsAsync(source);
+
+        var region = Assert.Single(regions, item => item.Text.Contains("FIRAW", StringComparison.OrdinalIgnoreCase));
+        Assert.True(region.Bounds.Width > 0);
+        Assert.True(region.Bounds.Height > 0);
+        Assert.InRange(region.Bounds.X, 0, source.PixelWidth - 1);
+        Assert.InRange(region.Bounds.Y, 0, source.PixelHeight - 1);
+    }
+
     private static BitmapSource CreateTextImage(string text)
     {
         using var bitmap = new Bitmap(640, 180, PixelFormat.Format32bppArgb);

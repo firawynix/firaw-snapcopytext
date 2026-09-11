@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Firaw.SnapCopyText.Models;
@@ -13,6 +14,8 @@ using Microsoft.Win32;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
+using Cursors = System.Windows.Input.Cursors;
+using Image = System.Windows.Controls.Image;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using MessageBox = System.Windows.MessageBox;
@@ -26,15 +29,26 @@ namespace Firaw.SnapCopyText.Views;
 
 public partial class EditorWindow : Window
 {
-    private readonly AnnotationHistory<UIElement> _history = new();
+    private readonly AnnotationHistory<EditorAction> _history = new();
     private readonly OcrService _ocrService = new();
     private readonly CaptureService _captureService = new();
+    private readonly SensitiveDataDetector _sensitiveDataDetector = new();
     private readonly TextHistoryService _textHistory = TextHistoryService.Shared;
+    private readonly HashSet<UIElement> _selectedElements = [];
+    private readonly List<RemovedAnnotation> _erasedAnnotations = [];
     private EditorTool _currentTool = EditorTool.Select;
+    private EraserMode _eraserMode = EraserMode.Object;
     private Point _startPoint;
+    private Point _lastPoint;
+    private Vector _moveDelta;
     private UIElement? _draft;
     private Rectangle? _textSelectionBox;
+    private Rectangle? _selectionOutline;
+    private Shape? _eraserPreview;
     private bool _drawing;
+    private bool _marqueeSelecting;
+    private bool _movingSelection;
+    private bool _erasing;
     private bool _selectingTextRegion;
     private bool _textSelectionMode;
     private string _currentColor = "#19D3E6";
@@ -75,12 +89,20 @@ public partial class EditorWindow : Window
         {
             _currentTool = tool;
             EditorStatus.Text = $"Ferramenta: {selected.Content}";
+            EraserOptionsPanel.Visibility = tool == EditorTool.Eraser
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+            if (tool != EditorTool.Select)
+            {
+                ClearSelection();
+            }
         }
     }
 
     private void AnnotationCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         _startPoint = ClampToCanvas(e.GetPosition(AnnotationCanvas));
+        _lastPoint = _startPoint;
 
         if (_textSelectionMode)
         {
@@ -90,6 +112,15 @@ public partial class EditorWindow : Window
 
         if (_currentTool == EditorTool.Select)
         {
+            BeginAnnotationSelection(e.OriginalSource as DependencyObject);
+            e.Handled = true;
+            return;
+        }
+
+        if (_currentTool == EditorTool.Eraser)
+        {
+            BeginErasing();
+            e.Handled = true;
             return;
         }
 
@@ -107,9 +138,30 @@ public partial class EditorWindow : Window
 
     private void AnnotationCanvas_MouseMove(object sender, MouseEventArgs e)
     {
+        Point current = ClampToCanvas(e.GetPosition(AnnotationCanvas));
+
         if (_selectingTextRegion && _textSelectionBox is not null)
         {
-            UpdateRectangle(_textSelectionBox, _startPoint, ClampToCanvas(e.GetPosition(AnnotationCanvas)));
+            UpdateRectangle(_textSelectionBox, _startPoint, current);
+            return;
+        }
+
+        if (_movingSelection)
+        {
+            MoveSelection(current);
+            return;
+        }
+
+        if (_marqueeSelecting)
+        {
+            UpdateMarqueeSelection(current);
+            return;
+        }
+
+        if (_erasing)
+        {
+            UpdateEraserPreview(current);
+            EraseAt(current);
             return;
         }
 
@@ -118,7 +170,6 @@ public partial class EditorWindow : Window
             return;
         }
 
-        Point current = ClampToCanvas(e.GetPosition(AnnotationCanvas));
         UpdateDraft(_draft, _startPoint, current);
     }
 
@@ -127,6 +178,24 @@ public partial class EditorWindow : Window
         if (_selectingTextRegion)
         {
             await CompleteTextRegionSelectionAsync(ClampToCanvas(e.GetPosition(AnnotationCanvas)));
+            return;
+        }
+
+        if (_movingSelection)
+        {
+            CompleteSelectionMove();
+            return;
+        }
+
+        if (_marqueeSelecting)
+        {
+            CompleteMarqueeSelection(ClampToCanvas(e.GetPosition(AnnotationCanvas)));
+            return;
+        }
+
+        if (_erasing)
+        {
+            CompleteErasing();
             return;
         }
 
@@ -145,13 +214,378 @@ public partial class EditorWindow : Window
         {
             AnnotationCanvas.Children.Remove(_draft);
         }
+        else if (_currentTool == EditorTool.Blur)
+        {
+            AnnotationCanvas.Children.Remove(_draft);
+            UIElement blurred = CreateBlurAnnotation(CreateRect(_startPoint, end));
+            AnnotationCanvas.Children.Add(blurred);
+            RecordAddedAnnotations([blurred]);
+            EditorStatus.Text = "Área borrada. Use Selecionar para mover depois.";
+        }
         else
         {
-            _history.Add(_draft);
+            RecordAddedAnnotations([_draft]);
         }
 
         _draft = null;
         UpdateHistoryButtons();
+    }
+
+    private void BeginAnnotationSelection(DependencyObject? originalSource)
+    {
+        UIElement? hit = GetDirectAnnotation(originalSource);
+        bool additive = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+
+        if (hit is not null)
+        {
+            if (!additive && !_selectedElements.Contains(hit))
+            {
+                ClearSelection();
+            }
+
+            _selectedElements.Add(hit);
+            _movingSelection = true;
+            _moveDelta = default;
+            AnnotationCanvas.CaptureMouse();
+            UpdateSelectionOutline();
+            AnnotationCanvas.Cursor = Cursors.SizeAll;
+            EditorStatus.Text = _selectedElements.Count == 1
+                ? "Objeto selecionado. Arraste para mover."
+                : $"{_selectedElements.Count} objetos selecionados. Arraste para mover juntos.";
+            return;
+        }
+
+        Rect selectedBounds = GetSelectionBounds();
+        if (_selectedElements.Count > 0 && selectedBounds.Contains(_startPoint))
+        {
+            _movingSelection = true;
+            _moveDelta = default;
+            AnnotationCanvas.CaptureMouse();
+            AnnotationCanvas.Cursor = Cursors.SizeAll;
+            return;
+        }
+
+        if (!additive)
+        {
+            ClearSelection();
+        }
+
+        _marqueeSelecting = true;
+        AnnotationCanvas.CaptureMouse();
+        _selectionOutline = CreateSelectionRectangle(fillSelection: true);
+        SelectionCanvas.Children.Add(_selectionOutline);
+        UpdateRectangle(_selectionOutline, _startPoint, _startPoint);
+        EditorStatus.Text = "Arraste uma área para selecionar um ou vários objetos.";
+    }
+
+    private void MoveSelection(Point current)
+    {
+        Vector requested = current - _lastPoint;
+        Vector allowed = ClampMoveToCanvas(requested);
+        if (Math.Abs(allowed.X) < 0.01 && Math.Abs(allowed.Y) < 0.01)
+        {
+            return;
+        }
+
+        TranslateAnnotations(_selectedElements, allowed);
+        _moveDelta += allowed;
+        _lastPoint += allowed;
+        UpdateSelectionOutline();
+    }
+
+    private Vector ClampMoveToCanvas(Vector requested)
+    {
+        Rect bounds = GetSelectionBounds();
+        if (bounds.IsEmpty)
+        {
+            return default;
+        }
+
+        double x = Math.Clamp(requested.X, -bounds.Left, AnnotationCanvas.ActualWidth - bounds.Right);
+        double y = Math.Clamp(requested.Y, -bounds.Top, AnnotationCanvas.ActualHeight - bounds.Bottom);
+        return new Vector(x, y);
+    }
+
+    private void CompleteSelectionMove()
+    {
+        _movingSelection = false;
+        AnnotationCanvas.ReleaseMouseCapture();
+        AnnotationCanvas.Cursor = Cursors.Arrow;
+
+        if (_moveDelta.Length > 0.1)
+        {
+            UIElement[] moved = [.. _selectedElements];
+            Vector delta = _moveDelta;
+            _history.Add(new EditorAction(
+                () => TranslateAnnotations(moved, -delta),
+                () => TranslateAnnotations(moved, delta)));
+            EditorStatus.Text = $"{moved.Length} objeto(s) movido(s).";
+            UpdateHistoryButtons();
+        }
+
+        _moveDelta = default;
+        UpdateSelectionOutline();
+    }
+
+    private void UpdateMarqueeSelection(Point current)
+    {
+        if (_selectionOutline is null)
+        {
+            return;
+        }
+
+        UpdateRectangle(_selectionOutline, _startPoint, current);
+    }
+
+    private void CompleteMarqueeSelection(Point end)
+    {
+        _marqueeSelecting = false;
+        AnnotationCanvas.ReleaseMouseCapture();
+        Rect region = CreateRect(_startPoint, end);
+
+        foreach (UIElement annotation in AnnotationCanvas.Children)
+        {
+            if (GetAnnotationBounds(annotation).IntersectsWith(region))
+            {
+                _selectedElements.Add(annotation);
+            }
+        }
+
+        RemoveSelectionVisual();
+        UpdateSelectionOutline();
+        EditorStatus.Text = _selectedElements.Count == 0
+            ? "Nenhum objeto encontrado nessa área."
+            : $"{_selectedElements.Count} objeto(s) selecionado(s). Arraste para mover.";
+    }
+
+    private void ClearSelection()
+    {
+        _selectedElements.Clear();
+        RemoveSelectionVisual();
+    }
+
+    private void RemoveSelectionVisual()
+    {
+        if (_selectionOutline is not null)
+        {
+            SelectionCanvas.Children.Remove(_selectionOutline);
+            _selectionOutline = null;
+        }
+    }
+
+    private void UpdateSelectionOutline()
+    {
+        RemoveSelectionVisual();
+        Rect bounds = GetSelectionBounds();
+        if (bounds.IsEmpty)
+        {
+            return;
+        }
+
+        _selectionOutline = CreateSelectionRectangle(fillSelection: false);
+        Canvas.SetLeft(_selectionOutline, bounds.Left - 3);
+        Canvas.SetTop(_selectionOutline, bounds.Top - 3);
+        _selectionOutline.Width = bounds.Width + 6;
+        _selectionOutline.Height = bounds.Height + 6;
+        SelectionCanvas.Children.Add(_selectionOutline);
+    }
+
+    private Rectangle CreateSelectionRectangle(bool fillSelection) => new()
+    {
+        Stroke = (Brush)FindResource("FirawCyan"),
+        StrokeThickness = 2,
+        StrokeDashArray = new DoubleCollection { 5, 3 },
+        Fill = fillSelection
+            ? new SolidColorBrush(Color.FromArgb(28, 25, 211, 230))
+            : Brushes.Transparent
+    };
+
+    private Rect GetSelectionBounds()
+    {
+        Rect bounds = Rect.Empty;
+        foreach (UIElement element in _selectedElements.Where(AnnotationCanvas.Children.Contains))
+        {
+            Rect itemBounds = GetAnnotationBounds(element);
+            if (!itemBounds.IsEmpty)
+            {
+                bounds.Union(itemBounds);
+            }
+        }
+
+        return bounds;
+    }
+
+    private Rect GetAnnotationBounds(UIElement element)
+    {
+        try
+        {
+            Rect bounds = VisualTreeHelper.GetDescendantBounds(element);
+            if (bounds.IsEmpty && element is FrameworkElement frameworkElement)
+            {
+                bounds = new Rect(0, 0, frameworkElement.ActualWidth, frameworkElement.ActualHeight);
+            }
+
+            return element.TransformToAncestor(AnnotationCanvas).TransformBounds(bounds);
+        }
+        catch (InvalidOperationException)
+        {
+            return Rect.Empty;
+        }
+    }
+
+    private UIElement? GetDirectAnnotation(DependencyObject? source)
+    {
+        DependencyObject? current = source;
+        while (current is not null && !ReferenceEquals(current, AnnotationCanvas))
+        {
+            DependencyObject? parent = current is Visual or System.Windows.Media.Media3D.Visual3D
+                ? VisualTreeHelper.GetParent(current)
+                : LogicalTreeHelper.GetParent(current);
+            if (ReferenceEquals(parent, AnnotationCanvas))
+            {
+                return current as UIElement;
+            }
+
+            current = parent;
+        }
+
+        return null;
+    }
+
+    private static void TranslateAnnotations(IEnumerable<UIElement> elements, Vector delta)
+    {
+        foreach (UIElement element in elements)
+        {
+            double left = Canvas.GetLeft(element);
+            double top = Canvas.GetTop(element);
+            Canvas.SetLeft(element, (double.IsNaN(left) ? 0 : left) + delta.X);
+            Canvas.SetTop(element, (double.IsNaN(top) ? 0 : top) + delta.Y);
+        }
+    }
+
+    private void BeginErasing()
+    {
+        _erasing = true;
+        _erasedAnnotations.Clear();
+        AnnotationCanvas.CaptureMouse();
+        UpdateEraserPreview(_startPoint);
+        EraseAt(_startPoint);
+    }
+
+    private void UpdateEraserPreview(Point point)
+    {
+        if (_eraserPreview is not null)
+        {
+            SelectionCanvas.Children.Remove(_eraserPreview);
+        }
+
+        double size = _eraserMode == EraserMode.Object ? 18 : EraserSizeSlider.Value;
+        _eraserPreview = _eraserMode == EraserMode.Circle
+            ? new Ellipse()
+            : new Rectangle();
+        _eraserPreview.Width = size;
+        _eraserPreview.Height = size;
+        _eraserPreview.Stroke = (Brush)FindResource("FirawCyan");
+        _eraserPreview.StrokeThickness = 2;
+        _eraserPreview.Fill = new SolidColorBrush(Color.FromArgb(35, 25, 211, 230));
+        Canvas.SetLeft(_eraserPreview, point.X - (size / 2));
+        Canvas.SetTop(_eraserPreview, point.Y - (size / 2));
+        SelectionCanvas.Children.Add(_eraserPreview);
+    }
+
+    private void EraseAt(Point point)
+    {
+        IEnumerable<UIElement> candidates;
+        if (_eraserMode == EraserMode.Object)
+        {
+            UIElement? hit = GetDirectAnnotation(AnnotationCanvas.InputHitTest(point) as DependencyObject);
+            candidates = hit is null ? [] : [hit];
+        }
+        else
+        {
+            double size = EraserSizeSlider.Value;
+            Rect eraserBounds = new(point.X - (size / 2), point.Y - (size / 2), size, size);
+            candidates = AnnotationCanvas.Children
+                .OfType<UIElement>()
+                .Where(annotation => EraserIntersects(GetAnnotationBounds(annotation), eraserBounds))
+                .ToArray();
+        }
+
+        foreach (UIElement annotation in candidates)
+        {
+            if (_erasedAnnotations.Any(item => ReferenceEquals(item.Element, annotation)))
+            {
+                continue;
+            }
+
+            int index = AnnotationCanvas.Children.IndexOf(annotation);
+            _erasedAnnotations.Add(new RemovedAnnotation(annotation, index));
+            AnnotationCanvas.Children.Remove(annotation);
+            _selectedElements.Remove(annotation);
+        }
+    }
+
+    private bool EraserIntersects(Rect annotationBounds, Rect eraserBounds)
+    {
+        if (_eraserMode == EraserMode.Square)
+        {
+            return annotationBounds.IntersectsWith(eraserBounds);
+        }
+
+        Point center = new(eraserBounds.Left + eraserBounds.Width / 2, eraserBounds.Top + eraserBounds.Height / 2);
+        Point nearest = new(
+            Math.Clamp(center.X, annotationBounds.Left, annotationBounds.Right),
+            Math.Clamp(center.Y, annotationBounds.Top, annotationBounds.Bottom));
+        return (nearest - center).Length <= eraserBounds.Width / 2;
+    }
+
+    private void CompleteErasing()
+    {
+        _erasing = false;
+        AnnotationCanvas.ReleaseMouseCapture();
+        if (_eraserPreview is not null)
+        {
+            SelectionCanvas.Children.Remove(_eraserPreview);
+            _eraserPreview = null;
+        }
+
+        if (_erasedAnnotations.Count == 0)
+        {
+            EditorStatus.Text = "Nenhuma anotação encontrada para apagar.";
+            return;
+        }
+
+        RemovedAnnotation[] removed = [.. _erasedAnnotations.OrderBy(item => item.Index)];
+        _history.Add(new EditorAction(
+            () => RestoreAnnotations(removed),
+            () => RemoveAnnotations(removed.Select(item => item.Element))));
+        _erasedAnnotations.Clear();
+        EditorStatus.Text = $"{removed.Length} objeto(s) apagado(s).";
+        UpdateHistoryButtons();
+    }
+
+    private void RestoreAnnotations(IEnumerable<RemovedAnnotation> annotations)
+    {
+        foreach (RemovedAnnotation annotation in annotations.OrderBy(item => item.Index))
+        {
+            if (!AnnotationCanvas.Children.Contains(annotation.Element))
+            {
+                AnnotationCanvas.Children.Insert(
+                    Math.Min(annotation.Index, AnnotationCanvas.Children.Count),
+                    annotation.Element);
+            }
+        }
+    }
+
+    private void RemoveAnnotations(IEnumerable<UIElement> annotations)
+    {
+        foreach (UIElement annotation in annotations)
+        {
+            AnnotationCanvas.Children.Remove(annotation);
+            _selectedElements.Remove(annotation);
+        }
+
+        UpdateSelectionOutline();
     }
 
     private void BeginTextRegionSelection()
@@ -250,6 +684,13 @@ public partial class EditorWindow : Window
                 Data = CreateArrowGeometry(start, start, thickness)
             },
             EditorTool.Redact => new Rectangle { Fill = Brushes.Black },
+            EditorTool.Blur => new Rectangle
+            {
+                Stroke = (Brush)FindResource("FirawCyan"),
+                StrokeThickness = 2,
+                StrokeDashArray = new DoubleCollection { 5, 3 },
+                Fill = new SolidColorBrush(Color.FromArgb(60, 25, 211, 230))
+            },
             _ => new Rectangle
             {
                 Stroke = brush,
@@ -296,6 +737,102 @@ public partial class EditorWindow : Window
             Canvas.SetTop(rectangle, top);
             rectangle.Width = Math.Abs(end.X - start.X);
             rectangle.Height = Math.Abs(end.Y - start.Y);
+        }
+    }
+
+    private UIElement CreateBlurAnnotation(Rect displayRegion)
+    {
+        double scaleX = OriginalImage.PixelWidth / AnnotationCanvas.ActualWidth;
+        double scaleY = OriginalImage.PixelHeight / AnnotationCanvas.ActualHeight;
+        Int32Rect pixelRegion = CaptureService.NormalizeSelection(
+            displayRegion.Left * scaleX,
+            displayRegion.Top * scaleY,
+            displayRegion.Right * scaleX,
+            displayRegion.Bottom * scaleY,
+            new Int32Rect(0, 0, OriginalImage.PixelWidth, OriginalImage.PixelHeight));
+        BitmapSource crop = _captureService.Crop(OriginalImage, pixelRegion);
+
+        var blurredImage = new Image
+        {
+            Source = crop,
+            Width = displayRegion.Width,
+            Height = displayRegion.Height,
+            Stretch = Stretch.Fill,
+            Effect = new BlurEffect
+            {
+                Radius = 18,
+                KernelType = KernelType.Gaussian,
+                RenderingBias = RenderingBias.Quality
+            }
+        };
+        var container = new Grid
+        {
+            Width = displayRegion.Width,
+            Height = displayRegion.Height,
+            ClipToBounds = true,
+            Background = Brushes.Transparent
+        };
+        container.Children.Add(blurredImage);
+        Canvas.SetLeft(container, displayRegion.Left);
+        Canvas.SetTop(container, displayRegion.Top);
+        return container;
+    }
+
+    private async void AutoBlurButton_Click(object sender, RoutedEventArgs e)
+    {
+        AutoBlurButton.IsEnabled = false;
+        EditorStatus.Text = "Procurando dados sensíveis localmente…";
+
+        try
+        {
+            IReadOnlyList<OcrTextRegion> regions = await _ocrService.RecognizeTextRegionsAsync(OriginalImage);
+            OcrTextRegion[] sensitiveRegions = regions
+                .Where(region => _sensitiveDataDetector.IsSensitive(region.Text))
+                .ToArray();
+            if (sensitiveRegions.Length == 0)
+            {
+                EditorStatus.Text = "Nenhum e-mail, telefone, documento, cartão ou IP foi identificado.";
+                return;
+            }
+
+            double scaleX = AnnotationCanvas.ActualWidth / OriginalImage.PixelWidth;
+            double scaleY = AnnotationCanvas.ActualHeight / OriginalImage.PixelHeight;
+            var annotations = new List<UIElement>();
+            foreach (OcrTextRegion region in sensitiveRegions)
+            {
+                Rect displayRegion = new(
+                    Math.Max(0, region.Bounds.X * scaleX - 5),
+                    Math.Max(0, region.Bounds.Y * scaleY - 4),
+                    Math.Min(AnnotationCanvas.ActualWidth - region.Bounds.X * scaleX + 5, region.Bounds.Width * scaleX + 10),
+                    Math.Min(AnnotationCanvas.ActualHeight - region.Bounds.Y * scaleY + 4, region.Bounds.Height * scaleY + 8));
+                if (displayRegion.Width < 2 || displayRegion.Height < 2)
+                {
+                    continue;
+                }
+
+                UIElement blurred = CreateBlurAnnotation(displayRegion);
+                AnnotationCanvas.Children.Add(blurred);
+                annotations.Add(blurred);
+            }
+
+            if (annotations.Count > 0)
+            {
+                RecordAddedAnnotations(annotations);
+                EditorStatus.Text = $"{annotations.Count} área(s) sensível(is) borrada(s). Revise antes de compartilhar.";
+            }
+            else
+            {
+                EditorStatus.Text = "Os dados encontrados estavam fora da área válida da imagem.";
+            }
+        }
+        catch (Exception exception)
+        {
+            EditorStatus.Text = "Não foi possível analisar os dados sensíveis.";
+            MessageBox.Show(this, exception.Message, "Firaw - Proteção de dados", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        finally
+        {
+            AutoBlurButton.IsEnabled = true;
         }
     }
 
@@ -361,8 +898,41 @@ public partial class EditorWindow : Window
         Canvas.SetLeft(annotation, position.X);
         Canvas.SetTop(annotation, position.Y);
         AnnotationCanvas.Children.Add(annotation);
-        _history.Add(annotation);
+        RecordAddedAnnotations([annotation]);
+        EditorStatus.Text = asNote
+            ? "Anotação criada. Use Selecionar para movê-la."
+            : "Texto criado. Use Selecionar para movê-lo.";
+    }
+
+    private void RecordAddedAnnotations(IEnumerable<UIElement> annotations)
+    {
+        UIElement[] added = [.. annotations];
+        _history.Add(new EditorAction(
+            () => RemoveAnnotations(added),
+            () =>
+            {
+                foreach (UIElement annotation in added)
+                {
+                    if (!AnnotationCanvas.Children.Contains(annotation))
+                    {
+                        AnnotationCanvas.Children.Add(annotation);
+                    }
+                }
+            }));
         UpdateHistoryButtons();
+    }
+
+    private void EraserModeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (EraserModeCombo?.SelectedItem is ComboBoxItem item &&
+            Enum.TryParse(item.Tag?.ToString(), out EraserMode mode))
+        {
+            _eraserMode = mode;
+            if (_currentTool == EditorTool.Eraser)
+            {
+                EditorStatus.Text = $"Borracha: {item.Content}.";
+            }
+        }
     }
 
     private Brush CurrentBrush()
@@ -391,20 +961,24 @@ public partial class EditorWindow : Window
 
     private void UndoButton_Click(object sender, RoutedEventArgs e)
     {
-        UIElement? item = _history.Undo();
-        if (item is not null)
+        ClearSelection();
+        EditorAction? action = _history.Undo();
+        if (action is not null)
         {
-            AnnotationCanvas.Children.Remove(item);
+            action.Undo();
+            EditorStatus.Text = "Ação desfeita.";
         }
         UpdateHistoryButtons();
     }
 
     private void RedoButton_Click(object sender, RoutedEventArgs e)
     {
-        UIElement? item = _history.Redo();
-        if (item is not null)
+        ClearSelection();
+        EditorAction? action = _history.Redo();
+        if (action is not null)
         {
-            AnnotationCanvas.Children.Add(item);
+            action.Redo();
+            EditorStatus.Text = "Ação refeita.";
         }
         UpdateHistoryButtons();
     }
@@ -505,16 +1079,25 @@ public partial class EditorWindow : Window
 
     private BitmapSource RenderEditedImage()
     {
-        EditorSurface.UpdateLayout();
-        var result = new RenderTargetBitmap(
-            OriginalImage.PixelWidth,
-            OriginalImage.PixelHeight,
-            96,
-            96,
-            PixelFormats.Pbgra32);
-        result.Render(EditorSurface);
-        result.Freeze();
-        return result;
+        Visibility previousVisibility = SelectionCanvas.Visibility;
+        SelectionCanvas.Visibility = Visibility.Collapsed;
+        try
+        {
+            EditorSurface.UpdateLayout();
+            var result = new RenderTargetBitmap(
+                OriginalImage.PixelWidth,
+                OriginalImage.PixelHeight,
+                96,
+                96,
+                PixelFormats.Pbgra32);
+            result.Render(EditorSurface);
+            result.Freeze();
+            return result;
+        }
+        finally
+        {
+            SelectionCanvas.Visibility = previousVisibility;
+        }
     }
 
     private bool TryClipboard(Action write)
@@ -636,5 +1219,13 @@ public partial class EditorWindow : Window
             EditorStatus.Text = "Seleção de texto cancelada.";
             e.Handled = true;
         }
+        else if (e.Key == Key.Escape && _selectedElements.Count > 0)
+        {
+            ClearSelection();
+            EditorStatus.Text = "Seleção de objetos cancelada.";
+            e.Handled = true;
+        }
     }
+
+    private sealed record RemovedAnnotation(UIElement Element, int Index);
 }

@@ -1,6 +1,6 @@
 ﻿param(
-    [string]$Version = '1.1.4',
-    [string]$ReleaseNotes = 'Adiciona o perfil Print Screen: seleção, monitor e janela, com opção de devolver cada combinação ao Windows.'
+    [string]$Version = '1.1.5',
+    [string]$ReleaseNotes = 'Editor com seleção e movimentação de objetos, borracha em três formatos e desfoque manual ou automático de dados sensíveis.'
 )
 
 $ErrorActionPreference = 'Stop'

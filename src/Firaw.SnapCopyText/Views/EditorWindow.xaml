@@ -104,7 +104,7 @@
         <Border Grid.Row="0" Background="{StaticResource FirawSurface}" Padding="12,9"
                 BorderBrush="#263543" BorderThickness="0,0,0,1">
             <DockPanel LastChildFill="True">
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                     <Button x:Name="CopyTextButton" Style="{StaticResource FirawButton}"
                             Content="Copiar texto" Margin="4,0" Padding="15,8" Click="CopyTextButton_Click" />
                     <ToggleButton x:Name="SelectTextButton" Style="{StaticResource ToolButton}"
@@ -127,6 +127,11 @@
                     <ToggleButton Style="{StaticResource ToolButton}" Tag="Text" Content="Texto" Checked="ToolButton_Checked" />
                     <ToggleButton Style="{StaticResource ToolButton}" Tag="Note" Content="Anotação" Checked="ToolButton_Checked" />
                     <ToggleButton Style="{StaticResource ToolButton}" Tag="Redact" Content="Censurar" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Blur" Content="Borrar" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Eraser" Content="Borracha" Checked="ToolButton_Checked" />
+                    <Button x:Name="AutoBlurButton" Style="{StaticResource SecondaryButton}"
+                            Content="Borrar dados sensíveis" ToolTip="Localiza dados sensíveis com OCR local e borra as linhas encontradas"
+                            Click="AutoBlurButton_Click" />
                 </WrapPanel>
             </DockPanel>
         </Border>
@@ -148,6 +153,7 @@
                                 MouseLeftButtonDown="AnnotationCanvas_MouseLeftButtonDown"
                                 MouseMove="AnnotationCanvas_MouseMove"
                                 MouseLeftButtonUp="AnnotationCanvas_MouseLeftButtonUp" />
+                        <Canvas x:Name="SelectionCanvas" IsHitTestVisible="False" />
                     </Grid>
                 </Border>
             </ScrollViewer>
@@ -278,6 +284,20 @@
                                Foreground="{StaticResource FirawMutedText}" />
                     <Slider x:Name="ThicknessSlider" Width="110" Minimum="2" Maximum="16" Value="4"
                             TickFrequency="2" IsSnapToTickEnabled="True" VerticalAlignment="Center" />
+                    <StackPanel x:Name="EraserOptionsPanel" Orientation="Horizontal" Visibility="Collapsed" Margin="12,0,0,0">
+                        <TextBlock Text="Formato" VerticalAlignment="Center" Margin="0,0,6,0"
+                                   Foreground="{StaticResource FirawMutedText}" />
+                        <ComboBox x:Name="EraserModeCombo" Width="120" SelectedIndex="0" VerticalAlignment="Center"
+                                  SelectionChanged="EraserModeCombo_SelectionChanged">
+                            <ComboBoxItem Tag="Object" Content="Objeto inteiro" />
+                            <ComboBoxItem Tag="Circle" Content="Circular" />
+                            <ComboBoxItem Tag="Square" Content="Quadrada" />
+                        </ComboBox>
+                        <TextBlock Text="Tamanho" VerticalAlignment="Center" Margin="10,0,6,0"
+                                   Foreground="{StaticResource FirawMutedText}" />
+                        <Slider x:Name="EraserSizeSlider" Width="90" Minimum="16" Maximum="120" Value="44"
+                                TickFrequency="4" VerticalAlignment="Center" />
+                    </StackPanel>
                 </StackPanel>
             </DockPanel>
         </Border>

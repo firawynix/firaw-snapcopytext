@@ -16,7 +16,7 @@ Depois da instalação, o atalho abre `Firaw.SnapCopyText.Launcher.exe`. Ele lê
 2. Escolha **Selecionar região**, **Escolher janela** ou **Escolher monitor**. Janela e Monitor abrem uma lista no próprio Firaw com nomes e dimensões.
 3. Na captura por região, arraste sobre a área desejada e solte o mouse.
 4. Mova a região pela parte interna ou redimensione usando os oito pontos cianos; confirme em **Abrir editor** ou pressione **Enter**.
-5. No editor, faça anotações e escolha **Copiar imagem**, **Salvar PNG**, **Copiar texto** ou **Selecionar texto**.
+5. No editor, faça anotações; use **Selecionar** para marcar e mover objetos, inclusive textos e caixas de anotação já criados.
 6. **Copiar texto** envia todo o OCR direto à área de transferência. Em **Selecionar texto**, arraste uma moldura ciana sobre o texto na própria imagem; ao soltar, somente aquele trecho é reconhecido e copiado, sem abrir outra janela.
 7. Abra **Textos** para ver o histórico desta execução. Use Ctrl ou Shift para marcar vários trechos e **Copiar selecionados** para juntá-los.
 
@@ -34,6 +34,9 @@ Se o Lightshot ou o Recorte do Windows estiver usando `Print Screen`, o Firaw mo
 - Texto com diálogo no tema Firaw.
 - Caixa de anotação escura com borda e texto na cor escolhida.
 - Censura sólida para ocultar dados sensíveis.
+- Seleção por clique ou moldura, com movimentação individual ou em grupo depois da criação.
+- Borracha por objeto inteiro, formato circular ou quadrado, com tamanho ajustável.
+- Desfoque manual por área e proteção automática de e-mail, telefone, CPF/CNPJ, cartão e endereço IP usando OCR local.
 - Paleta visual com oito cores predefinidas e ciano Firaw selecionado inicialmente, além de espessura configurável.
 - Desfazer e refazer.
 - Copiar imagem editada e salvar em PNG.

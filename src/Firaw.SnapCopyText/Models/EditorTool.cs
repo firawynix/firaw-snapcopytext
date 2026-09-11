@@ -9,5 +9,7 @@ public enum EditorTool
     Highlight,
     Text,
     Note,
-    Redact
+    Redact,
+    Eraser,
+    Blur
 }

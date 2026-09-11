@@ -1,3 +1,15 @@
+# Editor inteligente — 1.1.5 (11 de setembro de 2026)
+
+- Texto, anotação, desenho, censura e desfoque podem ser selecionados e movidos depois de criados.
+- **Selecionar** aceita clique direto, moldura para vários objetos e arraste do grupo.
+- A borracha oferece objeto inteiro, formato circular e quadrado, com tamanho ajustável.
+- **Borrar** cria um desfoque manual movível.
+- **Borrar dados sensíveis** usa OCR local para proteger linhas com e-mail, telefone, CPF/CNPJ, cartão ou IP.
+- Criação, movimentação, borracha e proteção automática participam do mesmo desfazer/refazer.
+- Notas completas: `C:\Users\Hugo\Firaw-SnapCopyText\UPDATE-1.1.5.md`.
+
+---
+
 # Perfil Print Screen — 1.1.4 (11 de setembro de 2026)
 
 - `Print Screen` abre a seleção de região.
