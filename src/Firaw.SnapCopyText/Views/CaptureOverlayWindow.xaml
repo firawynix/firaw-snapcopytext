@@ -1,0 +1,35 @@
+<Window x:Class="Firaw.SnapCopyText.Views.CaptureOverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False"
+        AllowsTransparency="True" Background="Transparent" Topmost="True"
+        Cursor="Cross" KeyDown="Window_KeyDown"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        MouseMove="Window_MouseMove"
+        MouseLeftButtonUp="Window_MouseLeftButtonUp">
+    <Grid x:Name="Root">
+        <Image x:Name="DesktopImage" Stretch="Fill" IsHitTestVisible="False" />
+
+        <Canvas x:Name="OverlayCanvas" IsHitTestVisible="False">
+            <Rectangle x:Name="DimTop" Fill="#A8000000" />
+            <Rectangle x:Name="DimLeft" Fill="#A8000000" />
+            <Rectangle x:Name="DimRight" Fill="#A8000000" />
+            <Rectangle x:Name="DimBottom" Fill="#A8000000" />
+
+            <Rectangle x:Name="SelectionBorder" Stroke="{StaticResource FirawCyan}"
+                       StrokeThickness="2" Fill="Transparent" Visibility="Collapsed" />
+
+            <Border x:Name="SizeBadge" Visibility="Collapsed"
+                    Background="#E6151D26" CornerRadius="6" Padding="8,4">
+                <TextBlock x:Name="SizeText" Foreground="White" FontSize="12" />
+            </Border>
+        </Canvas>
+
+        <Border VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,28,0,0"
+                Padding="16,10" CornerRadius="9" Background="#E6151D26"
+                BorderBrush="{StaticResource FirawCyan}" BorderThickness="1">
+            <TextBlock Text="Arraste para selecionar  •  Esc para cancelar"
+                       Foreground="White" FontWeight="SemiBold" />
+        </Border>
+    </Grid>
+</Window>
