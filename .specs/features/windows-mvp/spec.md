@@ -31,6 +31,7 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 3. WHEN the user drags the selection or one of its eight handles THEN Firaw SHALL move or resize it within the virtual desktop.
 4. WHEN the user confirms by button or Enter THEN Firaw SHALL open the adjusted crop in the editor.
 5. WHEN the user presses Escape THEN Firaw SHALL cancel safely and restore the previously visible Firaw windows.
+6. WHEN Firaw windows are hidden THEN Firaw SHALL disable their DWM transitions and wait for composition so no shrinking-window ghost is captured.
 
 **Independent Test:** Leave an editor open, invoke capture, drag and release, move and resize the region, then confirm that no Firaw window appears in the crop.
 
@@ -44,6 +45,7 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 2. WHEN the user chooses Copy image THEN Firaw SHALL place the rendered image on the Windows clipboard.
 3. WHEN the user chooses Save THEN Firaw SHALL write a PNG selected by the user.
 4. WHEN the user chooses Undo or Redo THEN Firaw SHALL update the latest annotation accordingly.
+5. WHEN the user chooses Annotation and clicks the image THEN Firaw SHALL add the entered note as a dark box with a cyan-colored border and text.
 
 **Independent Test:** Draw a rectangle, undo, redo, copy, and paste into another application.
 
@@ -76,8 +78,10 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 | CAP-02 | Cancel safely | Implemented; UAT pending |
 | CAP-03 | Hide all Firaw windows before freezing desktop | Implemented; UAT pending |
 | CAP-04 | Move and resize active selection | Implemented; geometry tests passed, UAT pending |
+| CAP-05 | Prevent DWM hide-transition ghosts in the snapshot | Implemented; UAT pending |
 | EDIT-01 | Draw annotations | Implemented; UAT pending |
 | EDIT-02 | Undo and redo | Implemented; automated test passed |
+| EDIT-03 | Add boxed notes to the image | Implemented; UAT pending |
 | IMG-01 | Copy rendered image | Implemented; UAT pending |
 | IMG-02 | Save PNG | Implemented; UAT pending |
 | OCR-01 | Local Portuguese/English recognition | Verified by automated smoke test |
@@ -85,7 +89,7 @@ Users need to capture a screen region, mark it up, and reuse either the image or
 | OCR-03 | Select an image region and copy its OCR without a dialog | Implemented; UAT pending |
 | HOTKEY-01 | Global shortcut with fallback | Implemented; UAT pending |
 
-**Coverage:** 12 total, 12 mapped to tasks, 0 unmapped.
+**Coverage:** 14 total, 14 mapped to tasks, 0 unmapped.
 
 ## Success Criteria
 

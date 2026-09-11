@@ -1,11 +1,11 @@
 # Windows MVP Tasks
 
 **Design:** `.specs/features/windows-mvp/design.md`
-**Status:** Done through T12; interactive UAT pending
+**Status:** Done through T14; interactive UAT pending
 
 ## Execution Plan
 
-T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12
+T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12 -> T13 -> T14
 
 ## Task Breakdown
 
@@ -124,6 +124,24 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9 -> T10 -> T11 -> T12
 **Requirements:** OCR-02, OCR-03
 **Done when:** Copy text copies all OCR directly and Select text lets the user drag over the image, then copies that region without opening a dialog.
 **Verify:** crop/OCR tests plus interactive in-image selection and clipboard test.
+
+### T13: Add boxed annotations
+
+**Status:** DONE
+
+**Where:** EditorTool, editor toolbar/canvas, and text prompt.
+**Requirements:** EDIT-03
+**Done when:** Annotation inserts a dark note card with the selected accent color and participates in undo/redo.
+**Verify:** build plus editor construction and interaction smoke test.
+
+### T14: Prevent window-transition capture ghosts
+
+**Status:** DONE
+
+**Where:** MainWindow capture lifecycle.
+**Requirements:** CAP-05
+**Done when:** Firaw disables hide transitions, flushes pending DWM composition, and waits before reading desktop pixels.
+**Verify:** capture with an editor open and confirm no flattened window thumbnail appears.
 
 ## Tools
 

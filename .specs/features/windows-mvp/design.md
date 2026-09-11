@@ -5,7 +5,7 @@
 
 ## Architecture Overview
 
-The WPF process owns a small launcher window and registers capture hotkeys. Before the capture service snapshots the virtual desktop, the launcher records and hides every visible Firaw window, waits for the UI compositor to settle, and restores the same windows after selection. The borderless overlay keeps the selected rectangle active so it can be moved or resized through eight handles before confirmation. The editor renders annotations over the image, delegates OCR to a local service, and writes image or Unicode text to the clipboard.
+The WPF process owns a small launcher window and registers capture hotkeys. Before the capture service snapshots the virtual desktop, the launcher records every visible Firaw window, temporarily disables its DWM transitions, hides it, waits for the UI compositor to settle, and restores the window plus its original transition setting after selection. The borderless overlay keeps the selected rectangle active so it can be moved or resized through eight handles before confirmation. The editor renders annotations over the image, delegates OCR to a local service, and writes image or Unicode text to the clipboard.
 
 The presentation layer uses centralized Firaw theme resources: dark neutral backgrounds, white text, and cyan (`#19D3E6`) for primary actions, focus, selection borders, and active tools.
 
@@ -35,6 +35,7 @@ This is a greenfield project. It reuses Windows desktop, WPF rendering, clipboar
 - **Location:** `src/Firaw.SnapCopyText/Views/EditorWindow.xaml(.cs)`
 - **Dependencies:** AnnotationHistory and OcrService.
 - **Text-region interaction:** Select text activates a temporary cyan rectangle on the editor canvas. The rectangle is removed on release, its underlying original-image pixels are cropped, and OCR output is copied without a preview dialog.
+- **Boxed annotation:** Annotation reuses the text prompt and inserts a dark semi-transparent card with the current color applied to its border and text.
 
 ### OcrService
 

@@ -20,6 +20,7 @@
 **Instant editor** - COMPLETE
 
 - Basic annotations, redaction, colors, thickness, undo, and redo.
+- Dark boxed notes with the current Firaw accent color.
 - Copy rendered result or save as PNG.
 
 **Local OCR** - COMPLETE

@@ -25,11 +25,13 @@ Se o Lightshot ou o Recorte do Windows estiver usando `Print Screen`, o Firaw mo
 
 - Caneta, seta, retângulo e marca-texto.
 - Texto com diálogo no tema Firaw.
+- Caixa de anotação escura com borda e texto na cor escolhida.
 - Censura sólida para ocultar dados sensíveis.
 - Cor e espessura configuráveis.
 - Desfazer e refazer.
 - Copiar imagem editada e salvar em PNG.
 - Região ajustável em tempo real, com movimentação e oito pontos de redimensionamento.
+- Ocultação sincronizada das janelas do Firaw para evitar miniaturas fantasma na captura.
 - OCR local em português e inglês, com cópia integral ou seleção ciana diretamente sobre a imagem.
 
 ## Privacidade

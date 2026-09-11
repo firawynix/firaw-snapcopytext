@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-- Milestone M1: adjustable capture, full Firaw window hiding, and in-image OCR selection published; user acceptance test pending.
+- Milestone M1: boxed annotations and DWM transition suppression implemented; publication and user acceptance test pending.
 
 ## Decisions
 
