@@ -1,0 +1,88 @@
+# Windows MVP Tasks
+
+**Design:** `.specs/features/windows-mvp/design.md`
+**Status:** In Progress
+
+## Execution Plan
+
+T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8 -> T9
+
+## Task Breakdown
+
+### T1: Create WPF application foundation
+
+**Where:** project file, app entry, manifest, centralized Firaw theme, launcher window.
+**Requirement:** HOTKEY-01
+**Done when:** solution restores and builds an empty launcher.
+**Verify:** `dotnet build Firaw.SnapCopyText.sln`
+
+### T2: Create capture service and geometry tests
+
+**Where:** `Services/CaptureService.cs`, test project.
+**Depends on:** T1
+**Requirements:** CAP-01, CAP-02
+**Done when:** virtual screen capture compiles and crop normalization tests pass.
+**Verify:** `dotnet test Firaw.SnapCopyText.sln`
+
+### T3: Create capture overlay
+
+**Where:** `Views/CaptureOverlayWindow.xaml(.cs)`
+**Depends on:** T2
+**Requirements:** CAP-01, CAP-02
+**Done when:** drag returns a valid crop and Escape cancels.
+**Verify:** build plus overlay logic tests.
+
+### T4: Create annotation model and history tests
+
+**Where:** `Models/EditorTool.cs`, `Models/AnnotationHistory.cs`, tests.
+**Depends on:** T1
+**Requirements:** EDIT-01, EDIT-02
+**Done when:** tool model compiles and undo/redo tests pass.
+**Verify:** `dotnet test Firaw.SnapCopyText.sln`
+
+### T5: Create editor layout
+
+**Where:** `Views/EditorWindow.xaml`
+**Depends on:** T3, T4
+**Requirements:** EDIT-01, IMG-01, IMG-02, OCR-02
+**Done when:** all MVP controls render and bind to named handlers.
+**Verify:** solution builds.
+
+### T6: Implement editor interactions and image output
+
+**Where:** `Views/EditorWindow.xaml.cs`
+**Depends on:** T5
+**Requirements:** EDIT-01, EDIT-02, IMG-01, IMG-02
+**Done when:** drawing, text, redaction, undo/redo, copy, and save compile and follow the spec.
+**Verify:** solution builds and tests pass.
+
+### T7: Implement local OCR and preview
+
+**Where:** `Services/OcrService.cs`, OCR preview dialog, project dependencies.
+**Depends on:** T1
+**Requirements:** OCR-01, OCR-02
+**Done when:** OCR models are copied to output and recognized text can be edited and copied.
+**Verify:** OCR smoke test plus solution build.
+
+### T8: Integrate launcher and global shortcuts
+
+**Where:** `Services/HotkeyService.cs`, launcher code-behind.
+**Depends on:** T3, T6, T7
+**Requirements:** HOTKEY-01, CAP-01
+**Done when:** button and available global shortcut open exactly one capture overlay.
+**Verify:** solution builds and duplicate-request guard is tested.
+
+### T9: Package documentation and validate MVP
+
+**Where:** `README.md`, spec/task/state status.
+**Depends on:** T1-T8
+**Requirements:** all
+**Done when:** clean restore, build, and tests pass; run instructions are documented.
+**Verify:** `dotnet restore`, `dotnet build`, and `dotnet test` all succeed.
+
+## Tools
+
+- Local filesystem edits through `apply_patch`.
+- Installed .NET SDK for restore, build, tests, and execution.
+- Official Microsoft and Tesseract documentation for API verification.
+- No external account, cloud connector, or upload service.
