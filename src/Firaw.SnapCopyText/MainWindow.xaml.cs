@@ -161,8 +161,8 @@ public partial class MainWindow : Window
 
         try
         {
-            CaptureTarget? fixedTarget = mode == CaptureMode.Region ? null : ChooseCaptureTarget(mode);
-            if (mode != CaptureMode.Region && fixedTarget is null)
+            CaptureChoice? fixedChoice = mode == CaptureMode.Region ? null : ChooseCaptureTarget(mode);
+            if (mode != CaptureMode.Region && fixedChoice is null)
             {
                 SetStatus("Captura cancelada.");
                 return;
@@ -176,19 +176,23 @@ public partial class MainWindow : Window
             DesktopSnapshot snapshot = _captureService.CaptureVirtualScreen();
             BitmapSource? selectedImage;
             bool selected;
+            CaptureResultAction selectedAction;
             if (mode == CaptureMode.Region)
             {
                 var overlay = new CaptureOverlayWindow(snapshot, _captureService);
                 selected = overlay.ShowDialog() == true && overlay.SelectedImage is not null;
                 selectedImage = overlay.SelectedImage;
+                selectedAction = overlay.SelectedAction;
             }
             else
             {
+                CaptureTarget fixedTarget = fixedChoice!.Target;
                 selectedImage = mode == CaptureMode.Window
-                    ? _captureService.CaptureWindow(fixedTarget!) ??
-                      _captureService.CropScreenBounds(snapshot, fixedTarget!.Bounds)
-                    : _captureService.CropScreenBounds(snapshot, fixedTarget!.Bounds);
+                    ? _captureService.CaptureWindow(fixedTarget) ??
+                      _captureService.CropScreenBounds(snapshot, fixedTarget.Bounds)
+                    : _captureService.CropScreenBounds(snapshot, fixedTarget.Bounds);
                 selected = true;
+                selectedAction = fixedChoice.Action;
             }
 
             RestoreFirawWindows(hiddenWindows);
@@ -196,13 +200,22 @@ public partial class MainWindow : Window
 
             if (selected)
             {
-                var editor = new EditorWindow(selectedImage!);
-                if (IsVisible)
+                if (selectedAction == CaptureResultAction.CopyImage)
                 {
-                    editor.Owner = this;
+                    SetStatus(TryCopyImage(selectedImage!)
+                        ? $"Captura de {ModeLabel(mode).ToLowerInvariant()} copiada para a área de transferência."
+                        : "Não foi possível copiar a imagem. Tente novamente.");
                 }
-                editor.Show();
-                SetStatus($"Captura de {ModeLabel(mode).ToLowerInvariant()} aberta no editor.");
+                else
+                {
+                    var editor = new EditorWindow(selectedImage!);
+                    if (IsVisible)
+                    {
+                        editor.Owner = this;
+                    }
+                    editor.Show();
+                    SetStatus($"Captura de {ModeLabel(mode).ToLowerInvariant()} aberta no editor.");
+                }
             }
             else
             {
@@ -223,7 +236,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private CaptureTarget? ChooseCaptureTarget(CaptureMode mode)
+    private CaptureChoice? ChooseCaptureTarget(CaptureMode mode)
     {
         IReadOnlyList<CaptureTarget> targets = mode == CaptureMode.Monitor
             ? _windowSelectionService.GetMonitors()
@@ -235,7 +248,27 @@ public partial class MainWindow : Window
             picker.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         }
 
-        return picker.ShowDialog() == true ? picker.SelectedTarget : null;
+        return picker.ShowDialog() == true && picker.SelectedTarget is not null
+            ? new CaptureChoice(picker.SelectedTarget, picker.SelectedAction)
+            : null;
+    }
+
+    private static bool TryCopyImage(BitmapSource image)
+    {
+        for (int attempt = 0; attempt < 3; attempt++)
+        {
+            try
+            {
+                System.Windows.Clipboard.SetImage(image);
+                return true;
+            }
+            catch (COMException) when (attempt < 2)
+            {
+                Thread.Sleep(40);
+            }
+        }
+
+        return false;
     }
 
     private static string ModeLabel(CaptureMode mode) => mode switch
@@ -244,6 +277,8 @@ public partial class MainWindow : Window
         CaptureMode.Monitor => "Monitor",
         _ => "Região"
     };
+
+    private sealed record CaptureChoice(CaptureTarget Target, CaptureResultAction Action);
 
     private static List<HiddenWindowState> HideVisibleFirawWindows()
     {

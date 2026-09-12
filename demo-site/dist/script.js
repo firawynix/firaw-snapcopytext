@@ -3,7 +3,7 @@ const demos = {
     number: "01",
     title: "Ajuste antes de confirmar",
     description: "Arraste, mova e redimensione a área escolhida pelos oito pontos cianos. Confirme só quando o enquadramento estiver certo.",
-    points: ["Seleção em tempo real", "Confirmação por Enter", "Sem o Firaw aparecer na imagem"],
+    points: ["Seleção em tempo real", "Abrir por Enter ou copiar por Ctrl+C", "Sem o Firaw aparecer na imagem"],
     image: "assets/firaw-app.png",
     alt: "Tela do modo de captura por região"
   },
@@ -11,7 +11,7 @@ const demos = {
     number: "02",
     title: "Escolha o programa certo",
     description: "O Firaw lista as janelas abertas com nome e dimensão para você confirmar o alvo antes da captura.",
-    points: ["Lista visual dentro do aplicativo", "Captura pelo identificador da janela", "Funciona mesmo com outra janela à frente"],
+    points: ["Abrir no editor ou copiar direto", "Ctrl+C copia a janela escolhida", "Funciona mesmo com outra janela à frente"],
     image: "assets/firaw-picker.png",
     alt: "Lista do Firaw para escolher uma janela"
   },
@@ -19,7 +19,7 @@ const demos = {
     number: "03",
     title: "Um monitor inteiro",
     description: "Veja as telas disponíveis, a resolução de cada uma e qual é a principal. Depois, escolha com um clique.",
-    points: ["Suporte a vários monitores", "Resolução e posição visíveis", "Identificação da tela principal"],
+    points: ["Abrir no editor ou copiar direto", "Ctrl+C copia o monitor escolhido", "Identificação da tela principal"],
     image: "assets/firaw-picker.png",
     alt: "Lista do Firaw para escolher um monitor"
   },

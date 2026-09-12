@@ -8,6 +8,13 @@ The capture entry point receives an explicit `CaptureMode`, while global shortcu
 
 Before every pixel read, visible Firaw windows receive `WDA_EXCLUDEFROMCAPTURE`, have DWM transitions disabled, and are hidden. Their previous settings are restored after selection.
 
+Capture confirmation returns both the selected target and a
+`CaptureResultAction`. Region, Window, and Monitor can use `OpenEditor` or
+`CopyImage`; the latter copies only after the selection UI has closed and the
+hidden Firaw windows have been restored. The region overlay and target picker
+expose a **Copy image** button and handle Ctrl+C. The editor handles Ctrl+C as
+the same action as its existing **Copy image** button.
+
 Custom shortcuts are stored as normalized labels such as `Ctrl + Alt + F9`. `HotkeyService` parses and validates the label before calling `RegisterHotKey`; ordinary keys still require Ctrl, Shift, or Alt, while the dedicated Print Screen key and function keys may be used alone. Print Screen accepts `PrintScreen`, `Print Screen`, and `PrtSc`, normalizes them to `Print Screen`, and avoids duplicate registration when the separate Print Screen preference is also enabled.
 
 Print Screen profile: `HotkeyService.KeyboardProcedure()` maps the exact combinations Print Screen → Region, Alt+Print Screen → Monitor, and Ctrl+Print Screen → Window. `WH_KEYBOARD_LL` is primary so Windows reservations do not prevent capture; `RegisterHotKey` is the fallback if the hook cannot be installed. A combination is suppressed only when its matching `CapturePreferences` flag is enabled; disabled combinations continue through `CallNextHookEx` for native Windows behavior. The custom shortcut remains a separate default-mode fallback.

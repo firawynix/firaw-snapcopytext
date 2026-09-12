@@ -1,3 +1,15 @@
+# Cópia direta de capturas — 1.1.6 (11 de setembro de 2026)
+
+- A seleção de região oferece **Copiar imagem** e aceita `Ctrl+C`.
+- As listas de janela e monitor oferecem **Abrir no editor** e **Copiar imagem**.
+- `Ctrl+C` copia diretamente a janela ou o monitor marcado na lista.
+- No editor, `Ctrl+C` copia a imagem final com todas as edições.
+- A cópia ocorre depois que a interface de seleção fecha, mantendo as janelas
+  do Firaw fora da captura.
+- Notas completas: `C:\Users\Hugo\Firaw-SnapCopyText\UPDATE-1.1.6.md`.
+
+---
+
 # Editor inteligente — 1.1.5 (11 de setembro de 2026)
 
 - Texto, anotação, desenho, censura e desfoque podem ser selecionados e movidos depois de criados.

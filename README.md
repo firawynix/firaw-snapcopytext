@@ -15,10 +15,16 @@ Depois da instalação, o atalho abre `Firaw.SnapCopyText.Launcher.exe`. Ele lê
 1. Abra o Firaw - SnapCopyText.
 2. Escolha **Selecionar região**, **Escolher janela** ou **Escolher monitor**. Janela e Monitor abrem uma lista no próprio Firaw com nomes e dimensões.
 3. Na captura por região, arraste sobre a área desejada e solte o mouse.
-4. Mova a região pela parte interna ou redimensione usando os oito pontos cianos; confirme em **Abrir editor** ou pressione **Enter**.
-5. No editor, faça anotações; use **Selecionar** para marcar e mover objetos, inclusive textos e caixas de anotação já criados.
-6. **Copiar texto** envia todo o OCR direto à área de transferência. Em **Selecionar texto**, arraste uma moldura ciana sobre o texto na própria imagem; ao soltar, somente aquele trecho é reconhecido e copiado, sem abrir outra janela.
-7. Abra **Textos** para ver o histórico desta execução. Use Ctrl ou Shift para marcar vários trechos e **Copiar selecionados** para juntá-los.
+4. Mova a região pela parte interna ou redimensione usando os oito pontos cianos.
+   Use **Abrir editor** ou pressione **Enter** para editar; use **Copiar imagem**
+   ou pressione `Ctrl+C` para enviar a seleção direto à área de transferência.
+5. Nas listas de janela e monitor, escolha o alvo e use **Abrir no editor** ou
+   **Copiar imagem**. `Ctrl+C` copia o alvo selecionado sem abrir o editor.
+6. No editor, faça anotações; use **Selecionar** para marcar e mover objetos,
+   inclusive textos e caixas de anotação já criados. Pressione `Ctrl+C` para
+   copiar a imagem editada.
+7. **Copiar texto** envia todo o OCR direto à área de transferência. Em **Selecionar texto**, arraste uma moldura ciana sobre o texto na própria imagem; ao soltar, somente aquele trecho é reconhecido e copiado, sem abrir outra janela.
+8. Abra **Textos** para ver o histórico desta execução. Use Ctrl ou Shift para marcar vários trechos e **Copiar selecionados** para juntá-los.
 
 Em **Atalhos e preferências**, escolha o modo usado pelo atalho, clique no campo e pressione sua própria combinação. `Print Screen` também pode ser gravada sozinha como atalho personalizado. A mesma tela permite ativá-la como atalho adicional e abrir diretamente as configurações de teclado do Windows caso a Ferramenta de Captura esteja ocupando essa tecla.
 
@@ -40,6 +46,7 @@ Se o Lightshot ou o Recorte do Windows estiver usando `Print Screen`, o Firaw mo
 - Paleta visual com oito cores predefinidas e ciano Firaw selecionado inicialmente, além de espessura configurável.
 - Desfazer e refazer.
 - Copiar imagem editada e salvar em PNG.
+- Cópia direta por botão ou `Ctrl+C` na seleção de região, janela e monitor.
 - Região ajustável em tempo real, com movimentação e oito pontos de redimensionamento.
 - Captura por janela com lista de programas e leitura da janela escolhida mesmo quando outra está à frente.
 - Captura por monitor com lista de todas as telas, resolução e indicação do monitor principal.

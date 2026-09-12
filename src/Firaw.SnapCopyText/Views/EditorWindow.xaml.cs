@@ -1203,7 +1203,12 @@ public partial class EditorWindow : Window
 
     private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Z)
+        if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.C)
+        {
+            CopyImageButton_Click(sender, e);
+            e.Handled = true;
+        }
+        else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Z)
         {
             UndoButton_Click(sender, e);
             e.Handled = true;

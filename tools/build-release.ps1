@@ -1,6 +1,6 @@
 ﻿param(
-    [string]$Version = '1.1.5',
-    [string]$ReleaseNotes = 'Editor com seleção e movimentação de objetos, borracha em três formatos e desfoque manual ou automático de dados sensíveis.'
+    [string]$Version = '1.1.6',
+    [string]$ReleaseNotes = 'Cópia direta da captura com Ctrl+C ou botão nos modos Região, Janela e Monitor, além do mesmo atalho no editor.'
 )
 
 $ErrorActionPreference = 'Stop'

@@ -30,6 +30,7 @@ public partial class CaptureOverlayWindow : Window
     private bool _drawing;
 
     public BitmapSource? SelectedImage { get; private set; }
+    public CaptureResultAction SelectedAction { get; private set; } = CaptureResultAction.OpenEditor;
 
     public CaptureOverlayWindow(
         DesktopSnapshot snapshot,
@@ -130,7 +131,7 @@ public partial class CaptureOverlayWindow : Window
             return;
         }
 
-        InstructionText.Text = "Mova ou redimensione  •  Enter abre o editor  •  Esc cancela";
+        InstructionText.Text = "Mova ou redimensione  •  Enter abre o editor  •  Ctrl + C copia";
         UpdateSelectionVisuals(showControls: true);
         e.Handled = true;
     }
@@ -168,7 +169,11 @@ public partial class CaptureOverlayWindow : Window
         UpdateSelectionVisuals(showControls: true);
     }
 
-    private void ConfirmButton_Click(object sender, RoutedEventArgs e) => ConfirmSelection();
+    private void ConfirmButton_Click(object sender, RoutedEventArgs e) =>
+        ConfirmSelection(CaptureResultAction.OpenEditor);
+
+    private void CopyButton_Click(object sender, RoutedEventArgs e) =>
+        ConfirmSelection(CaptureResultAction.CopyImage);
 
     private void CancelButton_Click(object sender, RoutedEventArgs e) => DialogResult = false;
 
@@ -179,14 +184,19 @@ public partial class CaptureOverlayWindow : Window
             DialogResult = false;
             e.Handled = true;
         }
+        else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.C && !_selection.IsEmpty)
+        {
+            ConfirmSelection(CaptureResultAction.CopyImage);
+            e.Handled = true;
+        }
         else if (e.Key == Key.Enter && !_selection.IsEmpty)
         {
-            ConfirmSelection();
+            ConfirmSelection(CaptureResultAction.OpenEditor);
             e.Handled = true;
         }
     }
 
-    private void ConfirmSelection()
+    private void ConfirmSelection(CaptureResultAction action = CaptureResultAction.OpenEditor)
     {
         if (_selection.IsEmpty ||
             _selection.Width < MinimumSelectionSize ||
@@ -205,6 +215,7 @@ public partial class CaptureOverlayWindow : Window
             new Int32Rect(0, 0, _snapshot.Image.PixelWidth, _snapshot.Image.PixelHeight));
 
         SelectedImage = _captureService.Crop(_snapshot.Image, pixelRegion);
+        SelectedAction = action;
         DialogResult = true;
     }
 
