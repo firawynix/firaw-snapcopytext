@@ -48,7 +48,12 @@ public partial class CaptureTargetPickerWindow : Window
 
     private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.C)
+        if (e.Key == Key.Escape)
+        {
+            DialogResult = false;
+            e.Handled = true;
+        }
+        else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.C)
         {
             ConfirmSelection(CaptureResultAction.CopyImage);
             e.Handled = true;

@@ -1,3 +1,12 @@
+# Cancelamento rápido — 1.1.7 (12 de setembro de 2026)
+
+- `Esc` cancela imediatamente a escolha de janela ou monitor.
+- O atalho executa a mesma ação do botão **Cancelar**.
+- Nenhuma imagem é capturada, copiada ou aberta no editor após o cancelamento.
+- Notas completas: `C:\Users\Hugo\Firaw-SnapCopyText\UPDATE-1.1.7.md`.
+
+---
+
 # Cópia direta de capturas — 1.1.6 (11 de setembro de 2026)
 
 - A seleção de região oferece **Copiar imagem** e aceita `Ctrl+C`.

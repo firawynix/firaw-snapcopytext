@@ -13,7 +13,9 @@ Capture confirmation returns both the selected target and a
 `CopyImage`; the latter copies only after the selection UI has closed and the
 hidden Firaw windows have been restored. The region overlay and target picker
 expose a **Copy image** button and handle Ctrl+C. The editor handles Ctrl+C as
-the same action as its existing **Copy image** button.
+the same action as its existing **Copy image** button. The shared target picker
+handles Escape as `DialogResult = false`, so Window and Monitor cancel through
+the same path as the **Cancel** button.
 
 Custom shortcuts are stored as normalized labels such as `Ctrl + Alt + F9`. `HotkeyService` parses and validates the label before calling `RegisterHotKey`; ordinary keys still require Ctrl, Shift, or Alt, while the dedicated Print Screen key and function keys may be used alone. Print Screen accepts `PrintScreen`, `Print Screen`, and `PrtSc`, normalizes them to `Print Screen`, and avoids duplicate registration when the separate Print Screen preference is also enabled.
 
@@ -23,4 +25,4 @@ Windows integration: `WindowsPrintScreenService.SetScreenSnippingEnabled()` chan
 
 Settings recording: `MainWindow.OpenSettings()` suspends current global hotkeys before showing the modal dialog and restores them in `finally`. `SettingsWindow.OnSourceInitialized()` owns a temporary foreground Print Screen registration while the dialog is open; its window hook records the key when the shortcut field has focus. `PreviewKeyUp` is a fallback for keyboards that expose Print Screen only on release.
 
-Updated: 2026-09-11
+Updated: 2026-09-12

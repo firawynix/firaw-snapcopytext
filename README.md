@@ -19,7 +19,8 @@ Depois da instalação, o atalho abre `Firaw.SnapCopyText.Launcher.exe`. Ele lê
    Use **Abrir editor** ou pressione **Enter** para editar; use **Copiar imagem**
    ou pressione `Ctrl+C` para enviar a seleção direto à área de transferência.
 5. Nas listas de janela e monitor, escolha o alvo e use **Abrir no editor** ou
-   **Copiar imagem**. `Ctrl+C` copia o alvo selecionado sem abrir o editor.
+   **Copiar imagem**. `Ctrl+C` copia o alvo selecionado sem abrir o editor e
+   `Esc` cancela a escolha.
 6. No editor, faça anotações; use **Selecionar** para marcar e mover objetos,
    inclusive textos e caixas de anotação já criados. Pressione `Ctrl+C` para
    copiar a imagem editada.

@@ -11,7 +11,7 @@ const demos = {
     number: "02",
     title: "Escolha o programa certo",
     description: "O Firaw lista as janelas abertas com nome e dimensão para você confirmar o alvo antes da captura.",
-    points: ["Abrir no editor ou copiar direto", "Ctrl+C copia a janela escolhida", "Funciona mesmo com outra janela à frente"],
+    points: ["Abrir no editor ou copiar direto", "Ctrl+C copia e Esc cancela", "Funciona mesmo com outra janela à frente"],
     image: "assets/firaw-picker.png",
     alt: "Lista do Firaw para escolher uma janela"
   },
@@ -19,7 +19,7 @@ const demos = {
     number: "03",
     title: "Um monitor inteiro",
     description: "Veja as telas disponíveis, a resolução de cada uma e qual é a principal. Depois, escolha com um clique.",
-    points: ["Abrir no editor ou copiar direto", "Ctrl+C copia o monitor escolhido", "Identificação da tela principal"],
+    points: ["Abrir no editor ou copiar direto", "Ctrl+C copia e Esc cancela", "Identificação da tela principal"],
     image: "assets/firaw-picker.png",
     alt: "Lista do Firaw para escolher um monitor"
   },

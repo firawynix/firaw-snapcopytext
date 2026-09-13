@@ -1,6 +1,6 @@
 ﻿param(
-    [string]$Version = '1.1.6',
-    [string]$ReleaseNotes = 'Cópia direta da captura com Ctrl+C ou botão nos modos Região, Janela e Monitor, além do mesmo atalho no editor.'
+    [string]$Version = '1.1.7',
+    [string]$ReleaseNotes = 'A tecla Esc cancela imediatamente a escolha de janela ou monitor.'
 )
 
 $ErrorActionPreference = 'Stop'
