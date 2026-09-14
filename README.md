@@ -1,6 +1,10 @@
 # Firaw - SnapCopyText
 
-Capturador de tela para Windows com edição rápida e extração local de texto em português e inglês.
+Capturador de tela para Windows e Linux com edição rápida e extração local de texto em português e inglês.
+
+A edição Linux fica em `linux/` e é distribuída como AppImage e `.deb`. Ela usa
+a captura do desktop do Electron/PipeWire, atalhos globais e os mesmos modelos
+Tesseract locais do projeto; nenhum print é enviado para serviço externo.
 
 ## Instalar a versão pronta
 

@@ -9,3 +9,4 @@ Last updated: 2026-09-12
 - [capture-window-visibility](capture-window-visibility.md) — Hide and restore every Firaw window around desktop snapshots | gotcha | wpf, capture, windows
 - [capture-modes-and-shortcuts](capture-modes-and-shortcuts.md) — Target pickers, cancel/copy actions, native rendering, and hotkeys | flow | capture, clipboard, windows, monitors, hotkeys
 - [editor-object-interactions](editor-object-interactions.md) — Selection/movement actions, eraser modes, blur annotations, and local sensitive-data OCR | flow | editor, selection, eraser, blur, ocr
+- [linux-port](linux-port.md) — Desktop capture, local OCR resources and AppImage packaging | setup | linux, electron, appimage

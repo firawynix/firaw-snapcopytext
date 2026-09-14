@@ -175,7 +175,7 @@ h1 em { color: var(--cyan); font-style: normal; }
 
 .download { display: grid; grid-template-columns: .85fr 1.15fr; gap: 80px; align-items: center; }
 .download-copy > p:last-child { max-width: 440px; margin-top: 25px; color: var(--muted); }
-.download-options { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.download-options { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
 .download-card { min-height: 310px; padding: 28px; display: flex; flex-direction: column; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface); transition: transform .2s, border-color .2s; }
 .download-card:hover { transform: translateY(-5px); border-color: var(--cyan); }
 .download-card > span { color: var(--cyan); font-size: 11px; font-weight: 850; text-transform: uppercase; letter-spacing: .1em; }
