@@ -1,6 +1,6 @@
 ﻿param(
-    [string]$Version = '1.1.10',
-    [string]$ReleaseNotes = 'Controle de camadas entre prints e ajuste automático da saída ao espaço ocupado pela montagem.'
+    [string]$Version = '1.1.11',
+    [string]$ReleaseNotes = 'A barra de ações da seleção agora procura espaço livre abaixo, acima ou nas laterais e só fica dentro da captura quando não existe outra opção.'
 )
 
 $ErrorActionPreference = 'Stop'

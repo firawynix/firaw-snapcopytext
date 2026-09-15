@@ -23,6 +23,12 @@ overlay exposes 1 Reselect, 2 Copy, and 3 Open editor. Reselect calls
 `ClearSelection()` and keeps the captured desktop open, so a replacement region
 does not require another desktop snapshot.
 
+`SelectionGeometry.PlaceActionBar()` keeps the region action bar accessible:
+below → above → right → left, using only a side with enough free space. If none
+fits (including full-screen selection), it places the bar inside the selection
+with an inset. `CaptureOverlayWindow.PositionActionBar()` recalculates this
+after drawing, moving, or resizing.
+
 The editor also exposes `+ Region`, `+ Window`, and `+ Monitor`. These reuse the
 same selectors in add mode, hide every Firaw window before reading pixels, and
 return the new bitmap to the current editor instead of opening another editor.

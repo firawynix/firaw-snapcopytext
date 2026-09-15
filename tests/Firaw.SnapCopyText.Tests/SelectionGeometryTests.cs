@@ -44,4 +44,32 @@ public class SelectionGeometryTests
 
         Assert.Equal(new Rect(100, 100, 700, 500), result);
     }
+
+    [Fact]
+    public void PlaceActionBar_UsesSpaceAboveWhenSelectionTouchesBottom()
+    {
+        Rect result = SelectionGeometry.PlaceActionBar(
+            new Rect(100, 300, 600, 300), new Size(320, 42), Bounds);
+
+        Assert.Equal(new Rect(380, 248, 320, 42), result);
+    }
+
+    [Fact]
+    public void PlaceActionBar_UsesFreeSideWhenSelectionSpansFullHeight()
+    {
+        Rect result = SelectionGeometry.PlaceActionBar(
+            new Rect(0, 0, 400, 600), new Size(320, 42), Bounds);
+
+        Assert.Equal(new Rect(410, 558, 320, 42), result);
+    }
+
+    [Fact]
+    public void PlaceActionBar_FallsBackInsideForFullScreenSelection()
+    {
+        Rect result = SelectionGeometry.PlaceActionBar(
+            Bounds, new Size(320, 42), Bounds);
+
+        Assert.Equal(new Rect(470, 548, 320, 42), result);
+        Assert.True(Bounds.Contains(result));
+    }
 }

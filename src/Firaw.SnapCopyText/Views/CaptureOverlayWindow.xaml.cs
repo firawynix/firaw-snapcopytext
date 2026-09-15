@@ -357,18 +357,12 @@ public partial class CaptureOverlayWindow : Window
     private void PositionActionBar(Rect region)
     {
         ActionBar.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        double left = Math.Clamp(
-            region.Right - ActionBar.DesiredSize.Width,
-            0,
-            Math.Max(0, ActualWidth - ActionBar.DesiredSize.Width));
-        double top = region.Bottom + 10;
-        if (top + ActionBar.DesiredSize.Height > ActualHeight)
-        {
-            top = Math.Max(0, region.Top - ActionBar.DesiredSize.Height - 10);
-        }
-
-        Canvas.SetLeft(ActionBar, left);
-        Canvas.SetTop(ActionBar, top);
+        Rect placement = SelectionGeometry.PlaceActionBar(
+            region,
+            ActionBar.DesiredSize,
+            SelectionBounds());
+        Canvas.SetLeft(ActionBar, placement.Left);
+        Canvas.SetTop(ActionBar, placement.Top);
     }
 
     private void SetControlVisibility(Visibility visibility)
