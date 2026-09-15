@@ -131,7 +131,7 @@ public partial class CaptureOverlayWindow : Window
             return;
         }
 
-        InstructionText.Text = "Mova ou redimensione  •  Enter abre o editor  •  Ctrl + C copia";
+        InstructionText.Text = "1 seleciona novamente  •  2 copia  •  3 abre o editor";
         UpdateSelectionVisuals(showControls: true);
         e.Handled = true;
     }
@@ -175,6 +175,12 @@ public partial class CaptureOverlayWindow : Window
     private void CopyButton_Click(object sender, RoutedEventArgs e) =>
         ConfirmSelection(CaptureResultAction.CopyImage);
 
+    private void ReselectButton_Click(object sender, RoutedEventArgs e)
+    {
+        ClearSelection();
+        Focus();
+    }
+
     private void CancelButton_Click(object sender, RoutedEventArgs e) => DialogResult = false;
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -190,6 +196,27 @@ public partial class CaptureOverlayWindow : Window
             e.Handled = true;
         }
         else if (e.Key == Key.Enter && !_selection.IsEmpty)
+        {
+            ConfirmSelection(CaptureResultAction.OpenEditor);
+            e.Handled = true;
+        }
+        else if (Keyboard.Modifiers == ModifierKeys.None &&
+                 e.Key is Key.D1 or Key.NumPad1 &&
+                 !_selection.IsEmpty)
+        {
+            ClearSelection();
+            e.Handled = true;
+        }
+        else if (Keyboard.Modifiers == ModifierKeys.None &&
+                 e.Key is Key.D2 or Key.NumPad2 &&
+                 !_selection.IsEmpty)
+        {
+            ConfirmSelection(CaptureResultAction.CopyImage);
+            e.Handled = true;
+        }
+        else if (Keyboard.Modifiers == ModifierKeys.None &&
+                 e.Key is Key.D3 or Key.NumPad3 &&
+                 !_selection.IsEmpty)
         {
             ConfirmSelection(CaptureResultAction.OpenEditor);
             e.Handled = true;

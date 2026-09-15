@@ -1,3 +1,13 @@
+# Seleção renovada e OCR aprimorado — 1.1.8 (15 de setembro de 2026)
+
+- A captura por região permite limpar o enquadramento e selecionar novamente sem fechar a tela.
+- O editor abre dimensionado ao recorte exato e reduz somente a visualização quando necessário.
+- O OCR compara a leitura original com uma versão ampliada, preservando o resultado de maior confiança e cobertura.
+- Os três modos principais, as ações da região e as dez ferramentas do editor estão numerados e aceitam as teclas correspondentes.
+- Notas completas: `C:\Users\Hugo\Firaw-SnapCopyText\UPDATE-1.1.8.md`.
+
+---
+
 # Cancelamento rápido — 1.1.7 (12 de setembro de 2026)
 
 - `Esc` cancela imediatamente a escolha de janela ou monitor.

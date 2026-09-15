@@ -62,10 +62,41 @@ public partial class EditorWindow : Window
         CaptureImage.Source = image;
         EditorSurface.Width = image.PixelWidth;
         EditorSurface.Height = image.PixelHeight;
+        Title = $"Firaw - SnapCopyText • Editor • {image.PixelWidth} × {image.PixelHeight}";
+        ConfigureInitialWindowSize();
         CopiedTextList.ItemsSource = _textHistory.Items;
         _textHistory.Items.CollectionChanged += TextHistory_CollectionChanged;
         Closed += (_, _) => _textHistory.Items.CollectionChanged -= TextHistory_CollectionChanged;
+        Loaded += (_, _) => FitEditorToCapture();
         UpdateTextHistoryUi();
+    }
+
+    private void ConfigureInitialWindowSize()
+    {
+        double maximumWidth = Math.Max(MinWidth, SystemParameters.WorkArea.Width - 48);
+        double maximumHeight = Math.Max(MinHeight, SystemParameters.WorkArea.Height - 48);
+        Width = Math.Clamp(OriginalImage.PixelWidth + 72, MinWidth, maximumWidth);
+        Height = Math.Clamp(OriginalImage.PixelHeight + 190, MinHeight, maximumHeight);
+    }
+
+    private void FitEditorToCapture()
+    {
+        UpdateLayout();
+
+        double scale = Math.Min(
+            1,
+            Math.Min(
+                EditorScrollViewer.ViewportWidth / OriginalImage.PixelWidth,
+                EditorScrollViewer.ViewportHeight / OriginalImage.PixelHeight));
+        if (scale < 0.999)
+        {
+            EditorFrame.LayoutTransform = new ScaleTransform(scale, scale);
+            EditorStatus.Text = $"Recorte exato: {OriginalImage.PixelWidth} × {OriginalImage.PixelHeight} • visualização {scale:P0}";
+        }
+        else
+        {
+            EditorStatus.Text = $"Recorte exato: {OriginalImage.PixelWidth} × {OriginalImage.PixelHeight}";
+        }
     }
 
     private void ToolButton_Checked(object sender, RoutedEventArgs e)
@@ -1230,6 +1261,36 @@ public partial class EditorWindow : Window
             EditorStatus.Text = "Seleção de objetos cancelada.";
             e.Handled = true;
         }
+        else if (Keyboard.Modifiers == ModifierKeys.None && TrySelectToolByNumber(e.Key))
+        {
+            e.Handled = true;
+        }
+    }
+
+    private bool TrySelectToolByNumber(Key key)
+    {
+        int index = key switch
+        {
+            Key.D1 or Key.NumPad1 => 0,
+            Key.D2 or Key.NumPad2 => 1,
+            Key.D3 or Key.NumPad3 => 2,
+            Key.D4 or Key.NumPad4 => 3,
+            Key.D5 or Key.NumPad5 => 4,
+            Key.D6 or Key.NumPad6 => 5,
+            Key.D7 or Key.NumPad7 => 6,
+            Key.D8 or Key.NumPad8 => 7,
+            Key.D9 or Key.NumPad9 => 8,
+            Key.D0 or Key.NumPad0 => 9,
+            _ => -1
+        };
+        ToggleButton[] tools = ToolsPanel.Children.OfType<ToggleButton>().ToArray();
+        if (index < 0 || index >= tools.Length)
+        {
+            return false;
+        }
+
+        tools[index].IsChecked = true;
+        return true;
     }
 
     private sealed record RemovedAnnotation(UIElement Element, int Index);

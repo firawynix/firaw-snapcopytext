@@ -10,6 +10,12 @@ Flow:
 - Eraser Object removes the hit annotation. Circle and Square remove annotations whose bounds intersect the cursor shape; a single stroke is one history action.
 - Manual blur crops the original pixels and overlays a clipped WPF `BlurEffect` object. Automatic protection obtains Tesseract text-line bounds, filters them with `SensitiveDataDetector`, then creates the same movable blur objects.
 - Export temporarily hides `SelectionCanvas`, keeping selection outlines and eraser previews out of copied/saved images.
+- The ten tools are numbered 1-9 and 0 in panel order. `TrySelectToolByNumber()`
+  maps both the digit row and numpad to the same toggle buttons.
+- `ConfigureInitialWindowSize()` sizes the editor from the captured pixel size,
+  capped to the current working area. `FitEditorToCapture()` applies a layout
+  scale only when necessary; export still renders `EditorSurface` at original
+  resolution.
 
 Gotchas:
 - Keep OCR on `OriginalImage`, not the rendered editor, so annotations do not pollute sensitive-data detection.
@@ -20,4 +26,4 @@ Verification:
 - Unit tests cover OCR regions and sensitive-data patterns.
 - Visual smoke test should create a blur, select and move it, marquee-select it, erase it, and undo the erase.
 
-Updated: 2026-09-11
+Updated: 2026-09-15

@@ -1,6 +1,6 @@
 ﻿param(
-    [string]$Version = '1.1.7',
-    [string]$ReleaseNotes = 'A tecla Esc cancela imediatamente a escolha de janela ou monitor.'
+    [string]$Version = '1.1.8',
+    [string]$ReleaseNotes = 'Nova seleção de região, editor ajustado ao recorte, OCR aprimorado e navegação numérica.'
 )
 
 $ErrorActionPreference = 'Stop'

@@ -2,8 +2,8 @@ const demos = {
   regiao: {
     number: "01",
     title: "Ajuste antes de confirmar",
-    description: "Arraste, mova e redimensione a área escolhida pelos oito pontos cianos. Confirme só quando o enquadramento estiver certo.",
-    points: ["Seleção em tempo real", "Abrir por Enter ou copiar por Ctrl+C", "Sem o Firaw aparecer na imagem"],
+    description: "Arraste, mova e redimensione a área escolhida pelos oito pontos cianos. Se precisar, selecione novamente antes de confirmar.",
+    points: ["Seleção em tempo real", "Botões 1, 2 e 3 para repetir, copiar ou editar", "Sem o Firaw aparecer na imagem"],
     image: "assets/firaw-app.png",
     alt: "Tela do modo de captura por região"
   },

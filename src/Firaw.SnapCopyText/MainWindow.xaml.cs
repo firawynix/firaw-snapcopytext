@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Firaw.SnapCopyText.Services;
@@ -8,6 +9,8 @@ using Firaw.SnapCopyText.Views;
 using Firaw.SnapCopyText.Models;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using CaptureMode = Firaw.SnapCopyText.Models.CaptureMode;
 
 namespace Firaw.SnapCopyText;
 
@@ -100,6 +103,27 @@ public partial class MainWindow : Window
             Enum.TryParse(element.Tag?.ToString(), out CaptureMode mode))
         {
             RequestCapture(mode);
+        }
+    }
+
+    private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (Keyboard.Modifiers != ModifierKeys.None)
+        {
+            return;
+        }
+
+        CaptureMode? mode = e.Key switch
+        {
+            Key.D1 or Key.NumPad1 => CaptureMode.Region,
+            Key.D2 or Key.NumPad2 => CaptureMode.Window,
+            Key.D3 or Key.NumPad3 => CaptureMode.Monitor,
+            _ => null
+        };
+        if (mode is not null)
+        {
+            RequestCapture(mode.Value);
+            e.Handled = true;
         }
     }
 

@@ -17,17 +17,20 @@ Depois da instalação, o atalho abre `Firaw.SnapCopyText.Launcher.exe`. Ele lê
 ## Como usar
 
 1. Abra o Firaw - SnapCopyText.
-2. Escolha **Selecionar região**, **Escolher janela** ou **Escolher monitor**. Janela e Monitor abrem uma lista no próprio Firaw com nomes e dimensões.
+2. Escolha **1 Região**, **2 Janela** ou **3 Monitor**. Janela e Monitor abrem uma lista no próprio Firaw com nomes e dimensões. Na tela principal, as teclas `1`, `2` e `3` abrem os mesmos modos.
 3. Na captura por região, arraste sobre a área desejada e solte o mouse.
 4. Mova a região pela parte interna ou redimensione usando os oito pontos cianos.
-   Use **Abrir editor** ou pressione **Enter** para editar; use **Copiar imagem**
-   ou pressione `Ctrl+C` para enviar a seleção direto à área de transferência.
+   Use **1 Selecionar novamente** para refazer o enquadramento, **2 Copiar imagem**
+   para enviar a seleção à área de transferência ou **3 Abrir editor** para editar.
+   `Ctrl+C` e `Enter` continuam disponíveis.
 5. Nas listas de janela e monitor, escolha o alvo e use **Abrir no editor** ou
    **Copiar imagem**. `Ctrl+C` copia o alvo selecionado sem abrir o editor e
    `Esc` cancela a escolha.
-6. No editor, faça anotações; use **Selecionar** para marcar e mover objetos,
-   inclusive textos e caixas de anotação já criados. Pressione `Ctrl+C` para
-   copiar a imagem editada.
+6. No editor, faça anotações; use **1 Selecionar** para marcar e mover objetos,
+   inclusive textos e caixas de anotação já criados. As ferramentas seguem de
+   `1` a `0` e podem ser escolhidas pelas mesmas teclas. O editor abre na medida
+   exata do recorte e reduz apenas a visualização quando a imagem é maior que a
+   área útil da tela. Pressione `Ctrl+C` para copiar a imagem editada.
 7. **Copiar texto** envia todo o OCR direto à área de transferência. Em **Selecionar texto**, arraste uma moldura ciana sobre o texto na própria imagem; ao soltar, somente aquele trecho é reconhecido e copiado, sem abrir outra janela.
 8. Abra **Textos** para ver o histórico desta execução. Use Ctrl ou Shift para marcar vários trechos e **Copiar selecionados** para juntá-los.
 
@@ -57,7 +60,7 @@ Se o Lightshot ou o Recorte do Windows estiver usando `Print Screen`, o Firaw mo
 - Captura por monitor com lista de todas as telas, resolução e indicação do monitor principal.
 - Atalho personalizado, modo padrão e uso opcional de Print Screen salvos por usuário.
 - Ocultação sincronizada das janelas do Firaw para evitar miniaturas fantasma na captura.
-- OCR local em português e inglês, com cópia integral ou seleção ciana diretamente sobre a imagem.
+- OCR local em português e inglês, com duas leituras automáticas, ampliação controlada de textos pequenos e escolha do resultado mais confiável.
 - Histórico de até 100 textos em memória, incluindo cópias feitas em outros programas enquanto o Firaw está ativo.
 - Gaveta abre/fecha com importação do clipboard, seleção múltipla e cópia conjunta.
 - Ícone próprio do Olho de Hórus e barra de título ciana em versões compatíveis do Windows 11.

@@ -119,16 +119,16 @@
                 </StackPanel>
 
                 <WrapPanel x:Name="ToolsPanel" VerticalAlignment="Center">
-                    <ToggleButton x:Name="SelectTool" Style="{StaticResource ToolButton}" Tag="Select" Content="Selecionar" IsChecked="True" Checked="ToolButton_Checked" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Pencil" Content="Caneta" Checked="ToolButton_Checked" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Arrow" Content="Seta" Checked="ToolButton_Checked" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Rectangle" Content="Retângulo" Checked="ToolButton_Checked" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Highlight" Content="Marca-texto" Checked="ToolButton_Checked" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Text" Content="Texto" Checked="ToolButton_Checked" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Note" Content="Anotação" Checked="ToolButton_Checked" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Redact" Content="Censurar" Checked="ToolButton_Checked" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Blur" Content="Borrar" Checked="ToolButton_Checked" />
-                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Eraser" Content="Borracha" Checked="ToolButton_Checked" />
+                    <ToggleButton x:Name="SelectTool" Style="{StaticResource ToolButton}" Tag="Select" Content="1 Selecionar" IsChecked="True" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Pencil" Content="2 Caneta" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Arrow" Content="3 Seta" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Rectangle" Content="4 Retângulo" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Highlight" Content="5 Marca-texto" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Text" Content="6 Texto" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Note" Content="7 Anotação" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Redact" Content="8 Censurar" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Blur" Content="9 Borrar" Checked="ToolButton_Checked" />
+                    <ToggleButton Style="{StaticResource ToolButton}" Tag="Eraser" Content="0 Borracha" Checked="ToolButton_Checked" />
                     <Button x:Name="AutoBlurButton" Style="{StaticResource SecondaryButton}"
                             Content="Borrar dados sensíveis" ToolTip="Localiza dados sensíveis com OCR local e borra as linhas encontradas"
                             Click="AutoBlurButton_Click" />
@@ -142,10 +142,10 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <ScrollViewer Grid.Column="0"
+            <ScrollViewer x:Name="EditorScrollViewer" Grid.Column="0"
                           HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                           Padding="28" Focusable="False">
-                <Border Background="#111820" BorderBrush="#334555" BorderThickness="1"
+                <Border x:Name="EditorFrame" Background="#111820" BorderBrush="#334555" BorderThickness="1"
                         HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Grid x:Name="EditorSurface" Background="White">
                         <Image x:Name="CaptureImage" Stretch="Fill" IsHitTestVisible="False" />

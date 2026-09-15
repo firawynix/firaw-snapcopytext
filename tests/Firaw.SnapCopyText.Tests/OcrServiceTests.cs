@@ -36,14 +36,30 @@ public sealed class OcrServiceTests
         Assert.InRange(region.Bounds.Y, 0, source.PixelHeight - 1);
     }
 
-    private static BitmapSource CreateTextImage(string text)
+    [Fact]
+    public async Task RecognizeAsync_ReadsSmallScreenshotTextAfterEnhancement()
     {
-        using var bitmap = new Bitmap(640, 180, PixelFormat.Format32bppArgb);
+        BitmapSource source = CreateTextImage("SNAPCOPY 2026", 22, 420, 90);
+        var service = new OcrService(Path.Combine(AppContext.BaseDirectory, "tessdata"));
+
+        string result = await service.RecognizeAsync(source);
+
+        Assert.Contains("SNAPCOPY", result, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("2026", result, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static BitmapSource CreateTextImage(
+        string text,
+        float fontSize = 72,
+        int width = 640,
+        int height = 180)
+    {
+        using var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
         using Graphics graphics = Graphics.FromImage(bitmap);
         graphics.Clear(Color.White);
         graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
-        using var font = new Font("Arial", 72, FontStyle.Bold, GraphicsUnit.Pixel);
-        graphics.DrawString(text, font, Brushes.Black, new PointF(15, 35));
+        using var font = new Font("Arial", fontSize, FontStyle.Bold, GraphicsUnit.Pixel);
+        graphics.DrawString(text, font, Brushes.Black, new PointF(15, Math.Max(4, (height - fontSize) / 2)));
 
         using var stream = new MemoryStream();
         bitmap.Save(stream, ImageFormat.Png);
