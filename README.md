@@ -33,7 +33,9 @@ Depois da instalação, o atalho abre `Firaw.SnapCopyText.Launcher.exe`. Ele lê
    caixas de anotação já criados. As ferramentas seguem de `1` a `0` e podem
    ser escolhidas pelas mesmas teclas. O editor abre na medida exata do primeiro
    recorte e reduz apenas a visualização quando a composição é maior que a área
-   útil da tela. Pressione `Ctrl+C` para copiar a imagem editada inteira.
+   útil da tela. Use **Trazer à frente** ou **Enviar atrás** para controlar
+   sobreposições. Ao concluir, use **Ajustar saída** para remover margens vazias.
+   Pressione `Ctrl+C` para copiar a imagem editada inteira.
 7. **Copiar texto** envia todo o OCR direto à área de transferência. Em **Selecionar texto**, arraste uma moldura ciana sobre o texto na própria imagem; ao soltar, somente aquele trecho é reconhecido e copiado, sem abrir outra janela.
 8. Abra **Textos** para ver o histórico desta execução. Use Ctrl ou Shift para marcar vários trechos e **Copiar selecionados** para juntá-los.
 
@@ -60,6 +62,7 @@ Se o Lightshot ou o Recorte do Windows estiver usando `Print Screen`, o Firaw mo
 - Cópia direta por botão ou `Ctrl+C` na seleção de região, janela e monitor.
 - Região ajustável em tempo real, com movimentação e oito pontos de redimensionamento.
 - Composição com várias capturas de região, janela ou monitor, lado a lado, movíveis e redimensionáveis individualmente.
+- Ordem de camadas entre prints e ajuste automático da saída ao espaço ocupado pela montagem.
 - Captura por janela com lista de programas e leitura da janela escolhida mesmo quando outra está à frente.
 - Captura por monitor com lista de todas as telas, resolução e indicação do monitor principal.
 - Atalho personalizado, modo padrão e uso opcional de Print Screen salvos por usuário.
@@ -88,8 +91,8 @@ dotnet run --project src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj
 Release completa com publicações autocontidas, launcher, instaladores Inno e manifesto de atualização:
 
 ```powershell
-.\tools\build-release.ps1 -Version 1.1.9 -ReleaseNotes "o que mudou"
-gh release create v1.1.9 -R firawynix/firaw-snapcopytext --title "Firaw - SnapCopyText 1.1.9" --notes "o que mudou" release\Firaw-SnapCopyText-1.1.9\github-release\*
+.\tools\build-release.ps1 -Version 1.1.10 -ReleaseNotes "o que mudou"
+gh release create v1.1.10 -R firawynix/firaw-snapcopytext --title "Firaw - SnapCopyText 1.1.10" --notes "o que mudou" release\Firaw-SnapCopyText-1.1.10\github-release\*
 ```
 
 Suba a versão também nos dois `.csproj` (o script grava `FileVersion` no executável, que é o que o launcher compara). A pasta `github-release` leva os dois instaladores, um `.sha256` de cada e o `update.json` — publique os cinco na mesma tag. O Firawynix Center pega a release nova sozinho (timer no servidor que confere o `.sha256`).

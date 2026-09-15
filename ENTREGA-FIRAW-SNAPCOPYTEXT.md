@@ -1,3 +1,13 @@
+# Camadas e saída ajustável — 1.1.10 (15 de setembro de 2026)
+
+- O print selecionado pode ser trazido para frente ou enviado para trás.
+- As anotações permanecem acima de todas as capturas.
+- **Ajustar saída** remove margens vazias e usa o tamanho real da montagem.
+- As novas operações participam do desfazer/refazer.
+- Notas completas: `C:\Users\Hugo\Firaw-SnapCopyText\UPDATE-1.1.10.md`.
+
+---
+
 # Composição com várias capturas — 1.1.9 (15 de setembro de 2026)
 
 - O mesmo editor agora recebe novas capturas de região, janela e monitor.

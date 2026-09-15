@@ -1,6 +1,6 @@
 ﻿param(
-    [string]$Version = '1.1.9',
-    [string]$ReleaseNotes = 'Editor com várias capturas de região, janela ou monitor, movíveis e redimensionáveis na mesma composição.'
+    [string]$Version = '1.1.10',
+    [string]$ReleaseNotes = 'Controle de camadas entre prints e ajuste automático da saída ao espaço ocupado pela montagem.'
 )
 
 $ErrorActionPreference = 'Stop'

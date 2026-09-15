@@ -480,6 +480,110 @@ public partial class EditorWindow : Window
         _ => "Região"
     };
 
+    private void BringCaptureForwardButton_Click(object sender, RoutedEventArgs e) =>
+        MoveSelectedCaptureToLayer(front: true);
+
+    private void SendCaptureBackwardButton_Click(object sender, RoutedEventArgs e) =>
+        MoveSelectedCaptureToLayer(front: false);
+
+    private void MoveSelectedCaptureToLayer(bool front)
+    {
+        if (_selectedElements.Count != 1 ||
+            _selectedElements.Single() is not UIElement capture ||
+            !IsCaptureAnnotation(capture))
+        {
+            EditorStatus.Text = "Selecione um único print para alterar sua camada.";
+            return;
+        }
+
+        int previousIndex = AnnotationCanvas.Children.IndexOf(capture);
+        int targetIndex = front ? ActiveCaptureCount() - 1 : 0;
+        if (previousIndex == targetIndex)
+        {
+            EditorStatus.Text = front
+                ? "Este print já está na frente dos outros."
+                : "Este print já está atrás dos outros.";
+            return;
+        }
+
+        MoveCaptureToIndex(capture, targetIndex);
+        _history.Add(new EditorAction(
+            () => MoveCaptureToIndex(capture, previousIndex),
+            () => MoveCaptureToIndex(capture, targetIndex)));
+        UpdateHistoryButtons();
+        EditorStatus.Text = front
+            ? "Print trazido para a frente."
+            : "Print enviado para trás.";
+    }
+
+    private void MoveCaptureToIndex(UIElement capture, int index)
+    {
+        if (!AnnotationCanvas.Children.Contains(capture))
+        {
+            return;
+        }
+
+        AnnotationCanvas.Children.Remove(capture);
+        int captureIndex = Math.Clamp(index, 0, ActiveCaptureCount());
+        AnnotationCanvas.Children.Insert(captureIndex, capture);
+        UpdateSelectionOutline();
+    }
+
+    private void FitOutputButton_Click(object sender, RoutedEventArgs e)
+    {
+        UIElement[] elements = AnnotationCanvas.Children
+            .OfType<UIElement>()
+            .Where(element => element.Visibility == Visibility.Visible)
+            .ToArray();
+        Rect contentBounds = Rect.Empty;
+        foreach (UIElement element in elements)
+        {
+            Rect bounds = GetAnnotationBounds(element);
+            if (!bounds.IsEmpty)
+            {
+                contentBounds.Union(bounds);
+            }
+        }
+
+        if (contentBounds.IsEmpty)
+        {
+            EditorStatus.Text = "Não há conteúdo para ajustar.";
+            return;
+        }
+
+        double previousWidth = EditorSurface.Width;
+        double previousHeight = EditorSurface.Height;
+        Vector offset = new(-contentBounds.Left, -contentBounds.Top);
+        double fittedWidth = Math.Max(1, Math.Ceiling(contentBounds.Width));
+        double fittedHeight = Math.Max(1, Math.Ceiling(contentBounds.Height));
+        bool sameSize = Math.Abs(previousWidth - fittedWidth) < 0.01 &&
+                        Math.Abs(previousHeight - fittedHeight) < 0.01;
+        if (offset.Length < 0.01 && sameSize)
+        {
+            EditorStatus.Text = "A saída já está ajustada ao conteúdo.";
+            return;
+        }
+
+        ApplyOutputFit(elements, offset, fittedWidth, fittedHeight);
+        _history.Add(new EditorAction(
+            () => ApplyOutputFit(elements, -offset, previousWidth, previousHeight),
+            () => ApplyOutputFit(elements, offset, fittedWidth, fittedHeight)));
+        UpdateHistoryButtons();
+        EditorStatus.Text = $"Saída ajustada para {fittedWidth:0} × {fittedHeight:0}.";
+    }
+
+    private void ApplyOutputFit(
+        IEnumerable<UIElement> elements,
+        Vector offset,
+        double width,
+        double height)
+    {
+        TranslateAnnotations(elements.Where(AnnotationCanvas.Children.Contains), offset);
+        SetCompositionSize(width, height);
+        UpdateSelectionOutline();
+        FitEditorToCapture();
+    }
+
     private void UpdateMarqueeSelection(Point current)
     {
         if (_selectionOutline is null)

@@ -141,6 +141,15 @@
                     <Button Style="{StaticResource SecondaryButton}" Tag="Monitor"
                             Content="+ Monitor" ToolTip="Adiciona outro monitor à composição"
                             Click="AddCaptureButton_Click" />
+                    <Button Style="{StaticResource SecondaryButton}"
+                            Content="Trazer à frente" ToolTip="Coloca o print selecionado na frente dos outros prints"
+                            Click="BringCaptureForwardButton_Click" />
+                    <Button Style="{StaticResource SecondaryButton}"
+                            Content="Enviar atrás" ToolTip="Coloca o print selecionado atrás dos outros prints"
+                            Click="SendCaptureBackwardButton_Click" />
+                    <Button Style="{StaticResource FirawButton}"
+                            Content="Ajustar saída" ToolTip="Remove margens vazias e ajusta a saída ao conteúdo montado"
+                            Click="FitOutputButton_Click" />
                 </WrapPanel>
             </DockPanel>
         </Border>
