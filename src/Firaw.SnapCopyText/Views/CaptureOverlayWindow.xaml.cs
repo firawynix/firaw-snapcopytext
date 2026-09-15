@@ -25,6 +25,7 @@ public partial class CaptureOverlayWindow : Window
     private readonly CaptureService _captureService;
     private readonly CaptureMode _captureMode;
     private readonly IReadOnlyList<CaptureTarget> _targets;
+    private readonly bool _addToCurrentEditor;
     private Point _start;
     private Rect _selection = Rect.Empty;
     private bool _drawing;
@@ -36,12 +37,14 @@ public partial class CaptureOverlayWindow : Window
         DesktopSnapshot snapshot,
         CaptureService captureService,
         CaptureMode captureMode = CaptureMode.Region,
-        IReadOnlyList<CaptureTarget>? windowTargets = null)
+        IReadOnlyList<CaptureTarget>? windowTargets = null,
+        bool addToCurrentEditor = false)
     {
         InitializeComponent();
         _snapshot = snapshot;
         _captureService = captureService;
         _captureMode = captureMode;
+        _addToCurrentEditor = addToCurrentEditor;
         _targets = captureMode == CaptureMode.Monitor
             ? System.Windows.Forms.Screen.AllScreens
                 .Select(screen => new CaptureTarget(screen.Bounds, $"Monitor {screen.DeviceName.Replace("\\\\.\\DISPLAY", string.Empty)}"))
@@ -53,6 +56,11 @@ public partial class CaptureOverlayWindow : Window
         Width = SystemParameters.VirtualScreenWidth;
         Height = SystemParameters.VirtualScreenHeight;
         DesktopImage.Source = snapshot.Image;
+        if (_addToCurrentEditor)
+        {
+            CopyButton.Visibility = Visibility.Collapsed;
+            ConfirmButton.Content = "2  Adicionar ao editor";
+        }
         Cursor = captureMode == CaptureMode.Region ? Cursors.Cross : Cursors.Hand;
         InstructionText.Text = InitialInstruction();
 
@@ -131,7 +139,9 @@ public partial class CaptureOverlayWindow : Window
             return;
         }
 
-        InstructionText.Text = "1 seleciona novamente  •  2 copia  •  3 abre o editor";
+        InstructionText.Text = _addToCurrentEditor
+            ? "1 seleciona novamente  •  2 adiciona ao editor"
+            : "1 seleciona novamente  •  2 copia  •  3 abre o editor";
         UpdateSelectionVisuals(showControls: true);
         e.Handled = true;
     }
@@ -192,7 +202,9 @@ public partial class CaptureOverlayWindow : Window
         }
         else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.C && !_selection.IsEmpty)
         {
-            ConfirmSelection(CaptureResultAction.CopyImage);
+            ConfirmSelection(_addToCurrentEditor
+                ? CaptureResultAction.OpenEditor
+                : CaptureResultAction.CopyImage);
             e.Handled = true;
         }
         else if (e.Key == Key.Enter && !_selection.IsEmpty)
@@ -207,14 +219,24 @@ public partial class CaptureOverlayWindow : Window
             ClearSelection();
             e.Handled = true;
         }
-        else if (Keyboard.Modifiers == ModifierKeys.None &&
+        else if (_addToCurrentEditor &&
+                 Keyboard.Modifiers == ModifierKeys.None &&
+                 e.Key is Key.D2 or Key.NumPad2 &&
+                 !_selection.IsEmpty)
+        {
+            ConfirmSelection(CaptureResultAction.OpenEditor);
+            e.Handled = true;
+        }
+        else if (!_addToCurrentEditor &&
+                 Keyboard.Modifiers == ModifierKeys.None &&
                  e.Key is Key.D2 or Key.NumPad2 &&
                  !_selection.IsEmpty)
         {
             ConfirmSelection(CaptureResultAction.CopyImage);
             e.Handled = true;
         }
-        else if (Keyboard.Modifiers == ModifierKeys.None &&
+        else if (!_addToCurrentEditor &&
+                 Keyboard.Modifiers == ModifierKeys.None &&
                  e.Key is Key.D3 or Key.NumPad3 &&
                  !_selection.IsEmpty)
         {

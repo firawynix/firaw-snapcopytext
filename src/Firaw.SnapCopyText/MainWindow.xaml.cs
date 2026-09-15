@@ -49,6 +49,72 @@ public partial class MainWindow : Window
 
     public void RequestCapture(CaptureMode mode) => _ = BeginCaptureAsync(mode);
 
+    internal async Task<BitmapSource?> CaptureForEditorAsync(CaptureMode mode, Window owner)
+    {
+        if (!_captureGate.TryEnter())
+        {
+            return null;
+        }
+
+        List<HiddenWindowState> hiddenWindows = [];
+        try
+        {
+            CaptureChoice? fixedChoice = mode == CaptureMode.Region
+                ? null
+                : ChooseCaptureTarget(mode, owner, addToCurrentEditor: true);
+            if (mode != CaptureMode.Region && fixedChoice is null)
+            {
+                return null;
+            }
+
+            hiddenWindows = HideVisibleFirawWindows();
+            await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+            DwmFlush();
+            await Task.Delay(260);
+
+            DesktopSnapshot snapshot = _captureService.CaptureVirtualScreen();
+            BitmapSource? selectedImage;
+            if (mode == CaptureMode.Region)
+            {
+                var overlay = new CaptureOverlayWindow(
+                    snapshot,
+                    _captureService,
+                    addToCurrentEditor: true);
+                bool selected = overlay.ShowDialog() == true && overlay.SelectedImage is not null;
+                selectedImage = selected ? overlay.SelectedImage : null;
+            }
+            else
+            {
+                CaptureTarget target = fixedChoice!.Target;
+                selectedImage = mode == CaptureMode.Window
+                    ? _captureService.CaptureWindow(target) ??
+                      _captureService.CropScreenBounds(snapshot, target.Bounds)
+                    : _captureService.CropScreenBounds(snapshot, target.Bounds);
+            }
+
+            RestoreFirawWindows(hiddenWindows);
+            hiddenWindows.Clear();
+            return selectedImage;
+        }
+        catch (Exception exception)
+        {
+            RestoreFirawWindows(hiddenWindows);
+            hiddenWindows.Clear();
+            MessageBox.Show(
+                owner,
+                exception.Message,
+                "Firaw - Captura",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            return null;
+        }
+        finally
+        {
+            RestoreFirawWindows(hiddenWindows);
+            _captureGate.Exit();
+        }
+    }
+
     public void OpenSettings()
     {
         var settingsWindow = new SettingsWindow(_preferences);
@@ -260,15 +326,19 @@ public partial class MainWindow : Window
         }
     }
 
-    private CaptureChoice? ChooseCaptureTarget(CaptureMode mode)
+    private CaptureChoice? ChooseCaptureTarget(
+        CaptureMode mode,
+        Window? owner = null,
+        bool addToCurrentEditor = false)
     {
         IReadOnlyList<CaptureTarget> targets = mode == CaptureMode.Monitor
             ? _windowSelectionService.GetMonitors()
             : _windowSelectionService.GetVisibleWindows();
-        var picker = new CaptureTargetPickerWindow(mode, targets);
-        if (IsVisible)
+        var picker = new CaptureTargetPickerWindow(mode, targets, addToCurrentEditor);
+        Window? pickerOwner = owner ?? (IsVisible ? this : null);
+        if (pickerOwner?.IsVisible == true)
         {
-            picker.Owner = this;
+            picker.Owner = pickerOwner;
             picker.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         }
 

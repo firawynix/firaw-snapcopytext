@@ -23,6 +23,10 @@ overlay exposes 1 Reselect, 2 Copy, and 3 Open editor. Reselect calls
 `ClearSelection()` and keeps the captured desktop open, so a replacement region
 does not require another desktop snapshot.
 
+The editor also exposes `+ Region`, `+ Window`, and `+ Monitor`. These reuse the
+same selectors in add mode, hide every Firaw window before reading pixels, and
+return the new bitmap to the current editor instead of opening another editor.
+
 Custom shortcuts are stored as normalized labels such as `Ctrl + Alt + F9`. `HotkeyService` parses and validates the label before calling `RegisterHotKey`; ordinary keys still require Ctrl, Shift, or Alt, while the dedicated Print Screen key and function keys may be used alone. Print Screen accepts `PrintScreen`, `Print Screen`, and `PrtSc`, normalizes them to `Print Screen`, and avoids duplicate registration when the separate Print Screen preference is also enabled.
 
 Print Screen profile: `HotkeyService.KeyboardProcedure()` maps the exact combinations Print Screen → Region, Alt+Print Screen → Monitor, and Ctrl+Print Screen → Window. `WH_KEYBOARD_LL` is primary so Windows reservations do not prevent capture; `RegisterHotKey` is the fallback if the hook cannot be installed. A combination is suppressed only when its matching `CapturePreferences` flag is enabled; disabled combinations continue through `CallNextHookEx` for native Windows behavior. The custom shortcut remains a separate default-mode fallback.

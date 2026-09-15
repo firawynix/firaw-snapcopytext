@@ -26,11 +26,14 @@ Depois da instalação, o atalho abre `Firaw.SnapCopyText.Launcher.exe`. Ele lê
 5. Nas listas de janela e monitor, escolha o alvo e use **Abrir no editor** ou
    **Copiar imagem**. `Ctrl+C` copia o alvo selecionado sem abrir o editor e
    `Esc` cancela a escolha.
-6. No editor, faça anotações; use **1 Selecionar** para marcar e mover objetos,
-   inclusive textos e caixas de anotação já criados. As ferramentas seguem de
-   `1` a `0` e podem ser escolhidas pelas mesmas teclas. O editor abre na medida
-   exata do recorte e reduz apenas a visualização quando a imagem é maior que a
-   área útil da tela. Pressione `Ctrl+C` para copiar a imagem editada.
+6. No editor, use **+ Região**, **+ Janela** ou **+ Monitor** para acrescentar
+   outras capturas à composição sem fechar o trabalho. Cada print pode ser
+   selecionado, arrastado e redimensionado pelos cantos cianos. Use
+   **1 Selecionar** para marcar e mover qualquer objeto, inclusive textos e
+   caixas de anotação já criados. As ferramentas seguem de `1` a `0` e podem
+   ser escolhidas pelas mesmas teclas. O editor abre na medida exata do primeiro
+   recorte e reduz apenas a visualização quando a composição é maior que a área
+   útil da tela. Pressione `Ctrl+C` para copiar a imagem editada inteira.
 7. **Copiar texto** envia todo o OCR direto à área de transferência. Em **Selecionar texto**, arraste uma moldura ciana sobre o texto na própria imagem; ao soltar, somente aquele trecho é reconhecido e copiado, sem abrir outra janela.
 8. Abra **Textos** para ver o histórico desta execução. Use Ctrl ou Shift para marcar vários trechos e **Copiar selecionados** para juntá-los.
 
@@ -56,6 +59,7 @@ Se o Lightshot ou o Recorte do Windows estiver usando `Print Screen`, o Firaw mo
 - Copiar imagem editada e salvar em PNG.
 - Cópia direta por botão ou `Ctrl+C` na seleção de região, janela e monitor.
 - Região ajustável em tempo real, com movimentação e oito pontos de redimensionamento.
+- Composição com várias capturas de região, janela ou monitor, lado a lado, movíveis e redimensionáveis individualmente.
 - Captura por janela com lista de programas e leitura da janela escolhida mesmo quando outra está à frente.
 - Captura por monitor com lista de todas as telas, resolução e indicação do monitor principal.
 - Atalho personalizado, modo padrão e uso opcional de Print Screen salvos por usuário.
@@ -84,8 +88,8 @@ dotnet run --project src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj
 Release completa com publicações autocontidas, launcher, instaladores Inno e manifesto de atualização:
 
 ```powershell
-.\tools\build-release.ps1 -Version 1.1.2 -ReleaseNotes "o que mudou"
-gh release create v1.1.2 -R firawynix/firaw-snapcopytext --title "Firaw - SnapCopyText 1.1.2" --notes "o que mudou" release\Firaw-SnapCopyText-1.1.2\github-release\*
+.\tools\build-release.ps1 -Version 1.1.9 -ReleaseNotes "o que mudou"
+gh release create v1.1.9 -R firawynix/firaw-snapcopytext --title "Firaw - SnapCopyText 1.1.9" --notes "o que mudou" release\Firaw-SnapCopyText-1.1.9\github-release\*
 ```
 
 Suba a versão também nos dois `.csproj` (o script grava `FileVersion` no executável, que é o que o launcher compara). A pasta `github-release` leva os dois instaladores, um `.sha256` de cada e o `update.json` — publique os cinco na mesma tag. O Firawynix Center pega a release nova sozinho (timer no servidor que confere o `.sha256`).

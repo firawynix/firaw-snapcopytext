@@ -132,6 +132,15 @@
                     <Button x:Name="AutoBlurButton" Style="{StaticResource SecondaryButton}"
                             Content="Borrar dados sensíveis" ToolTip="Localiza dados sensíveis com OCR local e borra as linhas encontradas"
                             Click="AutoBlurButton_Click" />
+                    <Button Style="{StaticResource SecondaryButton}" Tag="Region"
+                            Content="+ Região" ToolTip="Adiciona outra região à composição"
+                            Click="AddCaptureButton_Click" />
+                    <Button Style="{StaticResource SecondaryButton}" Tag="Window"
+                            Content="+ Janela" ToolTip="Adiciona outra janela à composição"
+                            Click="AddCaptureButton_Click" />
+                    <Button Style="{StaticResource SecondaryButton}" Tag="Monitor"
+                            Content="+ Monitor" ToolTip="Adiciona outro monitor à composição"
+                            Click="AddCaptureButton_Click" />
                 </WrapPanel>
             </DockPanel>
         </Border>
@@ -148,12 +157,11 @@
                 <Border x:Name="EditorFrame" Background="#111820" BorderBrush="#334555" BorderThickness="1"
                         HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Grid x:Name="EditorSurface" Background="White">
-                        <Image x:Name="CaptureImage" Stretch="Fill" IsHitTestVisible="False" />
                         <Canvas x:Name="AnnotationCanvas" Background="Transparent" Cursor="Cross"
                                 MouseLeftButtonDown="AnnotationCanvas_MouseLeftButtonDown"
                                 MouseMove="AnnotationCanvas_MouseMove"
                                 MouseLeftButtonUp="AnnotationCanvas_MouseLeftButtonUp" />
-                        <Canvas x:Name="SelectionCanvas" IsHitTestVisible="False" />
+                        <Canvas x:Name="SelectionCanvas" />
                     </Grid>
                 </Border>
             </ScrollViewer>

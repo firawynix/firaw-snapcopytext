@@ -1,6 +1,6 @@
 ﻿param(
-    [string]$Version = '1.1.8',
-    [string]$ReleaseNotes = 'Nova seleção de região, editor ajustado ao recorte, OCR aprimorado e navegação numérica.'
+    [string]$Version = '1.1.9',
+    [string]$ReleaseNotes = 'Editor com várias capturas de região, janela ou monitor, movíveis e redimensionáveis na mesma composição.'
 )
 
 $ErrorActionPreference = 'Stop'

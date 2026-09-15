@@ -12,7 +12,10 @@ public partial class CaptureTargetPickerWindow : Window
     public CaptureTarget? SelectedTarget { get; private set; }
     public CaptureResultAction SelectedAction { get; private set; } = CaptureResultAction.OpenEditor;
 
-    public CaptureTargetPickerWindow(CaptureMode mode, IReadOnlyList<CaptureTarget> targets)
+    public CaptureTargetPickerWindow(
+        CaptureMode mode,
+        IReadOnlyList<CaptureTarget> targets,
+        bool addToCurrentEditor = false)
     {
         InitializeComponent();
         HeadingText.Text = mode == CaptureMode.Monitor ? "Escolha o monitor" : "Escolha a janela";
@@ -23,6 +26,11 @@ public partial class CaptureTargetPickerWindow : Window
         TargetsList.SelectedIndex = targets.Count > 0 ? 0 : -1;
         ConfirmButton.IsEnabled = targets.Count > 0;
         CopyButton.IsEnabled = targets.Count > 0;
+        if (addToCurrentEditor)
+        {
+            CopyButton.Visibility = Visibility.Collapsed;
+            ConfirmButton.Content = "Adicionar ao editor";
+        }
     }
 
     private void ConfirmButton_Click(object sender, RoutedEventArgs e) =>

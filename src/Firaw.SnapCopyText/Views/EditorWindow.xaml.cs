@@ -15,6 +15,9 @@ using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
 using Cursors = System.Windows.Input.Cursors;
+using DragCompletedEventArgs = System.Windows.Controls.Primitives.DragCompletedEventArgs;
+using DragDeltaEventArgs = System.Windows.Controls.Primitives.DragDeltaEventArgs;
+using DragStartedEventArgs = System.Windows.Controls.Primitives.DragStartedEventArgs;
 using Image = System.Windows.Controls.Image;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
@@ -24,11 +27,16 @@ using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 using TextDataFormat = System.Windows.TextDataFormat;
+using CaptureMode = Firaw.SnapCopyText.Models.CaptureMode;
 
 namespace Firaw.SnapCopyText.Views;
 
 public partial class EditorWindow : Window
 {
+    private const double CaptureGap = 24;
+    private const double MinimumCaptureWidth = 48;
+    private const double MinimumCaptureHeight = 36;
+    private static readonly object CaptureAnnotationTag = new();
     private readonly AnnotationHistory<EditorAction> _history = new();
     private readonly OcrService _ocrService = new();
     private readonly CaptureService _captureService = new();
@@ -36,6 +44,7 @@ public partial class EditorWindow : Window
     private readonly TextHistoryService _textHistory = TextHistoryService.Shared;
     private readonly HashSet<UIElement> _selectedElements = [];
     private readonly List<RemovedAnnotation> _erasedAnnotations = [];
+    private readonly List<Thumb> _resizeHandles = [];
     private EditorTool _currentTool = EditorTool.Select;
     private EraserMode _eraserMode = EraserMode.Object;
     private Point _startPoint;
@@ -52,6 +61,8 @@ public partial class EditorWindow : Window
     private bool _selectingTextRegion;
     private bool _textSelectionMode;
     private string _currentColor = "#19D3E6";
+    private FrameworkElement? _resizingCapture;
+    private Rect _resizeStartBounds = Rect.Empty;
 
     public BitmapSource OriginalImage { get; }
 
@@ -59,9 +70,9 @@ public partial class EditorWindow : Window
     {
         InitializeComponent();
         OriginalImage = image;
-        CaptureImage.Source = image;
         EditorSurface.Width = image.PixelWidth;
         EditorSurface.Height = image.PixelHeight;
+        AddCaptureAnnotation(image, new Point(0, 0), recordHistory: false);
         Title = $"Firaw - SnapCopyText • Editor • {image.PixelWidth} × {image.PixelHeight}";
         ConfigureInitialWindowSize();
         CopiedTextList.ItemsSource = _textHistory.Items;
@@ -83,20 +94,29 @@ public partial class EditorWindow : Window
     {
         UpdateLayout();
 
+        double compositionWidth = Math.Max(1, EditorSurface.Width);
+        double compositionHeight = Math.Max(1, EditorSurface.Height);
+
         double scale = Math.Min(
             1,
             Math.Min(
-                EditorScrollViewer.ViewportWidth / OriginalImage.PixelWidth,
-                EditorScrollViewer.ViewportHeight / OriginalImage.PixelHeight));
+                EditorScrollViewer.ViewportWidth / compositionWidth,
+                EditorScrollViewer.ViewportHeight / compositionHeight));
+        EditorFrame.LayoutTransform = scale < 0.999
+            ? new ScaleTransform(scale, scale)
+            : Transform.Identity;
+
+        int captureCount = ActiveCaptureCount();
+        string label = captureCount == 1
+            ? $"Recorte exato: {compositionWidth:0} × {compositionHeight:0}"
+            : $"{captureCount} capturas • composição {compositionWidth:0} × {compositionHeight:0}";
         if (scale < 0.999)
         {
-            EditorFrame.LayoutTransform = new ScaleTransform(scale, scale);
-            EditorStatus.Text = $"Recorte exato: {OriginalImage.PixelWidth} × {OriginalImage.PixelHeight} • visualização {scale:P0}";
+            label += $" • visualização {scale:P0}";
         }
-        else
-        {
-            EditorStatus.Text = $"Recorte exato: {OriginalImage.PixelWidth} × {OriginalImage.PixelHeight}";
-        }
+
+        Title = $"Firaw - SnapCopyText • Editor • {compositionWidth:0} × {compositionHeight:0}";
+        EditorStatus.Text = label;
     }
 
     private void ToolButton_Checked(object sender, RoutedEventArgs e)
@@ -358,6 +378,108 @@ public partial class EditorWindow : Window
         UpdateSelectionOutline();
     }
 
+    private async void AddCaptureButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement element ||
+            !Enum.TryParse(element.Tag?.ToString(), out CaptureMode mode) ||
+            System.Windows.Application.Current.MainWindow is not MainWindow mainWindow)
+        {
+            return;
+        }
+
+        CancelTextSelection();
+        ClearSelection();
+        EditorStatus.Text = $"Escolha a nova captura de {CaptureModeLabel(mode).ToLowerInvariant()}.";
+        BitmapSource? captured = await mainWindow.CaptureForEditorAsync(mode, this);
+        if (captured is null)
+        {
+            EditorStatus.Text = "Nova captura cancelada.";
+            return;
+        }
+
+        double right = AnnotationCanvas.Children
+            .OfType<UIElement>()
+            .Where(IsCaptureAnnotation)
+            .Select(GetAnnotationBounds)
+            .Where(bounds => !bounds.IsEmpty)
+            .Select(bounds => bounds.Right)
+            .DefaultIfEmpty(0)
+            .Max();
+        Point position = new(right > 0 ? right + CaptureGap : 0, 0);
+        UIElement capture = AddCaptureAnnotation(captured, position, recordHistory: true);
+        _selectedElements.Add(capture);
+        UpdateSelectionOutline();
+        FitEditorToCapture();
+        EditorStatus.Text = $"{CaptureModeLabel(mode)} adicionada. Arraste para mover ou use as alças cianas para redimensionar.";
+    }
+
+    private UIElement AddCaptureAnnotation(BitmapSource source, Point position, bool recordHistory)
+    {
+        var capture = new Image
+        {
+            Source = source,
+            Width = source.PixelWidth,
+            Height = source.PixelHeight,
+            Stretch = Stretch.Fill,
+            Tag = CaptureAnnotationTag
+        };
+        Canvas.SetLeft(capture, position.X);
+        Canvas.SetTop(capture, position.Y);
+
+        double previousWidth = EditorSurface.Width;
+        double previousHeight = EditorSurface.Height;
+        double requiredWidth = Math.Max(previousWidth, position.X + capture.Width);
+        double requiredHeight = Math.Max(previousHeight, position.Y + capture.Height);
+        AnnotationCanvas.Children.Insert(ActiveCaptureCount(), capture);
+        SetCompositionSize(requiredWidth, requiredHeight);
+
+        if (recordHistory)
+        {
+            _history.Add(new EditorAction(
+                () =>
+                {
+                    AnnotationCanvas.Children.Remove(capture);
+                    _selectedElements.Remove(capture);
+                    SetCompositionSize(previousWidth, previousHeight);
+                    UpdateSelectionOutline();
+                    FitEditorToCapture();
+                },
+                () =>
+                {
+                    if (!AnnotationCanvas.Children.Contains(capture))
+                    {
+                        AnnotationCanvas.Children.Insert(ActiveCaptureCount(), capture);
+                    }
+                    SetCompositionSize(requiredWidth, requiredHeight);
+                    FitEditorToCapture();
+                }));
+            UpdateHistoryButtons();
+        }
+
+        return capture;
+    }
+
+    private void SetCompositionSize(double width, double height)
+    {
+        EditorSurface.Width = Math.Max(1, width);
+        EditorSurface.Height = Math.Max(1, height);
+    }
+
+    private int ActiveCaptureCount() => AnnotationCanvas.Children
+        .OfType<UIElement>()
+        .Count(IsCaptureAnnotation);
+
+    private static bool IsCaptureAnnotation(UIElement element) =>
+        element is FrameworkElement frameworkElement &&
+        ReferenceEquals(frameworkElement.Tag, CaptureAnnotationTag);
+
+    private static string CaptureModeLabel(CaptureMode mode) => mode switch
+    {
+        CaptureMode.Window => "Janela",
+        CaptureMode.Monitor => "Monitor",
+        _ => "Região"
+    };
+
     private void UpdateMarqueeSelection(Point current)
     {
         if (_selectionOutline is null)
@@ -402,6 +524,12 @@ public partial class EditorWindow : Window
             SelectionCanvas.Children.Remove(_selectionOutline);
             _selectionOutline = null;
         }
+
+        foreach (Thumb handle in _resizeHandles)
+        {
+            SelectionCanvas.Children.Remove(handle);
+        }
+        _resizeHandles.Clear();
     }
 
     private void UpdateSelectionOutline()
@@ -414,11 +542,13 @@ public partial class EditorWindow : Window
         }
 
         _selectionOutline = CreateSelectionRectangle(fillSelection: false);
-        Canvas.SetLeft(_selectionOutline, bounds.Left - 3);
-        Canvas.SetTop(_selectionOutline, bounds.Top - 3);
-        _selectionOutline.Width = bounds.Width + 6;
-        _selectionOutline.Height = bounds.Height + 6;
         SelectionCanvas.Children.Add(_selectionOutline);
+        PositionSelectionVisuals(bounds);
+
+        if (_selectedElements.Count == 1 && IsCaptureAnnotation(_selectedElements.Single()))
+        {
+            AddCaptureResizeHandles(bounds);
+        }
     }
 
     private Rectangle CreateSelectionRectangle(bool fillSelection) => new()
@@ -426,10 +556,169 @@ public partial class EditorWindow : Window
         Stroke = (Brush)FindResource("FirawCyan"),
         StrokeThickness = 2,
         StrokeDashArray = new DoubleCollection { 5, 3 },
+        IsHitTestVisible = false,
         Fill = fillSelection
             ? new SolidColorBrush(Color.FromArgb(28, 25, 211, 230))
             : Brushes.Transparent
     };
+
+    private void AddCaptureResizeHandles(Rect bounds)
+    {
+        foreach (ResizeHandle resizeHandle in new[]
+                 {
+                     ResizeHandle.TopLeft,
+                     ResizeHandle.TopRight,
+                     ResizeHandle.BottomRight,
+                     ResizeHandle.BottomLeft
+                 })
+        {
+            var handle = new Thumb
+            {
+                Width = 14,
+                Height = 14,
+                Background = (Brush)FindResource("FirawCyan"),
+                BorderBrush = Brushes.White,
+                BorderThickness = new Thickness(1),
+                Cursor = resizeHandle is ResizeHandle.TopLeft or ResizeHandle.BottomRight
+                    ? Cursors.SizeNWSE
+                    : Cursors.SizeNESW,
+                Tag = resizeHandle
+            };
+            handle.DragStarted += CaptureResize_DragStarted;
+            handle.DragDelta += CaptureResize_DragDelta;
+            handle.DragCompleted += CaptureResize_DragCompleted;
+            _resizeHandles.Add(handle);
+            SelectionCanvas.Children.Add(handle);
+        }
+
+        PositionResizeHandles(bounds);
+    }
+
+    private void PositionSelectionVisuals(Rect bounds)
+    {
+        if (_selectionOutline is not null)
+        {
+            Canvas.SetLeft(_selectionOutline, bounds.Left - 3);
+            Canvas.SetTop(_selectionOutline, bounds.Top - 3);
+            _selectionOutline.Width = bounds.Width + 6;
+            _selectionOutline.Height = bounds.Height + 6;
+        }
+        PositionResizeHandles(bounds);
+    }
+
+    private void PositionResizeHandles(Rect bounds)
+    {
+        foreach (Thumb handle in _resizeHandles)
+        {
+            if (handle.Tag is not ResizeHandle resizeHandle)
+            {
+                continue;
+            }
+
+            Point point = resizeHandle switch
+            {
+                ResizeHandle.TopLeft => bounds.TopLeft,
+                ResizeHandle.TopRight => bounds.TopRight,
+                ResizeHandle.BottomRight => bounds.BottomRight,
+                _ => bounds.BottomLeft
+            };
+            Canvas.SetLeft(handle, point.X - handle.Width / 2);
+            Canvas.SetTop(handle, point.Y - handle.Height / 2);
+        }
+    }
+
+    private void CaptureResize_DragStarted(object sender, DragStartedEventArgs e)
+    {
+        _resizingCapture = _selectedElements.Count == 1
+            ? _selectedElements.Single() as FrameworkElement
+            : null;
+        _resizeStartBounds = _resizingCapture is null
+            ? Rect.Empty
+            : GetAnnotationBounds(_resizingCapture);
+    }
+
+    private void CaptureResize_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        if (_resizingCapture is null || sender is not Thumb { Tag: ResizeHandle handle })
+        {
+            return;
+        }
+
+        Rect bounds = GetAnnotationBounds(_resizingCapture);
+        double left = bounds.Left;
+        double top = bounds.Top;
+        double right = bounds.Right;
+        double bottom = bounds.Bottom;
+
+        if (handle is ResizeHandle.TopLeft or ResizeHandle.BottomLeft)
+        {
+            left = Math.Clamp(left + e.HorizontalChange, 0, right - MinimumCaptureWidth);
+        }
+        else
+        {
+            right = Math.Max(left + MinimumCaptureWidth, right + e.HorizontalChange);
+        }
+
+        if (handle is ResizeHandle.TopLeft or ResizeHandle.TopRight)
+        {
+            top = Math.Clamp(top + e.VerticalChange, 0, bottom - MinimumCaptureHeight);
+        }
+        else
+        {
+            bottom = Math.Max(top + MinimumCaptureHeight, bottom + e.VerticalChange);
+        }
+
+        Rect resized = new(left, top, right - left, bottom - top);
+        ApplyCaptureBounds(_resizingCapture, resized, updateSelection: false);
+        SetCompositionSize(
+            Math.Max(EditorSurface.Width, resized.Right),
+            Math.Max(EditorSurface.Height, resized.Bottom));
+        PositionSelectionVisuals(resized);
+    }
+
+    private void CaptureResize_DragCompleted(object sender, DragCompletedEventArgs e)
+    {
+        if (_resizingCapture is null)
+        {
+            return;
+        }
+
+        FrameworkElement capture = _resizingCapture;
+        Rect before = _resizeStartBounds;
+        Rect after = GetAnnotationBounds(capture);
+        _resizingCapture = null;
+        _resizeStartBounds = Rect.Empty;
+
+        if (!before.IsEmpty && before != after)
+        {
+            _history.Add(new EditorAction(
+                () => ApplyCaptureBounds(capture, before),
+                () => ApplyCaptureBounds(capture, after)));
+            UpdateHistoryButtons();
+        }
+
+        UpdateSelectionOutline();
+        FitEditorToCapture();
+        EditorStatus.Text = $"Print redimensionado para {after.Width:0} × {after.Height:0}.";
+    }
+
+    private void ApplyCaptureBounds(
+        FrameworkElement capture,
+        Rect bounds,
+        bool updateSelection = true)
+    {
+        Canvas.SetLeft(capture, bounds.Left);
+        Canvas.SetTop(capture, bounds.Top);
+        capture.Width = bounds.Width;
+        capture.Height = bounds.Height;
+        SetCompositionSize(
+            Math.Max(EditorSurface.Width, bounds.Right),
+            Math.Max(EditorSurface.Height, bounds.Bottom));
+        if (updateSelection)
+        {
+            UpdateSelectionOutline();
+        }
+    }
 
     private Rect GetSelectionBounds()
     {
@@ -451,9 +740,16 @@ public partial class EditorWindow : Window
         try
         {
             Rect bounds = VisualTreeHelper.GetDescendantBounds(element);
-            if (bounds.IsEmpty && element is FrameworkElement frameworkElement)
+            if ((bounds.IsEmpty || bounds.Width <= 0 || bounds.Height <= 0) &&
+                element is FrameworkElement frameworkElement)
             {
-                bounds = new Rect(0, 0, frameworkElement.ActualWidth, frameworkElement.ActualHeight);
+                double width = frameworkElement.ActualWidth > 0
+                    ? frameworkElement.ActualWidth
+                    : frameworkElement.Width;
+                double height = frameworkElement.ActualHeight > 0
+                    ? frameworkElement.ActualHeight
+                    : frameworkElement.Height;
+                bounds = new Rect(0, 0, Math.Max(0, width), Math.Max(0, height));
             }
 
             return element.TransformToAncestor(AnnotationCanvas).TransformBounds(bounds);
@@ -655,15 +951,16 @@ public partial class EditorWindow : Window
             return;
         }
 
-        double scaleX = OriginalImage.PixelWidth / AnnotationCanvas.ActualWidth;
-        double scaleY = OriginalImage.PixelHeight / AnnotationCanvas.ActualHeight;
+        BitmapSource composition = RenderCaptureComposition();
+        double scaleX = composition.PixelWidth / AnnotationCanvas.ActualWidth;
+        double scaleY = composition.PixelHeight / AnnotationCanvas.ActualHeight;
         Int32Rect pixelRegion = CaptureService.NormalizeSelection(
             region.Left * scaleX,
             region.Top * scaleY,
             region.Right * scaleX,
             region.Bottom * scaleY,
-            new Int32Rect(0, 0, OriginalImage.PixelWidth, OriginalImage.PixelHeight));
-        BitmapSource selectedRegion = _captureService.Crop(OriginalImage, pixelRegion);
+            new Int32Rect(0, 0, composition.PixelWidth, composition.PixelHeight));
+        BitmapSource selectedRegion = _captureService.Crop(composition, pixelRegion);
         await RecognizeAndCopyTextAsync(selectedRegion, isSelectedRegion: true);
     }
 
@@ -771,17 +1068,18 @@ public partial class EditorWindow : Window
         }
     }
 
-    private UIElement CreateBlurAnnotation(Rect displayRegion)
+    private UIElement CreateBlurAnnotation(Rect displayRegion, BitmapSource? composition = null)
     {
-        double scaleX = OriginalImage.PixelWidth / AnnotationCanvas.ActualWidth;
-        double scaleY = OriginalImage.PixelHeight / AnnotationCanvas.ActualHeight;
+        composition ??= RenderCaptureComposition();
+        double scaleX = composition.PixelWidth / AnnotationCanvas.ActualWidth;
+        double scaleY = composition.PixelHeight / AnnotationCanvas.ActualHeight;
         Int32Rect pixelRegion = CaptureService.NormalizeSelection(
             displayRegion.Left * scaleX,
             displayRegion.Top * scaleY,
             displayRegion.Right * scaleX,
             displayRegion.Bottom * scaleY,
-            new Int32Rect(0, 0, OriginalImage.PixelWidth, OriginalImage.PixelHeight));
-        BitmapSource crop = _captureService.Crop(OriginalImage, pixelRegion);
+            new Int32Rect(0, 0, composition.PixelWidth, composition.PixelHeight));
+        BitmapSource crop = _captureService.Crop(composition, pixelRegion);
 
         var blurredImage = new Image
         {
@@ -816,7 +1114,8 @@ public partial class EditorWindow : Window
 
         try
         {
-            IReadOnlyList<OcrTextRegion> regions = await _ocrService.RecognizeTextRegionsAsync(OriginalImage);
+            BitmapSource composition = RenderCaptureComposition();
+            IReadOnlyList<OcrTextRegion> regions = await _ocrService.RecognizeTextRegionsAsync(composition);
             OcrTextRegion[] sensitiveRegions = regions
                 .Where(region => _sensitiveDataDetector.IsSensitive(region.Text))
                 .ToArray();
@@ -826,8 +1125,8 @@ public partial class EditorWindow : Window
                 return;
             }
 
-            double scaleX = AnnotationCanvas.ActualWidth / OriginalImage.PixelWidth;
-            double scaleY = AnnotationCanvas.ActualHeight / OriginalImage.PixelHeight;
+            double scaleX = AnnotationCanvas.ActualWidth / composition.PixelWidth;
+            double scaleY = AnnotationCanvas.ActualHeight / composition.PixelHeight;
             var annotations = new List<UIElement>();
             foreach (OcrTextRegion region in sensitiveRegions)
             {
@@ -841,7 +1140,7 @@ public partial class EditorWindow : Window
                     continue;
                 }
 
-                UIElement blurred = CreateBlurAnnotation(displayRegion);
+                UIElement blurred = CreateBlurAnnotation(displayRegion, composition);
                 AnnotationCanvas.Children.Add(blurred);
                 annotations.Add(blurred);
             }
@@ -1049,7 +1348,7 @@ public partial class EditorWindow : Window
     private async void CopyTextButton_Click(object sender, RoutedEventArgs e)
     {
         CancelTextSelection();
-        await RecognizeAndCopyTextAsync(OriginalImage, isSelectedRegion: false);
+        await RecognizeAndCopyTextAsync(RenderCaptureComposition(), isSelectedRegion: false);
     }
 
     private void SelectTextButton_Click(object sender, RoutedEventArgs e)
@@ -1108,6 +1407,30 @@ public partial class EditorWindow : Window
         }
     }
 
+    private BitmapSource RenderCaptureComposition()
+    {
+        (UIElement Element, Visibility Visibility)[] annotations = AnnotationCanvas.Children
+            .OfType<UIElement>()
+            .Where(element => !IsCaptureAnnotation(element))
+            .Select(element => (element, element.Visibility))
+            .ToArray();
+        try
+        {
+            foreach ((UIElement element, _) in annotations)
+            {
+                element.Visibility = Visibility.Collapsed;
+            }
+            return RenderEditedImage();
+        }
+        finally
+        {
+            foreach ((UIElement element, Visibility visibility) in annotations)
+            {
+                element.Visibility = visibility;
+            }
+        }
+    }
+
     private BitmapSource RenderEditedImage()
     {
         Visibility previousVisibility = SelectionCanvas.Visibility;
@@ -1115,9 +1438,11 @@ public partial class EditorWindow : Window
         try
         {
             EditorSurface.UpdateLayout();
+            int width = Math.Max(1, (int)Math.Ceiling(EditorSurface.Width));
+            int height = Math.Max(1, (int)Math.Ceiling(EditorSurface.Height));
             var result = new RenderTargetBitmap(
-                OriginalImage.PixelWidth,
-                OriginalImage.PixelHeight,
+                width,
+                height,
                 96,
                 96,
                 PixelFormats.Pbgra32);

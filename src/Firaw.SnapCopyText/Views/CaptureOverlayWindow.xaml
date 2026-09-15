@@ -71,9 +71,9 @@
                             Margin="0,0,5,0" Padding="11,7" Click="CancelButton_Click" />
                     <Button Content="1  Selecionar novamente" Style="{StaticResource FirawSecondaryButton}"
                             Margin="0,0,5,0" Padding="11,7" Click="ReselectButton_Click" />
-                    <Button Content="2  Copiar imagem" Style="{StaticResource FirawSecondaryButton}"
+                    <Button x:Name="CopyButton" Content="2  Copiar imagem" Style="{StaticResource FirawSecondaryButton}"
                             Margin="0,0,5,0" Padding="11,7" Click="CopyButton_Click" />
-                    <Button Content="3  Abrir editor" Style="{StaticResource FirawButton}"
+                    <Button x:Name="ConfirmButton" Content="3  Abrir editor" Style="{StaticResource FirawButton}"
                             Padding="13,7" Click="ConfirmButton_Click" />
                 </StackPanel>
             </Border>

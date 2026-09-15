@@ -1,3 +1,12 @@
+# Composição com várias capturas — 1.1.9 (15 de setembro de 2026)
+
+- O mesmo editor agora recebe novas capturas de região, janela e monitor.
+- Cada print pode ser movido e redimensionado individualmente.
+- Cópia, PNG, OCR e proteção de dados usam a composição completa.
+- Notas completas: `C:\Users\Hugo\Firaw-SnapCopyText\UPDATE-1.1.9.md`.
+
+---
+
 # Seleção renovada e OCR aprimorado — 1.1.8 (15 de setembro de 2026)
 
 - A captura por região permite limpar o enquadramento e selecionar novamente sem fechar a tela.
