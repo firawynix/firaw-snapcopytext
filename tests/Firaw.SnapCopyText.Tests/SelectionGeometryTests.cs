@@ -46,28 +46,42 @@ public class SelectionGeometryTests
     }
 
     [Fact]
-    public void PlaceActionBar_UsesSpaceAboveWhenSelectionTouchesBottom()
+    public void PlaceActionBar_StaysInsideWhenSelectionTouchesBottom()
     {
+        Rect selection = new(100, 300, 600, 300);
         Rect result = SelectionGeometry.PlaceActionBar(
-            new Rect(100, 300, 600, 300), new Size(320, 42), Bounds);
+            selection, new Size(320, 42), Bounds);
 
-        Assert.Equal(new Rect(380, 248, 320, 42), result);
+        Assert.Equal(new Rect(370, 548, 320, 42), result);
+        Assert.True(selection.Contains(result));
     }
 
     [Fact]
-    public void PlaceActionBar_UsesFreeSideWhenSelectionSpansFullHeight()
+    public void PlaceActionBar_StaysInsideWhenSelectionSpansFullHeight()
     {
+        Rect selection = new(0, 0, 400, 600);
         Rect result = SelectionGeometry.PlaceActionBar(
-            new Rect(0, 0, 400, 600), new Size(320, 42), Bounds);
+            selection, new Size(320, 42), Bounds);
 
-        Assert.Equal(new Rect(410, 558, 320, 42), result);
+        Assert.Equal(new Rect(70, 548, 320, 42), result);
+        Assert.True(selection.Contains(result));
     }
 
     [Fact]
-    public void PlaceActionBar_FallsBackInsideForFullScreenSelection()
+    public void PlaceActionBar_StaysInsideForFullScreenSelection()
     {
         Rect result = SelectionGeometry.PlaceActionBar(
             Bounds, new Size(320, 42), Bounds);
+
+        Assert.Equal(new Rect(470, 548, 320, 42), result);
+        Assert.True(Bounds.Contains(result));
+    }
+
+    [Fact]
+    public void PlaceActionBar_RemainsVisibleForSelectionSmallerThanBar()
+    {
+        Rect result = SelectionGeometry.PlaceActionBar(
+            new Rect(760, 570, 30, 20), new Size(320, 42), Bounds);
 
         Assert.Equal(new Rect(470, 548, 320, 42), result);
         Assert.True(Bounds.Contains(result));

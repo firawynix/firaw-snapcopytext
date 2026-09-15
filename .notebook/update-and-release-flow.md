@@ -45,6 +45,9 @@ the manifest and the installer never drift apart when the next release appears.
   is refreshed every 15 minutes from the latest release by a timer on the server
   (`firawynix/firawynix-center`, `tools/`). It trusts `<installer>.sha256` and
   requires it to match GitHub's asset digest.
+- After publishing a release, start `sync-releases-center.service` on srv1 when
+  the catalog must update immediately; otherwise the visible version can lag by
+  up to 15 minutes even though the timer is healthy.
 
 ## Gotchas
 

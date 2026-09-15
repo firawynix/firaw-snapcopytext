@@ -1,6 +1,6 @@
 ﻿param(
-    [string]$Version = '1.1.11',
-    [string]$ReleaseNotes = 'A barra de ações da seleção agora procura espaço livre abaixo, acima ou nas laterais e só fica dentro da captura quando não existe outra opção.'
+    [string]$Version = '1.1.12',
+    [string]$ReleaseNotes = 'O menu de confirmação fica dentro da área selecionada e permanece visível mesmo quando o recorte encosta nas bordas da tela.'
 )
 
 $ErrorActionPreference = 'Stop'

@@ -91,8 +91,8 @@ dotnet run --project src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj
 Release completa com publicações autocontidas, launcher, instaladores Inno e manifesto de atualização:
 
 ```powershell
-.\tools\build-release.ps1 -Version 1.1.11 -ReleaseNotes "o que mudou"
-gh release create v1.1.11 -R firawynix/firaw-snapcopytext --title "Firaw - SnapCopyText 1.1.11" --notes "o que mudou" release\Firaw-SnapCopyText-1.1.11\github-release\*
+.\tools\build-release.ps1 -Version 1.1.12 -ReleaseNotes "o que mudou"
+gh release create v1.1.12 -R firawynix/firaw-snapcopytext --title "Firaw - SnapCopyText 1.1.12" --notes "o que mudou" release\Firaw-SnapCopyText-1.1.12\github-release\*
 ```
 
 Suba a versão também nos dois `.csproj` (o script grava `FileVersion` no executável, que é o que o launcher compara). A pasta `github-release` leva os dois instaladores, um `.sha256` de cada e o `update.json` — publique os cinco na mesma tag. O Firawynix Center pega a release nova sozinho (timer no servidor que confere o `.sha256`).
