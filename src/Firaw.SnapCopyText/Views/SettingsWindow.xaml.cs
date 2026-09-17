@@ -118,7 +118,7 @@ public partial class SettingsWindow : Window
         DialogResult = true;
     }
 
-    private void CancelButton_Click(object sender, RoutedEventArgs e) => DialogResult = false;
+    private void CancelButton_Click(object sender, RoutedEventArgs e) => Close();
 
     private void OpenKeyboardSettingsButton_Click(object sender, RoutedEventArgs e)
     {
@@ -323,12 +323,8 @@ public partial class SettingsWindow : Window
 
     private nint WindowProcedure(nint hwnd, int message, nint wParam, nint lParam, ref bool handled)
     {
-        int id = wParam.ToInt32();
-        if (message == WmHotkey &&
-            id >= RecorderPrintScreenIdBase &&
-            id <= RecorderPrintScreenIdBase + (ModAlt | ModControl | ModShift))
+        if (TryDecodeRecorderHotkey(message, wParam, out ModifierKeys modifiers))
         {
-            ModifierKeys modifiers = ToModifierKeys((uint)(id - RecorderPrintScreenIdBase));
             TextBox? profileInput = FocusedProfileShortcutInput();
             if (profileInput is not null)
             {
@@ -343,6 +339,27 @@ public partial class SettingsWindow : Window
         }
 
         return nint.Zero;
+    }
+
+    internal static bool TryDecodeRecorderHotkey(int message, nint wParam, out ModifierKeys modifiers)
+    {
+        modifiers = ModifierKeys.None;
+        if (message != WmHotkey)
+        {
+            return false;
+        }
+
+        // wParam is pointer-sized. Converting every Windows message with ToInt32
+        // can overflow on x64 before we even know that the message is WM_HOTKEY.
+        long rawId = wParam.ToInt64();
+        long lastRecorderId = RecorderPrintScreenIdBase + (ModAlt | ModControl | ModShift);
+        if (rawId < RecorderPrintScreenIdBase || rawId > lastRecorderId)
+        {
+            return false;
+        }
+
+        modifiers = ToModifierKeys((uint)(rawId - RecorderPrintScreenIdBase));
+        return true;
     }
 
     private TextBox? FocusedProfileShortcutInput()

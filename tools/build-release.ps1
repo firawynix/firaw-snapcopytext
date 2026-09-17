@@ -1,6 +1,6 @@
 ﻿param(
-    [string]$Version = '1.1.14',
-    [string]$ReleaseNotes = 'As três ações do perfil aceitam combinações próprias com Ctrl, Alt ou Shift + Print Screen.'
+    [string]$Version = '1.1.15',
+    [string]$ReleaseNotes = 'Corrige o fechamento ao abrir Atalhos e preferências no Windows x64.'
 )
 
 $ErrorActionPreference = 'Stop'

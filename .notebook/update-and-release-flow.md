@@ -55,3 +55,4 @@ the manifest and the installer never drift apart when the next release appears.
 - The launcher accepts only packages on the manifest's host. A CDN or different host requires an intentional policy change.
 - Bump the version in both `.csproj` files AND pass it to the build: the launcher compares the `FileVersion` of the installed `.exe`. A `.exe` still reporting the old version would be reinstalled on every start.
 - `tools/build-release.ps1` is saved as UTF-8 **with BOM**: Windows PowerShell 5.1 reads BOM-less scripts as ANSI and garbles the accented release notes inside `update.json`.
+- WPF hooks receive pointer-sized `wParam` values for every native window message. Filter the message first and use `ToInt64()` plus range validation; calling `IntPtr.ToInt32()` before checking `WM_HOTKEY` crashes the x64 app and can make Windows PCA show a misleading compatibility/TLS warning.
