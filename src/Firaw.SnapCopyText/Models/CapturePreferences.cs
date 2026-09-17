@@ -7,6 +7,9 @@ public sealed class CapturePreferences
     public bool UsePrintScreen { get; set; } = true;
     public bool UseAltPrintScreen { get; set; } = true;
     public bool UseControlPrintScreen { get; set; } = true;
+    public CaptureMode PrintScreenMode { get; set; } = CaptureMode.Region;
+    public CaptureMode AltPrintScreenMode { get; set; } = CaptureMode.Monitor;
+    public CaptureMode ControlPrintScreenMode { get; set; } = CaptureMode.Window;
     public bool StartWithWindows { get; set; }
 
     public CapturePreferences Clone() => new()
@@ -16,6 +19,9 @@ public sealed class CapturePreferences
         UsePrintScreen = UsePrintScreen,
         UseAltPrintScreen = UseAltPrintScreen,
         UseControlPrintScreen = UseControlPrintScreen,
+        PrintScreenMode = PrintScreenMode,
+        AltPrintScreenMode = AltPrintScreenMode,
+        ControlPrintScreenMode = ControlPrintScreenMode,
         StartWithWindows = StartWithWindows
     };
 }

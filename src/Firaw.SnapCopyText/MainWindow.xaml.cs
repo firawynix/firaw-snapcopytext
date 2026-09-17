@@ -214,26 +214,26 @@ public partial class MainWindow : Window
         }
 
         List<string> activeShortcuts = [];
-        if (_hotkeyService.RegionShortcutActive)
+        if (_hotkeyService.PrintScreenShortcutActive)
         {
-            activeShortcuts.Add("Print Screen: região");
+            activeShortcuts.Add($"Print Screen: {ModeLabel(_preferences.PrintScreenMode).ToLowerInvariant()}");
         }
-        if (_hotkeyService.MonitorShortcutActive)
+        if (_hotkeyService.AltPrintScreenShortcutActive)
         {
-            activeShortcuts.Add("Alt + Print Screen: monitor");
+            activeShortcuts.Add($"Alt + Print Screen: {ModeLabel(_preferences.AltPrintScreenMode).ToLowerInvariant()}");
         }
-        if (_hotkeyService.WindowShortcutActive)
+        if (_hotkeyService.ControlPrintScreenShortcutActive)
         {
-            activeShortcuts.Add("Ctrl + Print Screen: janela");
+            activeShortcuts.Add($"Ctrl + Print Screen: {ModeLabel(_preferences.ControlPrintScreenMode).ToLowerInvariant()}");
         }
         if (_hotkeyService.FallbackRegistered)
         {
             activeShortcuts.Add($"{_hotkeyService.FallbackLabel}: {ModeLabel(_preferences.DefaultMode).ToLowerInvariant()}");
         }
 
-        bool presetFailed = (_preferences.UsePrintScreen && !_hotkeyService.RegionShortcutActive) ||
-                            (_preferences.UseAltPrintScreen && !_hotkeyService.MonitorShortcutActive) ||
-                            (_preferences.UseControlPrintScreen && !_hotkeyService.WindowShortcutActive);
+        bool presetFailed = (_preferences.UsePrintScreen && !_hotkeyService.PrintScreenShortcutActive) ||
+                            (_preferences.UseAltPrintScreen && !_hotkeyService.AltPrintScreenShortcutActive) ||
+                            (_preferences.UseControlPrintScreen && !_hotkeyService.ControlPrintScreenShortcutActive);
         string prefix = presetFailed ? "Alguns atalhos estão ocupados" : "Pronto";
         SetStatus(activeShortcuts.Count > 0
             ? $"{prefix} • {string.Join(" • ", activeShortcuts)}"

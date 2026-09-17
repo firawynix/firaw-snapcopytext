@@ -22,6 +22,9 @@ public sealed class AppSettingsServiceTests
                 UsePrintScreen = false,
                 UseAltPrintScreen = false,
                 UseControlPrintScreen = true,
+                PrintScreenMode = CaptureMode.Window,
+                AltPrintScreenMode = CaptureMode.Region,
+                ControlPrintScreenMode = CaptureMode.Monitor,
                 StartWithWindows = true
             });
 
@@ -32,6 +35,9 @@ public sealed class AppSettingsServiceTests
             Assert.False(loaded.UsePrintScreen);
             Assert.False(loaded.UseAltPrintScreen);
             Assert.True(loaded.UseControlPrintScreen);
+            Assert.Equal(CaptureMode.Window, loaded.PrintScreenMode);
+            Assert.Equal(CaptureMode.Region, loaded.AltPrintScreenMode);
+            Assert.Equal(CaptureMode.Monitor, loaded.ControlPrintScreenMode);
             Assert.True(loaded.StartWithWindows);
         }
         finally
@@ -57,6 +63,9 @@ public sealed class AppSettingsServiceTests
             Assert.True(loaded.UsePrintScreen);
             Assert.True(loaded.UseAltPrintScreen);
             Assert.True(loaded.UseControlPrintScreen);
+            Assert.Equal(CaptureMode.Region, loaded.PrintScreenMode);
+            Assert.Equal(CaptureMode.Monitor, loaded.AltPrintScreenMode);
+            Assert.Equal(CaptureMode.Window, loaded.ControlPrintScreenMode);
             Assert.False(loaded.StartWithWindows);
         }
         finally
@@ -85,6 +94,9 @@ public sealed class AppSettingsServiceTests
             Assert.True(loaded.UsePrintScreen);
             Assert.True(loaded.UseAltPrintScreen);
             Assert.True(loaded.UseControlPrintScreen);
+            Assert.Equal(CaptureMode.Region, loaded.PrintScreenMode);
+            Assert.Equal(CaptureMode.Monitor, loaded.AltPrintScreenMode);
+            Assert.Equal(CaptureMode.Window, loaded.ControlPrintScreenMode);
         }
         finally
         {

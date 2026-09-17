@@ -80,6 +80,27 @@ public sealed class HotkeyServiceTests
     }
 
     [Theory]
+    [InlineData(ModifierKeys.None, CaptureMode.Monitor)]
+    [InlineData(ModifierKeys.Alt, CaptureMode.Window)]
+    [InlineData(ModifierKeys.Control, CaptureMode.Region)]
+    public void TryGetPresetMode_UsesConfiguredModeForEachCombination(
+        ModifierKeys modifiers,
+        CaptureMode expectedMode)
+    {
+        var settings = new CapturePreferences
+        {
+            PrintScreenMode = CaptureMode.Monitor,
+            AltPrintScreenMode = CaptureMode.Window,
+            ControlPrintScreenMode = CaptureMode.Region
+        };
+
+        bool found = HotkeyService.TryGetPresetMode(settings, modifiers, out CaptureMode mode);
+
+        Assert.True(found);
+        Assert.Equal(expectedMode, mode);
+    }
+
+    [Theory]
     [InlineData(ModifierKeys.None)]
     [InlineData(ModifierKeys.Alt)]
     [InlineData(ModifierKeys.Control)]

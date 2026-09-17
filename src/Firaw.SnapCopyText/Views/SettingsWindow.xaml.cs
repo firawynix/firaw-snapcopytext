@@ -28,14 +28,21 @@ public partial class SettingsWindow : Window
     {
         InitializeComponent();
 
-        DefaultModeCombo.ItemsSource = new[]
+        ModeOption[] modes =
         {
             new ModeOption(CaptureMode.Region, "Selecionar região"),
             new ModeOption(CaptureMode.Window, "Escolher janela"),
             new ModeOption(CaptureMode.Monitor, "Escolher monitor")
         };
 
+        DefaultModeCombo.ItemsSource = modes;
+        PrintScreenModeCombo.ItemsSource = modes;
+        AltPrintScreenModeCombo.ItemsSource = modes;
+        ControlPrintScreenModeCombo.ItemsSource = modes;
         DefaultModeCombo.SelectedValue = preferences.DefaultMode;
+        PrintScreenModeCombo.SelectedValue = preferences.PrintScreenMode;
+        AltPrintScreenModeCombo.SelectedValue = preferences.AltPrintScreenMode;
+        ControlPrintScreenModeCombo.SelectedValue = preferences.ControlPrintScreenMode;
         _shortcut = preferences.Shortcut;
         ShortcutInput.Text = _shortcut;
         RegionFirawRadio.IsChecked = preferences.UsePrintScreen;
@@ -79,6 +86,9 @@ public partial class SettingsWindow : Window
             UsePrintScreen = RegionFirawRadio.IsChecked == true,
             UseAltPrintScreen = MonitorFirawRadio.IsChecked == true,
             UseControlPrintScreen = WindowFirawRadio.IsChecked == true,
+            PrintScreenMode = SelectedMode(PrintScreenModeCombo, CaptureMode.Region),
+            AltPrintScreenMode = SelectedMode(AltPrintScreenModeCombo, CaptureMode.Monitor),
+            ControlPrintScreenMode = SelectedMode(ControlPrintScreenModeCombo, CaptureMode.Window),
             StartWithWindows = StartWithWindowsCheck.IsChecked == true
         };
         DialogResult = true;
@@ -194,6 +204,9 @@ public partial class SettingsWindow : Window
     {
         ShortcutInput.Text = _shortcut;
     }
+
+    private static CaptureMode SelectedMode(System.Windows.Controls.ComboBox combo, CaptureMode fallback) =>
+        combo.SelectedValue is CaptureMode mode ? mode : fallback;
 
     private nint WindowProcedure(nint hwnd, int message, nint wParam, nint lParam, ref bool handled)
     {

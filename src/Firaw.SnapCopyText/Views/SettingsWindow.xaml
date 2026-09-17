@@ -39,9 +39,15 @@
                                     <ColumnDefinition Width="150" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Print Screen" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                <RadioButton x:Name="RegionFirawRadio" Grid.Column="1" GroupName="RegionPrint"
-                                             Content="Firaw: região" Foreground="{StaticResource FirawText}"
-                                             VerticalAlignment="Center" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <RadioButton x:Name="RegionFirawRadio" GroupName="RegionPrint"
+                                                 Content="Firaw" Foreground="{StaticResource FirawText}"
+                                                 VerticalAlignment="Center" />
+                                    <ComboBox x:Name="PrintScreenModeCombo" Width="135" Height="30" Margin="8,0,8,0"
+                                              DisplayMemberPath="Label" SelectedValuePath="Value"
+                                              IsEnabled="{Binding IsChecked, ElementName=RegionFirawRadio}"
+                                              Background="White" Foreground="#071014" />
+                                </StackPanel>
                                 <RadioButton x:Name="RegionWindowsRadio" Grid.Column="2" GroupName="RegionPrint"
                                              Content="Windows original" Foreground="{StaticResource FirawText}"
                                              VerticalAlignment="Center" />
@@ -53,9 +59,15 @@
                                     <ColumnDefinition Width="150" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Alt + Print Screen" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                <RadioButton x:Name="MonitorFirawRadio" Grid.Column="1" GroupName="MonitorPrint"
-                                             Content="Firaw: monitor" Foreground="{StaticResource FirawText}"
-                                             VerticalAlignment="Center" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <RadioButton x:Name="MonitorFirawRadio" GroupName="MonitorPrint"
+                                                 Content="Firaw" Foreground="{StaticResource FirawText}"
+                                                 VerticalAlignment="Center" />
+                                    <ComboBox x:Name="AltPrintScreenModeCombo" Width="135" Height="30" Margin="8,0,8,0"
+                                              DisplayMemberPath="Label" SelectedValuePath="Value"
+                                              IsEnabled="{Binding IsChecked, ElementName=MonitorFirawRadio}"
+                                              Background="White" Foreground="#071014" />
+                                </StackPanel>
                                 <RadioButton x:Name="MonitorWindowsRadio" Grid.Column="2" GroupName="MonitorPrint"
                                              Content="Windows original" Foreground="{StaticResource FirawText}"
                                              VerticalAlignment="Center" />
@@ -67,9 +79,15 @@
                                     <ColumnDefinition Width="150" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Ctrl + Print Screen" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                <RadioButton x:Name="WindowFirawRadio" Grid.Column="1" GroupName="WindowPrint"
-                                             Content="Firaw: janela" Foreground="{StaticResource FirawText}"
-                                             VerticalAlignment="Center" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <RadioButton x:Name="WindowFirawRadio" GroupName="WindowPrint"
+                                                 Content="Firaw" Foreground="{StaticResource FirawText}"
+                                                 VerticalAlignment="Center" />
+                                    <ComboBox x:Name="ControlPrintScreenModeCombo" Width="135" Height="30" Margin="8,0,8,0"
+                                              DisplayMemberPath="Label" SelectedValuePath="Value"
+                                              IsEnabled="{Binding IsChecked, ElementName=WindowFirawRadio}"
+                                              Background="White" Foreground="#071014" />
+                                </StackPanel>
                                 <RadioButton x:Name="WindowWindowsRadio" Grid.Column="2" GroupName="WindowPrint"
                                              Content="Windows original" Foreground="{StaticResource FirawText}"
                                              VerticalAlignment="Center" />

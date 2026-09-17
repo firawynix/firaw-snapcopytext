@@ -1,6 +1,6 @@
 ﻿param(
-    [string]$Version = '1.1.12',
-    [string]$ReleaseNotes = 'O menu de confirmação fica dentro da área selecionada e permanece visível mesmo quando o recorte encosta nas bordas da tela.'
+    [string]$Version = '1.1.13',
+    [string]$ReleaseNotes = 'Cada combinação de Print Screen pode usar livremente captura por região, monitor ou janela.'
 )
 
 $ErrorActionPreference = 'Stop'

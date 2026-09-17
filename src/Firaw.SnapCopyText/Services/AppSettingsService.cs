@@ -63,7 +63,13 @@ public sealed class AppSettingsService
             UsePrintScreen = settings?.UsePrintScreen ?? true,
             UseAltPrintScreen = settings?.UseAltPrintScreen ?? true,
             UseControlPrintScreen = settings?.UseControlPrintScreen ?? true,
+            PrintScreenMode = SanitizeMode(settings?.PrintScreenMode, CaptureMode.Region),
+            AltPrintScreenMode = SanitizeMode(settings?.AltPrintScreenMode, CaptureMode.Monitor),
+            ControlPrintScreenMode = SanitizeMode(settings?.ControlPrintScreenMode, CaptureMode.Window),
             StartWithWindows = settings?.StartWithWindows ?? false
         };
     }
+
+    private static CaptureMode SanitizeMode(CaptureMode? mode, CaptureMode fallback) =>
+        mode.HasValue && Enum.IsDefined(mode.Value) ? mode.Value : fallback;
 }

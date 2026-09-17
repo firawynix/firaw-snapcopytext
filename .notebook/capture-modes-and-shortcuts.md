@@ -35,10 +35,10 @@ return the new bitmap to the current editor instead of opening another editor.
 
 Custom shortcuts are stored as normalized labels such as `Ctrl + Alt + F9`. `HotkeyService` parses and validates the label before calling `RegisterHotKey`; ordinary keys still require Ctrl, Shift, or Alt, while the dedicated Print Screen key and function keys may be used alone. Print Screen accepts `PrintScreen`, `Print Screen`, and `PrtSc`, normalizes them to `Print Screen`, and avoids duplicate registration when the separate Print Screen preference is also enabled.
 
-Print Screen profile: `HotkeyService.KeyboardProcedure()` maps the exact combinations Print Screen → Region, Alt+Print Screen → Monitor, and Ctrl+Print Screen → Window. `WH_KEYBOARD_LL` is primary so Windows reservations do not prevent capture; `RegisterHotKey` is the fallback if the hook cannot be installed. A combination is suppressed only when its matching `CapturePreferences` flag is enabled; disabled combinations continue through `CallNextHookEx` for native Windows behavior. The custom shortcut remains a separate default-mode fallback.
+Print Screen profile: `CapturePreferences` stores an independent enabled flag and `CaptureMode` for Print Screen, Alt+Print Screen, and Ctrl+Print Screen. Defaults remain Region, Monitor, and Window for backward compatibility, but `SettingsWindow` lets each Firaw combination choose any capture mode. `HotkeyService.KeyboardProcedure()` resolves the saved mode at runtime. `WH_KEYBOARD_LL` is primary so Windows reservations do not prevent capture; `RegisterHotKey` is the fallback if the hook cannot be installed. A combination is suppressed only when its matching flag is enabled; disabled combinations continue through `CallNextHookEx` for native Windows behavior. The custom shortcut remains a separate default-mode fallback.
 
 Windows integration: `WindowsPrintScreenService.SetScreenSnippingEnabled()` changes the current-user `PrintScreenKeyForSnippingEnabled` value. Settings expose both value directions plus per-combination Firaw/Windows radio choices.
 
 Settings recording: `MainWindow.OpenSettings()` suspends current global hotkeys before showing the modal dialog and restores them in `finally`. `SettingsWindow.OnSourceInitialized()` owns a temporary foreground Print Screen registration while the dialog is open; its window hook records the key when the shortcut field has focus. `PreviewKeyUp` is a fallback for keyboards that expose Print Screen only on release.
 
-Updated: 2026-09-15
+Updated: 2026-09-17

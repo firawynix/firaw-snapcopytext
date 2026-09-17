@@ -41,9 +41,9 @@ public sealed class HotkeyService : IDisposable
     private bool _suppressPrintScreenUntilKeyUp;
     private bool _disposed;
 
-    public bool RegionShortcutActive { get; private set; }
-    public bool MonitorShortcutActive { get; private set; }
-    public bool WindowShortcutActive { get; private set; }
+    public bool PrintScreenShortcutActive { get; private set; }
+    public bool AltPrintScreenShortcutActive { get; private set; }
+    public bool ControlPrintScreenShortcutActive { get; private set; }
     public bool FallbackRegistered { get; private set; }
     public bool UsesKeyboardHook => _keyboardHook != nint.Zero;
     public string FallbackLabel { get; private set; } = "Ctrl + Shift + S";
@@ -103,15 +103,15 @@ public sealed class HotkeyService : IDisposable
 
         if (_keyboardHook != nint.Zero)
         {
-            RegionShortcutActive = settings.UsePrintScreen;
-            MonitorShortcutActive = settings.UseAltPrintScreen;
-            WindowShortcutActive = settings.UseControlPrintScreen;
+            PrintScreenShortcutActive = settings.UsePrintScreen;
+            AltPrintScreenShortcutActive = settings.UseAltPrintScreen;
+            ControlPrintScreenShortcutActive = settings.UseControlPrintScreen;
         }
         else
         {
-            RegionShortcutActive = RegisterPreset(settings.UsePrintScreen, PrintScreenId, 0);
-            MonitorShortcutActive = RegisterPreset(settings.UseAltPrintScreen, AltPrintScreenId, ModAlt);
-            WindowShortcutActive = RegisterPreset(settings.UseControlPrintScreen, ControlPrintScreenId, ModControl);
+            PrintScreenShortcutActive = RegisterPreset(settings.UsePrintScreen, PrintScreenId, 0);
+            AltPrintScreenShortcutActive = RegisterPreset(settings.UseAltPrintScreen, AltPrintScreenId, ModAlt);
+            ControlPrintScreenShortcutActive = RegisterPreset(settings.UseControlPrintScreen, ControlPrintScreenId, ModControl);
         }
 
         bool customShortcutIsManagedPrintScreen = key == Key.PrintScreen &&
@@ -160,9 +160,9 @@ public sealed class HotkeyService : IDisposable
         }
 
         _suppressPrintScreenUntilKeyUp = false;
-        RegionShortcutActive = false;
-        MonitorShortcutActive = false;
-        WindowShortcutActive = false;
+        PrintScreenShortcutActive = false;
+        AltPrintScreenShortcutActive = false;
+        ControlPrintScreenShortcutActive = false;
         FallbackRegistered = false;
     }
 
@@ -253,17 +253,17 @@ public sealed class HotkeyService : IDisposable
                                 (ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Windows);
         if (relevant == ModifierKeys.None && settings.UsePrintScreen)
         {
-            mode = CaptureMode.Region;
+            mode = settings.PrintScreenMode;
             return true;
         }
         if (relevant == ModifierKeys.Alt && settings.UseAltPrintScreen)
         {
-            mode = CaptureMode.Monitor;
+            mode = settings.AltPrintScreenMode;
             return true;
         }
         if (relevant == ModifierKeys.Control && settings.UseControlPrintScreen)
         {
-            mode = CaptureMode.Window;
+            mode = settings.ControlPrintScreenMode;
             return true;
         }
 
@@ -326,9 +326,9 @@ public sealed class HotkeyService : IDisposable
 
         CaptureMode? mode = wParam.ToInt32() switch
         {
-            PrintScreenId => CaptureMode.Region,
-            AltPrintScreenId => CaptureMode.Monitor,
-            ControlPrintScreenId => CaptureMode.Window,
+            PrintScreenId => _settings.PrintScreenMode,
+            AltPrintScreenId => _settings.AltPrintScreenMode,
+            ControlPrintScreenId => _settings.ControlPrintScreenMode,
             FallbackId => _settings.DefaultMode,
             _ => null
         };
