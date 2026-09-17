@@ -26,7 +26,7 @@
             <ScrollViewer Grid.Row="1" Margin="0,22,0,20" VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="0,0,10,0">
                     <TextBlock Text="Perfil Print Screen" FontWeight="SemiBold" FontSize="15" />
-                    <TextBlock Text="O modo Firaw usa tratamento direto da tecla, semelhante aos capturadores dedicados."
+                    <TextBlock Text="Clique em uma combinação para gravar outra com Ctrl, Alt ou Shift + Print Screen."
                                Margin="0,4,0,10" Foreground="{StaticResource FirawMutedText}"
                                TextWrapping="Wrap" />
 
@@ -38,7 +38,15 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="150" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Print Screen" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                <TextBox x:Name="PrintScreenShortcutInput" Height="32" Margin="0,0,8,0"
+                                         IsReadOnly="True" FontWeight="SemiBold" VerticalContentAlignment="Center"
+                                         HorizontalContentAlignment="Center" Cursor="Hand"
+                                         Background="White" Foreground="#071014" BorderBrush="#7B8A94"
+                                         PreviewKeyDown="ProfileShortcutInput_PreviewKeyDown"
+                                         PreviewKeyUp="ProfileShortcutInput_PreviewKeyUp"
+                                         GotKeyboardFocus="ProfileShortcutInput_GotKeyboardFocus"
+                                         LostKeyboardFocus="ProfileShortcutInput_LostKeyboardFocus"
+                                         ToolTip="Clique e pressione a nova combinação com Print Screen" />
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                                     <RadioButton x:Name="RegionFirawRadio" GroupName="RegionPrint"
                                                  Content="Firaw" Foreground="{StaticResource FirawText}"
@@ -58,7 +66,15 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="150" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Alt + Print Screen" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                <TextBox x:Name="AltPrintScreenShortcutInput" Height="32" Margin="0,0,8,0"
+                                         IsReadOnly="True" FontWeight="SemiBold" VerticalContentAlignment="Center"
+                                         HorizontalContentAlignment="Center" Cursor="Hand"
+                                         Background="White" Foreground="#071014" BorderBrush="#7B8A94"
+                                         PreviewKeyDown="ProfileShortcutInput_PreviewKeyDown"
+                                         PreviewKeyUp="ProfileShortcutInput_PreviewKeyUp"
+                                         GotKeyboardFocus="ProfileShortcutInput_GotKeyboardFocus"
+                                         LostKeyboardFocus="ProfileShortcutInput_LostKeyboardFocus"
+                                         ToolTip="Clique e pressione a nova combinação com Print Screen" />
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                                     <RadioButton x:Name="MonitorFirawRadio" GroupName="MonitorPrint"
                                                  Content="Firaw" Foreground="{StaticResource FirawText}"
@@ -78,7 +94,15 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="150" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Ctrl + Print Screen" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                <TextBox x:Name="ControlPrintScreenShortcutInput" Height="32" Margin="0,0,8,0"
+                                         IsReadOnly="True" FontWeight="SemiBold" VerticalContentAlignment="Center"
+                                         HorizontalContentAlignment="Center" Cursor="Hand"
+                                         Background="White" Foreground="#071014" BorderBrush="#7B8A94"
+                                         PreviewKeyDown="ProfileShortcutInput_PreviewKeyDown"
+                                         PreviewKeyUp="ProfileShortcutInput_PreviewKeyUp"
+                                         GotKeyboardFocus="ProfileShortcutInput_GotKeyboardFocus"
+                                         LostKeyboardFocus="ProfileShortcutInput_LostKeyboardFocus"
+                                         ToolTip="Clique e pressione a nova combinação com Print Screen" />
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                                     <RadioButton x:Name="WindowFirawRadio" GroupName="WindowPrint"
                                                  Content="Firaw" Foreground="{StaticResource FirawText}"

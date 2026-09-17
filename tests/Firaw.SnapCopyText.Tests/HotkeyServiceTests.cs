@@ -54,6 +54,21 @@ public sealed class HotkeyServiceTests
         Assert.Equal("Print Screen", label);
     }
 
+    [Fact]
+    public void TryParsePrintScreenShortcut_AcceptsShiftCombination()
+    {
+        bool valid = HotkeyService.TryParsePrintScreenShortcut(
+            "shift+prtsc",
+            out uint nativeModifiers,
+            out ModifierKeys modifiers,
+            out string label);
+
+        Assert.True(valid);
+        Assert.NotEqual(0u, nativeModifiers);
+        Assert.Equal(ModifierKeys.Shift, modifiers);
+        Assert.Equal("Shift + Print Screen", label);
+    }
+
     [Theory]
     [InlineData("S")]
     [InlineData("Ctrl + Shift")]
@@ -98,6 +113,23 @@ public sealed class HotkeyServiceTests
 
         Assert.True(found);
         Assert.Equal(expectedMode, mode);
+    }
+
+    [Fact]
+    public void TryGetPresetMode_UsesChangedPrintScreenCombination()
+    {
+        var settings = new CapturePreferences
+        {
+            UsePrintScreen = false,
+            UseAltPrintScreen = true,
+            UseControlPrintScreen = false,
+            AltPrintScreenShortcut = "Shift + Print Screen",
+            AltPrintScreenMode = CaptureMode.Window
+        };
+
+        Assert.True(HotkeyService.TryGetPresetMode(settings, ModifierKeys.Shift, out CaptureMode mode));
+        Assert.Equal(CaptureMode.Window, mode);
+        Assert.False(HotkeyService.TryGetPresetMode(settings, ModifierKeys.Alt, out _));
     }
 
     [Theory]

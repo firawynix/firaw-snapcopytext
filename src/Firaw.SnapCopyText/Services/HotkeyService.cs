@@ -89,6 +89,10 @@ public sealed class HotkeyService : IDisposable
         }
         FallbackLabel = label;
 
+        TryParsePrintScreenShortcut(settings.PrintScreenShortcut, out uint printModifiers, out _, out _);
+        TryParsePrintScreenShortcut(settings.AltPrintScreenShortcut, out uint altPrintModifiers, out _, out _);
+        TryParsePrintScreenShortcut(settings.ControlPrintScreenShortcut, out uint controlPrintModifiers, out _, out _);
+
         bool anyPresetEnabled = settings.UsePrintScreen ||
                                 settings.UseAltPrintScreen ||
                                 settings.UseControlPrintScreen;
@@ -109,13 +113,15 @@ public sealed class HotkeyService : IDisposable
         }
         else
         {
-            PrintScreenShortcutActive = RegisterPreset(settings.UsePrintScreen, PrintScreenId, 0);
-            AltPrintScreenShortcutActive = RegisterPreset(settings.UseAltPrintScreen, AltPrintScreenId, ModAlt);
-            ControlPrintScreenShortcutActive = RegisterPreset(settings.UseControlPrintScreen, ControlPrintScreenId, ModControl);
+            PrintScreenShortcutActive = RegisterPreset(settings.UsePrintScreen, PrintScreenId, printModifiers);
+            AltPrintScreenShortcutActive = RegisterPreset(settings.UseAltPrintScreen, AltPrintScreenId, altPrintModifiers);
+            ControlPrintScreenShortcutActive = RegisterPreset(settings.UseControlPrintScreen, ControlPrintScreenId, controlPrintModifiers);
         }
 
         bool customShortcutIsManagedPrintScreen = key == Key.PrintScreen &&
-                                                  modifiers is 0 or ModAlt or ModControl;
+                                                  ((settings.UsePrintScreen && modifiers == printModifiers) ||
+                                                   (settings.UseAltPrintScreen && modifiers == altPrintModifiers) ||
+                                                   (settings.UseControlPrintScreen && modifiers == controlPrintModifiers));
         if (!customShortcutIsManagedPrintScreen)
         {
             FallbackRegistered = RegisterHotKey(
@@ -244,6 +250,27 @@ public sealed class HotkeyService : IDisposable
         return true;
     }
 
+    public static bool TryParsePrintScreenShortcut(
+        string? shortcut,
+        out uint nativeModifiers,
+        out ModifierKeys modifiers,
+        out string normalizedLabel)
+    {
+        modifiers = ModifierKeys.None;
+        if (!TryParseShortcut(shortcut, out nativeModifiers, out Key key, out normalizedLabel) ||
+            key != Key.PrintScreen)
+        {
+            nativeModifiers = 0;
+            normalizedLabel = string.Empty;
+            return false;
+        }
+
+        if ((nativeModifiers & ModControl) != 0) modifiers |= ModifierKeys.Control;
+        if ((nativeModifiers & ModShift) != 0) modifiers |= ModifierKeys.Shift;
+        if ((nativeModifiers & ModAlt) != 0) modifiers |= ModifierKeys.Alt;
+        return true;
+    }
+
     public static bool TryGetPresetMode(
         CapturePreferences settings,
         ModifierKeys modifiers,
@@ -251,17 +278,17 @@ public sealed class HotkeyService : IDisposable
     {
         ModifierKeys relevant = modifiers &
                                 (ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Windows);
-        if (relevant == ModifierKeys.None && settings.UsePrintScreen)
+        if (settings.UsePrintScreen && ShortcutMatches(settings.PrintScreenShortcut, relevant))
         {
             mode = settings.PrintScreenMode;
             return true;
         }
-        if (relevant == ModifierKeys.Alt && settings.UseAltPrintScreen)
+        if (settings.UseAltPrintScreen && ShortcutMatches(settings.AltPrintScreenShortcut, relevant))
         {
             mode = settings.AltPrintScreenMode;
             return true;
         }
-        if (relevant == ModifierKeys.Control && settings.UseControlPrintScreen)
+        if (settings.UseControlPrintScreen && ShortcutMatches(settings.ControlPrintScreenShortcut, relevant))
         {
             mode = settings.ControlPrintScreenMode;
             return true;
@@ -270,6 +297,10 @@ public sealed class HotkeyService : IDisposable
         mode = default;
         return false;
     }
+
+    private static bool ShortcutMatches(string shortcut, ModifierKeys modifiers) =>
+        TryParsePrintScreenShortcut(shortcut, out _, out ModifierKeys expected, out _) &&
+        expected == modifiers;
 
     private nint KeyboardProcedure(int code, nint message, nint dataPointer)
     {

@@ -10,18 +10,25 @@ namespace Firaw.SnapCopyText.Views;
 
 using CaptureMode = Firaw.SnapCopyText.Models.CaptureMode;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using TextBox = System.Windows.Controls.TextBox;
 
 public partial class SettingsWindow : Window
 {
-    private const int RecorderPrintScreenId = 0x5345;
+    private const int RecorderPrintScreenIdBase = 0x5350;
     private const int WmHotkey = 0x0312;
+    private const uint ModAlt = 0x0001;
+    private const uint ModControl = 0x0002;
+    private const uint ModShift = 0x0004;
     private const uint ModNoRepeat = 0x4000;
     private const uint VkSnapshot = 0x2C;
 
     private string _shortcut;
+    private string _printScreenShortcut;
+    private string _altPrintScreenShortcut;
+    private string _controlPrintScreenShortcut;
     private nint _windowHandle;
     private HwndSource? _windowSource;
-    private bool _printScreenRegistered;
+    private readonly List<int> _registeredRecorderHotkeys = [];
     public CapturePreferences? SavedPreferences { get; private set; }
 
     public SettingsWindow(CapturePreferences preferences)
@@ -44,7 +51,13 @@ public partial class SettingsWindow : Window
         AltPrintScreenModeCombo.SelectedValue = preferences.AltPrintScreenMode;
         ControlPrintScreenModeCombo.SelectedValue = preferences.ControlPrintScreenMode;
         _shortcut = preferences.Shortcut;
+        _printScreenShortcut = preferences.PrintScreenShortcut;
+        _altPrintScreenShortcut = preferences.AltPrintScreenShortcut;
+        _controlPrintScreenShortcut = preferences.ControlPrintScreenShortcut;
         ShortcutInput.Text = _shortcut;
+        PrintScreenShortcutInput.Text = _printScreenShortcut;
+        AltPrintScreenShortcutInput.Text = _altPrintScreenShortcut;
+        ControlPrintScreenShortcutInput.Text = _controlPrintScreenShortcut;
         RegionFirawRadio.IsChecked = preferences.UsePrintScreen;
         RegionWindowsRadio.IsChecked = !preferences.UsePrintScreen;
         MonitorFirawRadio.IsChecked = preferences.UseAltPrintScreen;
@@ -60,18 +73,21 @@ public partial class SettingsWindow : Window
         _windowHandle = new WindowInteropHelper(this).Handle;
         _windowSource = HwndSource.FromHwnd(_windowHandle);
         _windowSource?.AddHook(WindowProcedure);
-        _printScreenRegistered = RegisterHotKey(
-            _windowHandle,
-            RecorderPrintScreenId,
-            ModNoRepeat,
-            VkSnapshot);
+        for (uint modifiers = 0; modifiers <= (ModAlt | ModControl | ModShift); modifiers++)
+        {
+            int id = RecorderPrintScreenIdBase + (int)modifiers;
+            if (RegisterHotKey(_windowHandle, id, modifiers | ModNoRepeat, VkSnapshot))
+            {
+                _registeredRecorderHotkeys.Add(id);
+            }
+        }
     }
 
     protected override void OnClosed(EventArgs e)
     {
-        if (_printScreenRegistered)
+        foreach (int id in _registeredRecorderHotkeys)
         {
-            UnregisterHotKey(_windowHandle, RecorderPrintScreenId);
+            UnregisterHotKey(_windowHandle, id);
         }
         _windowSource?.RemoveHook(WindowProcedure);
         base.OnClosed(e);
@@ -79,6 +95,11 @@ public partial class SettingsWindow : Window
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
+        if (!ValidateShortcutAssignments())
+        {
+            return;
+        }
+
         SavedPreferences = new CapturePreferences
         {
             DefaultMode = DefaultModeCombo.SelectedValue is CaptureMode mode ? mode : CaptureMode.Region,
@@ -86,6 +107,9 @@ public partial class SettingsWindow : Window
             UsePrintScreen = RegionFirawRadio.IsChecked == true,
             UseAltPrintScreen = MonitorFirawRadio.IsChecked == true,
             UseControlPrintScreen = WindowFirawRadio.IsChecked == true,
+            PrintScreenShortcut = _printScreenShortcut,
+            AltPrintScreenShortcut = _altPrintScreenShortcut,
+            ControlPrintScreenShortcut = _controlPrintScreenShortcut,
             PrintScreenMode = SelectedMode(PrintScreenModeCombo, CaptureMode.Region),
             AltPrintScreenMode = SelectedMode(AltPrintScreenModeCombo, CaptureMode.Monitor),
             ControlPrintScreenMode = SelectedMode(ControlPrintScreenModeCombo, CaptureMode.Window),
@@ -174,18 +198,6 @@ public partial class SettingsWindow : Window
 
     private void RecordShortcut(ModifierKeys modifiers, Key key)
     {
-        ModifierKeys relevant = modifiers & (ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt);
-        if (key == Key.PrintScreen && relevant is ModifierKeys.None or ModifierKeys.Alt or ModifierKeys.Control)
-        {
-            if (relevant == ModifierKeys.None) RegionFirawRadio.IsChecked = true;
-            if (relevant == ModifierKeys.Alt) MonitorFirawRadio.IsChecked = true;
-            if (relevant == ModifierKeys.Control) WindowFirawRadio.IsChecked = true;
-            ShortcutInput.Text = _shortcut;
-            WindowsShortcutStatus.Text = "Combinação ativada no perfil Print Screen acima.";
-            Keyboard.ClearFocus();
-            return;
-        }
-
         if (HotkeyService.TryCreateShortcutLabel(modifiers, key, out string shortcut))
         {
             _shortcut = shortcut;
@@ -205,20 +217,149 @@ public partial class SettingsWindow : Window
         ShortcutInput.Text = _shortcut;
     }
 
+    private void ProfileShortcutInput_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        if (sender is TextBox input)
+        {
+            input.Text = "Pressione Print Screen…";
+            input.SelectAll();
+        }
+    }
+
+    private void ProfileShortcutInput_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        Key key = e.Key == Key.System ? e.SystemKey : e.Key;
+        RecordProfileShortcut((TextBox)sender, Keyboard.Modifiers, key);
+        e.Handled = true;
+    }
+
+    private void ProfileShortcutInput_PreviewKeyUp(object sender, KeyEventArgs e)
+    {
+        Key key = e.Key == Key.System ? e.SystemKey : e.Key;
+        if (key == Key.PrintScreen)
+        {
+            RecordProfileShortcut((TextBox)sender, Keyboard.Modifiers, key);
+            e.Handled = true;
+        }
+    }
+
+    private void ProfileShortcutInput_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        if (sender is TextBox input)
+        {
+            input.Text = GetProfileShortcut(input);
+        }
+    }
+
+    private void RecordProfileShortcut(TextBox input, ModifierKeys modifiers, Key key)
+    {
+        if (key is Key.LeftCtrl or Key.RightCtrl or Key.LeftShift or Key.RightShift or Key.LeftAlt or Key.RightAlt)
+        {
+            return;
+        }
+
+        if (key != Key.PrintScreen ||
+            !HotkeyService.TryCreateShortcutLabel(modifiers, key, out string shortcut))
+        {
+            input.Text = "Use Print Screen";
+            return;
+        }
+
+        SetProfileShortcut(input, shortcut);
+        SetProfileEnabled(input);
+        input.Text = shortcut;
+        WindowsShortcutStatus.Text = $"Atalho alterado para {shortcut}. Clique em Salvar para aplicar.";
+        Keyboard.ClearFocus();
+    }
+
+    private string GetProfileShortcut(TextBox input)
+    {
+        if (ReferenceEquals(input, PrintScreenShortcutInput)) return _printScreenShortcut;
+        if (ReferenceEquals(input, AltPrintScreenShortcutInput)) return _altPrintScreenShortcut;
+        return _controlPrintScreenShortcut;
+    }
+
+    private void SetProfileShortcut(TextBox input, string shortcut)
+    {
+        if (ReferenceEquals(input, PrintScreenShortcutInput)) _printScreenShortcut = shortcut;
+        else if (ReferenceEquals(input, AltPrintScreenShortcutInput)) _altPrintScreenShortcut = shortcut;
+        else _controlPrintScreenShortcut = shortcut;
+    }
+
+    private void SetProfileEnabled(TextBox input)
+    {
+        if (ReferenceEquals(input, PrintScreenShortcutInput)) RegionFirawRadio.IsChecked = true;
+        else if (ReferenceEquals(input, AltPrintScreenShortcutInput)) MonitorFirawRadio.IsChecked = true;
+        else WindowFirawRadio.IsChecked = true;
+    }
+
+    private bool ValidateShortcutAssignments()
+    {
+        List<string> enabled = [];
+        if (RegionFirawRadio.IsChecked == true) enabled.Add(_printScreenShortcut);
+        if (MonitorFirawRadio.IsChecked == true) enabled.Add(_altPrintScreenShortcut);
+        if (WindowFirawRadio.IsChecked == true) enabled.Add(_controlPrintScreenShortcut);
+
+        string? duplicate = enabled
+            .GroupBy(value => value, StringComparer.OrdinalIgnoreCase)
+            .FirstOrDefault(group => group.Count() > 1)?.Key;
+        if (duplicate is not null)
+        {
+            WindowsShortcutStatus.Text = $"O atalho {duplicate} está repetido. Defina uma combinação diferente.";
+            return false;
+        }
+
+        if (enabled.Contains(_shortcut, StringComparer.OrdinalIgnoreCase))
+        {
+            WindowsShortcutStatus.Text = $"O atalho adicional {_shortcut} já está sendo usado no perfil acima.";
+            return false;
+        }
+
+        return true;
+    }
+
     private static CaptureMode SelectedMode(System.Windows.Controls.ComboBox combo, CaptureMode fallback) =>
         combo.SelectedValue is CaptureMode mode ? mode : fallback;
 
     private nint WindowProcedure(nint hwnd, int message, nint wParam, nint lParam, ref bool handled)
     {
+        int id = wParam.ToInt32();
         if (message == WmHotkey &&
-            wParam.ToInt32() == RecorderPrintScreenId &&
-            ShortcutInput.IsKeyboardFocusWithin)
+            id >= RecorderPrintScreenIdBase &&
+            id <= RecorderPrintScreenIdBase + (ModAlt | ModControl | ModShift))
         {
-            RecordShortcut(ModifierKeys.None, Key.PrintScreen);
-            handled = true;
+            ModifierKeys modifiers = ToModifierKeys((uint)(id - RecorderPrintScreenIdBase));
+            TextBox? profileInput = FocusedProfileShortcutInput();
+            if (profileInput is not null)
+            {
+                RecordProfileShortcut(profileInput, modifiers, Key.PrintScreen);
+                handled = true;
+            }
+            else if (ShortcutInput.IsKeyboardFocusWithin)
+            {
+                RecordShortcut(modifiers, Key.PrintScreen);
+                handled = true;
+            }
         }
 
         return nint.Zero;
+    }
+
+    private TextBox? FocusedProfileShortcutInput()
+    {
+        if (PrintScreenShortcutInput.IsKeyboardFocusWithin) return PrintScreenShortcutInput;
+        if (AltPrintScreenShortcutInput.IsKeyboardFocusWithin) return AltPrintScreenShortcutInput;
+        if (ControlPrintScreenShortcutInput.IsKeyboardFocusWithin) return ControlPrintScreenShortcutInput;
+        return null;
+    }
+
+    private static ModifierKeys ToModifierKeys(uint modifiers)
+    {
+        ModifierKeys result = ModifierKeys.None;
+        if ((modifiers & ModControl) != 0) result |= ModifierKeys.Control;
+        if ((modifiers & ModShift) != 0) result |= ModifierKeys.Shift;
+        if ((modifiers & ModAlt) != 0) result |= ModifierKeys.Alt;
+        return result;
     }
 
     [DllImport("user32.dll", SetLastError = true)]

@@ -22,6 +22,9 @@ public sealed class AppSettingsServiceTests
                 UsePrintScreen = false,
                 UseAltPrintScreen = false,
                 UseControlPrintScreen = true,
+                PrintScreenShortcut = "Shift + Print Screen",
+                AltPrintScreenShortcut = "Ctrl + Alt + Print Screen",
+                ControlPrintScreenShortcut = "Ctrl + Shift + Print Screen",
                 PrintScreenMode = CaptureMode.Window,
                 AltPrintScreenMode = CaptureMode.Region,
                 ControlPrintScreenMode = CaptureMode.Monitor,
@@ -35,6 +38,9 @@ public sealed class AppSettingsServiceTests
             Assert.False(loaded.UsePrintScreen);
             Assert.False(loaded.UseAltPrintScreen);
             Assert.True(loaded.UseControlPrintScreen);
+            Assert.Equal("Shift + Print Screen", loaded.PrintScreenShortcut);
+            Assert.Equal("Ctrl + Alt + Print Screen", loaded.AltPrintScreenShortcut);
+            Assert.Equal("Ctrl + Shift + Print Screen", loaded.ControlPrintScreenShortcut);
             Assert.Equal(CaptureMode.Window, loaded.PrintScreenMode);
             Assert.Equal(CaptureMode.Region, loaded.AltPrintScreenMode);
             Assert.Equal(CaptureMode.Monitor, loaded.ControlPrintScreenMode);
@@ -63,6 +69,9 @@ public sealed class AppSettingsServiceTests
             Assert.True(loaded.UsePrintScreen);
             Assert.True(loaded.UseAltPrintScreen);
             Assert.True(loaded.UseControlPrintScreen);
+            Assert.Equal("Print Screen", loaded.PrintScreenShortcut);
+            Assert.Equal("Alt + Print Screen", loaded.AltPrintScreenShortcut);
+            Assert.Equal("Ctrl + Print Screen", loaded.ControlPrintScreenShortcut);
             Assert.Equal(CaptureMode.Region, loaded.PrintScreenMode);
             Assert.Equal(CaptureMode.Monitor, loaded.AltPrintScreenMode);
             Assert.Equal(CaptureMode.Window, loaded.ControlPrintScreenMode);
@@ -94,6 +103,9 @@ public sealed class AppSettingsServiceTests
             Assert.True(loaded.UsePrintScreen);
             Assert.True(loaded.UseAltPrintScreen);
             Assert.True(loaded.UseControlPrintScreen);
+            Assert.Equal("Print Screen", loaded.PrintScreenShortcut);
+            Assert.Equal("Alt + Print Screen", loaded.AltPrintScreenShortcut);
+            Assert.Equal("Ctrl + Print Screen", loaded.ControlPrintScreenShortcut);
             Assert.Equal(CaptureMode.Region, loaded.PrintScreenMode);
             Assert.Equal(CaptureMode.Monitor, loaded.AltPrintScreenMode);
             Assert.Equal(CaptureMode.Window, loaded.ControlPrintScreenMode);

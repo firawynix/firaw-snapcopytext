@@ -216,15 +216,15 @@ public partial class MainWindow : Window
         List<string> activeShortcuts = [];
         if (_hotkeyService.PrintScreenShortcutActive)
         {
-            activeShortcuts.Add($"Print Screen: {ModeLabel(_preferences.PrintScreenMode).ToLowerInvariant()}");
+            activeShortcuts.Add($"{_preferences.PrintScreenShortcut}: {ModeLabel(_preferences.PrintScreenMode).ToLowerInvariant()}");
         }
         if (_hotkeyService.AltPrintScreenShortcutActive)
         {
-            activeShortcuts.Add($"Alt + Print Screen: {ModeLabel(_preferences.AltPrintScreenMode).ToLowerInvariant()}");
+            activeShortcuts.Add($"{_preferences.AltPrintScreenShortcut}: {ModeLabel(_preferences.AltPrintScreenMode).ToLowerInvariant()}");
         }
         if (_hotkeyService.ControlPrintScreenShortcutActive)
         {
-            activeShortcuts.Add($"Ctrl + Print Screen: {ModeLabel(_preferences.ControlPrintScreenMode).ToLowerInvariant()}");
+            activeShortcuts.Add($"{_preferences.ControlPrintScreenShortcut}: {ModeLabel(_preferences.ControlPrintScreenMode).ToLowerInvariant()}");
         }
         if (_hotkeyService.FallbackRegistered)
         {

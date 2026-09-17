@@ -63,6 +63,15 @@ public sealed class AppSettingsService
             UsePrintScreen = settings?.UsePrintScreen ?? true,
             UseAltPrintScreen = settings?.UseAltPrintScreen ?? true,
             UseControlPrintScreen = settings?.UseControlPrintScreen ?? true,
+            PrintScreenShortcut = SanitizePrintScreenShortcut(
+                settings?.PrintScreenShortcut,
+                "Print Screen"),
+            AltPrintScreenShortcut = SanitizePrintScreenShortcut(
+                settings?.AltPrintScreenShortcut,
+                "Alt + Print Screen"),
+            ControlPrintScreenShortcut = SanitizePrintScreenShortcut(
+                settings?.ControlPrintScreenShortcut,
+                "Ctrl + Print Screen"),
             PrintScreenMode = SanitizeMode(settings?.PrintScreenMode, CaptureMode.Region),
             AltPrintScreenMode = SanitizeMode(settings?.AltPrintScreenMode, CaptureMode.Monitor),
             ControlPrintScreenMode = SanitizeMode(settings?.ControlPrintScreenMode, CaptureMode.Window),
@@ -72,4 +81,9 @@ public sealed class AppSettingsService
 
     private static CaptureMode SanitizeMode(CaptureMode? mode, CaptureMode fallback) =>
         mode.HasValue && Enum.IsDefined(mode.Value) ? mode.Value : fallback;
+
+    private static string SanitizePrintScreenShortcut(string? shortcut, string fallback) =>
+        HotkeyService.TryParsePrintScreenShortcut(shortcut, out _, out _, out string normalized)
+            ? normalized
+            : fallback;
 }

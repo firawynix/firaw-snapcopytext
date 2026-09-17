@@ -1,6 +1,6 @@
 ﻿param(
-    [string]$Version = '1.1.13',
-    [string]$ReleaseNotes = 'Cada combinação de Print Screen pode usar livremente captura por região, monitor ou janela.'
+    [string]$Version = '1.1.14',
+    [string]$ReleaseNotes = 'As três ações do perfil aceitam combinações próprias com Ctrl, Alt ou Shift + Print Screen.'
 )
 
 $ErrorActionPreference = 'Stop'
