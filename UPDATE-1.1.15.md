@@ -20,7 +20,7 @@ O aviso do **Auxiliar de Compatibilidade de Programas** sobre TLS era uma interp
 
 | Arquivo | Tamanho | SHA-256 |
 | --- | ---: | --- |
-| `Firaw-SnapCopyText-Setup-x64.exe` | 65.442.878 bytes | `3c13fd9c96244a4efbc5e427ee935ab1c1b3a994a580cb3853078657468974b2` |
-| `Firaw-SnapCopyText-Setup-x86.exe` | 58.717.508 bytes | `9d7ad0f5932a6341d79b179a68c41d2ca10f104184ce0c19d05b0a62f5f1c0d8` |
+| `Firaw-SnapCopyText-Setup-x64.exe` | 65.449.523 bytes | `172151e44ef4a23393215a963c44a1d7bc13e1cb72011ff3f573637f6370d585` |
+| `Firaw-SnapCopyText-Setup-x86.exe` | 58.713.363 bytes | `c6ef9747f8a25a28babd71610b691213091f9f04e93e51334c429ca03f3db556` |
 
 Pasta local: `C:\Users\Hugo\Firaw-SnapCopyText\release\Firaw-SnapCopyText-1.1.15\github-release`
