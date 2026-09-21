@@ -44,7 +44,6 @@ CloseApplications=yes
 RestartApplications=no
 MinVersion=10.0.17763
 #if MyArch == "x64"
-SetupArchitecture=x64
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 #else
