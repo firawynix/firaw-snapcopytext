@@ -1,5 +1,11 @@
 # Firaw - SnapCopyText
 
+[![Build Windows installers](https://github.com/firawynix/firaw-snapcopytext/actions/workflows/build-windows.yml/badge.svg)](https://github.com/firawynix/firaw-snapcopytext/actions/workflows/build-windows.yml)
+
+Código próprio licenciado sob [MIT](LICENSE). Consulte também a
+[política de privacidade](PRIVACY.md), a [política de segurança](SECURITY.md) e
+a [política de assinatura](CODE_SIGNING_POLICY.md).
+
 Capturador de tela para Windows e Linux com edição rápida e extração local de texto em português e inglês.
 
 A edição Linux fica em `linux/` e é distribuída como AppImage e `.deb`. Ela usa

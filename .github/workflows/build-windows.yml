@@ -1,0 +1,75 @@
+name: Build Windows installers
+
+on:
+  push:
+    branches: [master]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore and test
+        shell: pwsh
+        run: |
+          dotnet restore .\Firaw.SnapCopyText.sln
+          dotnet test .\Firaw.SnapCopyText.sln --configuration Release --no-restore
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
+
+      - name: Resolve version
+        id: metadata
+        shell: pwsh
+        run: |
+          [xml]$project = Get-Content .\src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj
+          $version = [string]$project.Project.PropertyGroup.Version
+          if ("${{ github.ref_type }}" -eq "tag") {
+            $version = "${{ github.ref_name }}" -replace '^v', ''
+          }
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Build installers from source
+        shell: pwsh
+        run: |
+          & .\tools\build-release.ps1 -Version "${{ steps.metadata.outputs.version }}" -ReleaseNotes "Public source build from commit ${{ github.sha }}."
+
+      - name: Record provenance
+        shell: pwsh
+        run: |
+          $output = ".\release\Firaw-SnapCopyText-${{ steps.metadata.outputs.version }}\github-release"
+          $files = Get-ChildItem -LiteralPath $output -File | ForEach-Object {
+            [ordered]@{ name = $_.Name; sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }
+          }
+          [ordered]@{
+            repository = "${{ github.server_url }}/${{ github.repository }}"
+            commit = "${{ github.sha }}"
+            run = "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            version = "${{ steps.metadata.outputs.version }}"
+            files = $files
+          } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $output "provenance.json") -Encoding utf8
+
+      - name: Upload unsigned artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firaw-snapcopytext-${{ steps.metadata.outputs.version }}-${{ github.sha }}
+          path: release/Firaw-SnapCopyText-${{ steps.metadata.outputs.version }}/github-release/*
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0

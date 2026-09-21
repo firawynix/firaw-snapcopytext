@@ -96,7 +96,7 @@ Esta versão não é publicada automaticamente pelo script de geração.
 
 # Atualização — 1.1.1 (11 de setembro de 2026)
 
-O endereço `http://10.81.66.10/firaw-snapcopytext/` só existe dentro da rede local
+O endereço `https://updates.example.test/firaw-snapcopytext/` representa o canal de testes
 e sem HTTPS: fora dela ninguém receberia atualização. Desde a 1.1.1:
 
 - o launcher lê o `update.json` da release mais recente do GitHub
@@ -125,7 +125,7 @@ Esta entrega acrescenta um launcher com atualização automática, dois instalad
 ## O que foi entregue
 
 - Launcher `Firaw.SnapCopyText.Launcher.exe`, iniciado antes do aplicativo principal.
-- Consulta automática de versão em `http://10.81.66.10/firaw-snapcopytext/update.json`.
+- Consulta automática de versão em `https://updates.example.test/firaw-snapcopytext/update.json`.
 - Escolha automática do pacote x64 ou x86.
 - Validação do tamanho e do SHA-256 antes de executar uma atualização.
 - Instalação silenciosa da nova versão e reabertura do Firaw na bandeja.
@@ -147,7 +147,7 @@ Esta entrega acrescenta um launcher com atualização automática, dois instalad
 
 ## Como colocar a atualização no servidor
 
-O endereço `10.81.66.10` recusou conexão HTTP e HTTPS durante esta preparação. Por isso, nenhum arquivo remoto foi alterado.
+O endereço de testes recusou conexão durante esta preparação. Por isso, nenhum arquivo remoto foi alterado.
 
 Quando o servidor estiver acessível, copie o conteúdo desta pasta:
 
@@ -158,7 +158,7 @@ C:\Users\Hugo\Firaw-SnapCopyText\release\Firaw-SnapCopyText-1.1.0\update-server\
 para a rota pública/interna:
 
 ```text
-http://10.81.66.10/firaw-snapcopytext/
+https://updates.example.test/firaw-snapcopytext/
 ```
 
 O resultado esperado no servidor é:

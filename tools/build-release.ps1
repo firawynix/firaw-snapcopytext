@@ -9,13 +9,17 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 $mainProject = Join-Path $projectRoot 'src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj'
 $launcherProject = Join-Path $projectRoot 'src\Firaw.SnapCopyText.Launcher\Firaw.SnapCopyText.Launcher.csproj'
 $installerScript = Join-Path $projectRoot 'installer\firaw-snapcopytext.iss'
-$innoCompiler = Join-Path $env:LOCALAPPDATA 'Programs\Inno Setup 7\ISCC.exe'
+$innoCompiler = @(
+    (Join-Path $env:LOCALAPPDATA 'Programs\Inno Setup 7\ISCC.exe'),
+    'C:\Program Files (x86)\Inno Setup 6\ISCC.exe',
+    'C:\Program Files\Inno Setup 6\ISCC.exe'
+) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
 $releaseRoot = Join-Path $projectRoot "release\Firaw-SnapCopyText-$Version"
 $installerOutput = Join-Path $releaseRoot 'installers'
 $githubOutput = Join-Path $releaseRoot 'github-release'
 
-if (-not (Test-Path -LiteralPath $innoCompiler)) {
-    throw "Inno Setup 7 não foi encontrado em: $innoCompiler"
+if (-not $innoCompiler) {
+    throw "Inno Setup 6 ou 7 não foi encontrado."
 }
 
 # O launcher compara a FileVersion do executável instalado com o manifesto. Sem

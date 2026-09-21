@@ -1,11 +1,11 @@
 # Publicação do site
 
-`https://snapcopytext.firawynix.com.br` → Cloudflare Tunnel do `10.81.66.7` →
-`127.0.0.1:26005` → nginx com a pasta `/home/ksdev/snapcopytext-site/public`
+`https://snapcopytext.firawynix.com.br` → proxy HTTPS autorizado →
+servidor web com a pasta pública do site
 montada (sem rebuild: atualizar é copiar os arquivos).
 
-A pasta mora no `10.81.66.7`, que é a fonte do espelho: o `sync-standby` leva
-`/home/ksdev` para o `10.81.66.10` com `rsync --delete`. Pasta criada só no `.10`
+A implantação concreta é privada e não faz parte deste repositório. O conteúdo
+publicável fica em `demo-site/dist`.
 é apagada no ciclo seguinte.
 
 Atualizar o conteúdo:

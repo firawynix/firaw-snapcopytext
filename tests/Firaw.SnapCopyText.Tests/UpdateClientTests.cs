@@ -25,12 +25,12 @@ public sealed class UpdateClientTests
         var client = new UpdateClient(new HttpClient(new StaticResponseHandler(manifest)));
 
         UpdatePlan? plan = await client.FindUpdateAsync(
-            new Uri("http://10.81.66.10/firaw-snapcopytext/update.json"),
+            new Uri("https://updates.example.test/firaw-snapcopytext/update.json"),
             new Version(1, 1, 0),
             Architecture.X86);
 
         Assert.NotNull(plan);
-        Assert.Equal(new Uri("http://10.81.66.10/firaw-snapcopytext/setup-x86.exe"), plan.PackageUri);
+        Assert.Equal(new Uri("https://updates.example.test/firaw-snapcopytext/setup-x86.exe"), plan.PackageUri);
         Assert.Equal(new Version(2, 0, 0), plan.Version);
     }
 
@@ -41,7 +41,7 @@ public sealed class UpdateClientTests
         var client = new UpdateClient(new HttpClient(new StaticResponseHandler(manifest)));
 
         UpdatePlan? plan = await client.FindUpdateAsync(
-            new Uri("http://10.81.66.10/firaw-snapcopytext/update.json"),
+            new Uri("https://updates.example.test/firaw-snapcopytext/update.json"),
             new Version(1, 1, 0),
             Architecture.X64);
 
@@ -56,7 +56,7 @@ public sealed class UpdateClientTests
         var plan = new UpdatePlan(
             new Version(2, 0, 0),
             string.Empty,
-            new Uri("http://10.81.66.10/firaw-snapcopytext/setup-x64.exe"),
+            new Uri("https://updates.example.test/firaw-snapcopytext/setup-x64.exe"),
             new string('A', 64),
             payload.Length);
         string destination = Path.Combine(Path.GetTempPath(), $"firaw-update-{Guid.NewGuid():N}.exe");
@@ -75,7 +75,7 @@ public sealed class UpdateClientTests
         var plan = new UpdatePlan(
             new Version(2, 0, 0),
             string.Empty,
-            new Uri("http://10.81.66.10/firaw-snapcopytext/setup-x64.exe"),
+            new Uri("https://updates.example.test/firaw-snapcopytext/setup-x64.exe"),
             hash,
             payload.Length);
         string destination = Path.Combine(Path.GetTempPath(), $"firaw-update-{Guid.NewGuid():N}.exe");
