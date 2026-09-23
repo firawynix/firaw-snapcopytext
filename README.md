@@ -97,8 +97,8 @@ dotnet run --project src\Firaw.SnapCopyText\Firaw.SnapCopyText.csproj
 Release completa com publicações autocontidas, launcher, instaladores Inno e manifesto de atualização:
 
 ```powershell
-.\tools\build-release.ps1 -Version 1.1.16 -ReleaseNotes "o que mudou"
-gh release create v1.1.16 -R firawynix/firaw-snapcopytext --title "Firaw - SnapCopyText 1.1.16" --notes "o que mudou" release\Firaw-SnapCopyText-1.1.16\github-release\*
+.\tools\build-release.ps1 -Version 1.1.17 -ReleaseNotes "o que mudou"
+gh release create v1.1.17 -R firawynix/firaw-snapcopytext --title "Firaw - SnapCopyText 1.1.17" --notes "o que mudou" release\Firaw-SnapCopyText-1.1.17\github-release\*
 ```
 
 Quando `FIRAW_SIGNING_THUMBPRINT` e `FIRAW_SIGNTOOL` estão definidos, o mesmo
