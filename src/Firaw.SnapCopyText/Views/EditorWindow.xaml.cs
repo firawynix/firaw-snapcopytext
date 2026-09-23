@@ -43,10 +43,10 @@ public partial class EditorWindow : Window
     private readonly SensitiveDataDetector _sensitiveDataDetector = new();
     private readonly TextHistoryService _textHistory = TextHistoryService.Shared;
     private readonly HashSet<UIElement> _selectedElements = [];
-    private readonly List<RemovedAnnotation> _erasedAnnotations = [];
+    private readonly Dictionary<UIElement, Geometry?> _eraserOriginalClips = [];
     private readonly List<Thumb> _resizeHandles = [];
     private EditorTool _currentTool = EditorTool.Select;
-    private EraserMode _eraserMode = EraserMode.Object;
+    private EraserMode _eraserMode = EraserMode.Circle;
     private Point _startPoint;
     private Point _lastPoint;
     private Vector _moveDelta;
@@ -61,8 +61,11 @@ public partial class EditorWindow : Window
     private bool _selectingTextRegion;
     private bool _textSelectionMode;
     private string _currentColor = "#19D3E6";
-    private FrameworkElement? _resizingCapture;
-    private Rect _resizeStartBounds = Rect.Empty;
+    private UIElement? _transformingElement;
+    private Matrix _transformStartMatrix;
+    private Point _rotationStartPoint;
+    private Point _rotationCenter;
+    private bool _rotating;
 
     public BitmapSource OriginalImage { get; }
 
@@ -212,7 +215,8 @@ public partial class EditorWindow : Window
         if (_erasing)
         {
             UpdateEraserPreview(current);
-            EraseAt(current);
+            EraseBetween(_lastPoint, current);
+            _lastPoint = current;
             return;
         }
 
@@ -246,6 +250,8 @@ public partial class EditorWindow : Window
 
         if (_erasing)
         {
+            Point eraseEnd = ClampToCanvas(e.GetPosition(AnnotationCanvas));
+            EraseBetween(_lastPoint, eraseEnd);
             CompleteErasing();
             return;
         }
@@ -649,9 +655,9 @@ public partial class EditorWindow : Window
         SelectionCanvas.Children.Add(_selectionOutline);
         PositionSelectionVisuals(bounds);
 
-        if (_selectedElements.Count == 1 && IsCaptureAnnotation(_selectedElements.Single()))
+        if (_selectedElements.Count == 1)
         {
-            AddCaptureResizeHandles(bounds);
+            AddTransformHandles(bounds);
         }
     }
 
@@ -666,7 +672,7 @@ public partial class EditorWindow : Window
             : Brushes.Transparent
     };
 
-    private void AddCaptureResizeHandles(Rect bounds)
+    private void AddTransformHandles(Rect bounds)
     {
         foreach (ResizeHandle resizeHandle in new[]
                  {
@@ -688,12 +694,29 @@ public partial class EditorWindow : Window
                     : Cursors.SizeNESW,
                 Tag = resizeHandle
             };
-            handle.DragStarted += CaptureResize_DragStarted;
-            handle.DragDelta += CaptureResize_DragDelta;
-            handle.DragCompleted += CaptureResize_DragCompleted;
+            handle.DragStarted += Transform_DragStarted;
+            handle.DragDelta += Resize_DragDelta;
+            handle.DragCompleted += Transform_DragCompleted;
             _resizeHandles.Add(handle);
             SelectionCanvas.Children.Add(handle);
         }
+
+        var rotationHandle = new Thumb
+        {
+            Width = 16,
+            Height = 16,
+            Background = Brushes.Orange,
+            BorderBrush = Brushes.White,
+            BorderThickness = new Thickness(1),
+            Cursor = Cursors.Hand,
+            Tag = "Rotate",
+            ToolTip = "Arraste para girar"
+        };
+        rotationHandle.DragStarted += Transform_DragStarted;
+        rotationHandle.DragDelta += Rotate_DragDelta;
+        rotationHandle.DragCompleted += Transform_DragCompleted;
+        _resizeHandles.Add(rotationHandle);
+        SelectionCanvas.Children.Add(rotationHandle);
 
         PositionResizeHandles(bounds);
     }
@@ -714,6 +737,13 @@ public partial class EditorWindow : Window
     {
         foreach (Thumb handle in _resizeHandles)
         {
+            if (handle.Tag is "Rotate")
+            {
+                Canvas.SetLeft(handle, bounds.Left + bounds.Width / 2 - handle.Width / 2);
+                Canvas.SetTop(handle, Math.Max(0, bounds.Top - 30));
+                continue;
+            }
+
             if (handle.Tag is not ResizeHandle resizeHandle)
             {
                 continue;
@@ -731,97 +761,144 @@ public partial class EditorWindow : Window
         }
     }
 
-    private void CaptureResize_DragStarted(object sender, DragStartedEventArgs e)
+    private void Transform_DragStarted(object sender, DragStartedEventArgs e)
     {
-        _resizingCapture = _selectedElements.Count == 1
-            ? _selectedElements.Single() as FrameworkElement
+        _transformingElement = _selectedElements.Count == 1
+            ? _selectedElements.Single()
             : null;
-        _resizeStartBounds = _resizingCapture is null
-            ? Rect.Empty
-            : GetAnnotationBounds(_resizingCapture);
-    }
-
-    private void CaptureResize_DragDelta(object sender, DragDeltaEventArgs e)
-    {
-        if (_resizingCapture is null || sender is not Thumb { Tag: ResizeHandle handle })
+        if (_transformingElement is null)
         {
             return;
         }
 
-        Rect bounds = GetAnnotationBounds(_resizingCapture);
+        _transformStartMatrix = _transformingElement.RenderTransform.Value;
+        _rotating = sender is Thumb { Tag: "Rotate" };
+        Rect bounds = GetAnnotationBounds(_transformingElement);
+        _rotationCenter = new Point(bounds.Left + bounds.Width / 2, bounds.Top + bounds.Height / 2);
+        _rotationStartPoint = Mouse.GetPosition(AnnotationCanvas);
+    }
+
+    private void Resize_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        if (_transformingElement is null || sender is not Thumb { Tag: ResizeHandle handle })
+        {
+            return;
+        }
+
+        Rect bounds = GetAnnotationBounds(_transformingElement);
+        if (bounds.Width < 0.01 || bounds.Height < 0.01)
+        {
+            return;
+        }
+
         double left = bounds.Left;
         double top = bounds.Top;
         double right = bounds.Right;
         double bottom = bounds.Bottom;
+        double minimumWidth = IsCaptureAnnotation(_transformingElement)
+            ? MinimumCaptureWidth
+            : Math.Min(12, Math.Max(1, bounds.Width));
+        double minimumHeight = IsCaptureAnnotation(_transformingElement)
+            ? MinimumCaptureHeight
+            : Math.Min(12, Math.Max(1, bounds.Height));
 
         if (handle is ResizeHandle.TopLeft or ResizeHandle.BottomLeft)
         {
-            left = Math.Clamp(left + e.HorizontalChange, 0, right - MinimumCaptureWidth);
+            left = Math.Clamp(left + e.HorizontalChange, 0, Math.Max(0, right - minimumWidth));
         }
         else
         {
-            right = Math.Max(left + MinimumCaptureWidth, right + e.HorizontalChange);
+            right = Math.Max(left + minimumWidth, right + e.HorizontalChange);
         }
 
         if (handle is ResizeHandle.TopLeft or ResizeHandle.TopRight)
         {
-            top = Math.Clamp(top + e.VerticalChange, 0, bottom - MinimumCaptureHeight);
+            top = Math.Clamp(top + e.VerticalChange, 0, Math.Max(0, bottom - minimumHeight));
         }
         else
         {
-            bottom = Math.Max(top + MinimumCaptureHeight, bottom + e.VerticalChange);
+            bottom = Math.Max(top + minimumHeight, bottom + e.VerticalChange);
         }
 
         Rect resized = new(left, top, right - left, bottom - top);
-        ApplyCaptureBounds(_resizingCapture, resized, updateSelection: false);
-        SetCompositionSize(
-            Math.Max(EditorSurface.Width, resized.Right),
-            Math.Max(EditorSurface.Height, resized.Bottom));
-        PositionSelectionVisuals(resized);
+        double canvasLeft = GetCanvasOffset(_transformingElement, Canvas.LeftProperty);
+        double canvasTop = GetCanvasOffset(_transformingElement, Canvas.TopProperty);
+        Point fixedCorner = handle switch
+        {
+            ResizeHandle.TopLeft => bounds.BottomRight,
+            ResizeHandle.TopRight => bounds.BottomLeft,
+            ResizeHandle.BottomRight => bounds.TopLeft,
+            _ => bounds.TopRight
+        };
+        Matrix transform = _transformingElement.RenderTransform.Value;
+        transform.ScaleAt(resized.Width / bounds.Width, resized.Height / bounds.Height,
+            fixedCorner.X - canvasLeft, fixedCorner.Y - canvasTop);
+        ApplyAnnotationTransform(_transformingElement, transform);
     }
 
-    private void CaptureResize_DragCompleted(object sender, DragCompletedEventArgs e)
+    private void Rotate_DragDelta(object sender, DragDeltaEventArgs e)
     {
-        if (_resizingCapture is null)
+        if (_transformingElement is null || !_rotating)
         {
             return;
         }
 
-        FrameworkElement capture = _resizingCapture;
-        Rect before = _resizeStartBounds;
-        Rect after = GetAnnotationBounds(capture);
-        _resizingCapture = null;
-        _resizeStartBounds = Rect.Empty;
+        Point current = Mouse.GetPosition(AnnotationCanvas);
+        Vector start = _rotationStartPoint - _rotationCenter;
+        Vector end = current - _rotationCenter;
+        if (start.Length < 1 || end.Length < 1)
+        {
+            return;
+        }
 
-        if (!before.IsEmpty && before != after)
+        double angle = Math.Atan2(end.Y, end.X) - Math.Atan2(start.Y, start.X);
+        Matrix transform = _transformStartMatrix;
+        transform.RotateAt(angle * 180 / Math.PI,
+            _rotationCenter.X - GetCanvasOffset(_transformingElement, Canvas.LeftProperty),
+            _rotationCenter.Y - GetCanvasOffset(_transformingElement, Canvas.TopProperty));
+        ApplyAnnotationTransform(_transformingElement, transform);
+    }
+
+    private void Transform_DragCompleted(object sender, DragCompletedEventArgs e)
+    {
+        if (_transformingElement is null)
+        {
+            return;
+        }
+
+        UIElement element = _transformingElement;
+        Matrix before = _transformStartMatrix;
+        Matrix after = element.RenderTransform.Value;
+        _transformingElement = null;
+        _rotating = false;
+
+        if (before != after)
         {
             _history.Add(new EditorAction(
-                () => ApplyCaptureBounds(capture, before),
-                () => ApplyCaptureBounds(capture, after)));
+                () => ApplyAnnotationTransform(element, before),
+                () => ApplyAnnotationTransform(element, after)));
             UpdateHistoryButtons();
         }
 
         UpdateSelectionOutline();
         FitEditorToCapture();
-        EditorStatus.Text = $"Print redimensionado para {after.Width:0} × {after.Height:0}.";
+        EditorStatus.Text = "Tamanho/rotação atualizado. Ctrl+Z para desfazer.";
     }
 
-    private void ApplyCaptureBounds(
-        FrameworkElement capture,
-        Rect bounds,
-        bool updateSelection = true)
+    private static double GetCanvasOffset(UIElement element, DependencyProperty property)
     {
-        Canvas.SetLeft(capture, bounds.Left);
-        Canvas.SetTop(capture, bounds.Top);
-        capture.Width = bounds.Width;
-        capture.Height = bounds.Height;
+        double value = (double)element.GetValue(property);
+        return double.IsNaN(value) ? 0 : value;
+    }
+
+    private void ApplyAnnotationTransform(UIElement element, Matrix transform)
+    {
+        element.RenderTransform = new MatrixTransform(transform);
+        Rect bounds = GetAnnotationBounds(element);
         SetCompositionSize(
             Math.Max(EditorSurface.Width, bounds.Right),
             Math.Max(EditorSurface.Height, bounds.Bottom));
-        if (updateSelection)
-        {
-            UpdateSelectionOutline();
-        }
+        PositionSelectionVisuals(bounds);
     }
 
     private Rect GetSelectionBounds()
@@ -897,10 +974,10 @@ public partial class EditorWindow : Window
     private void BeginErasing()
     {
         _erasing = true;
-        _erasedAnnotations.Clear();
+        _eraserOriginalClips.Clear();
         AnnotationCanvas.CaptureMouse();
         UpdateEraserPreview(_startPoint);
-        EraseAt(_startPoint);
+        EraseBetween(_startPoint, _startPoint);
     }
 
     private void UpdateEraserPreview(Point point)
@@ -910,7 +987,7 @@ public partial class EditorWindow : Window
             SelectionCanvas.Children.Remove(_eraserPreview);
         }
 
-        double size = _eraserMode == EraserMode.Object ? 18 : EraserSizeSlider.Value;
+        double size = EraserSizeSlider.Value;
         _eraserPreview = _eraserMode == EraserMode.Circle
             ? new Ellipse()
             : new Rectangle();
@@ -924,50 +1001,66 @@ public partial class EditorWindow : Window
         SelectionCanvas.Children.Add(_eraserPreview);
     }
 
-    private void EraseAt(Point point)
+    private void EraseBetween(Point from, Point to)
     {
-        IEnumerable<UIElement> candidates;
-        if (_eraserMode == EraserMode.Object)
+        double size = EraserSizeSlider.Value;
+        Geometry stroke;
+        if ((to - from).Length < 0.1)
         {
-            UIElement? hit = GetDirectAnnotation(AnnotationCanvas.InputHitTest(point) as DependencyObject);
-            candidates = hit is null ? [] : [hit];
+            stroke = _eraserMode == EraserMode.Circle
+                ? new EllipseGeometry(from, size / 2, size / 2)
+                : new RectangleGeometry(new Rect(from.X - size / 2, from.Y - size / 2, size, size));
         }
         else
         {
-            double size = EraserSizeSlider.Value;
-            Rect eraserBounds = new(point.X - (size / 2), point.Y - (size / 2), size, size);
-            candidates = AnnotationCanvas.Children
-                .OfType<UIElement>()
-                .Where(annotation => EraserIntersects(GetAnnotationBounds(annotation), eraserBounds))
-                .ToArray();
+            System.Windows.Media.Pen pen = new(Brushes.Black, size)
+            {
+                StartLineCap = _eraserMode == EraserMode.Circle ? PenLineCap.Round : PenLineCap.Square,
+                EndLineCap = _eraserMode == EraserMode.Circle ? PenLineCap.Round : PenLineCap.Square,
+                LineJoin = _eraserMode == EraserMode.Circle ? PenLineJoin.Round : PenLineJoin.Bevel
+            };
+            stroke = new LineGeometry(from, to).GetWidenedPathGeometry(pen);
         }
 
-        foreach (UIElement annotation in candidates)
+        foreach (UIElement annotation in AnnotationCanvas.Children.OfType<UIElement>().ToArray())
         {
-            if (_erasedAnnotations.Any(item => ReferenceEquals(item.Element, annotation)))
+            if (!GetAnnotationBounds(annotation).IntersectsWith(stroke.Bounds))
             {
                 continue;
             }
 
-            int index = AnnotationCanvas.Children.IndexOf(annotation);
-            _erasedAnnotations.Add(new RemovedAnnotation(annotation, index));
-            AnnotationCanvas.Children.Remove(annotation);
-            _selectedElements.Remove(annotation);
-        }
-    }
+            GeneralTransform? inverse = annotation.TransformToAncestor(AnnotationCanvas).Inverse;
+            if (inverse is null ||
+                !inverse.TryTransform(new Point(0, 0), out Point origin) ||
+                !inverse.TryTransform(new Point(1, 0), out Point xAxis) ||
+                !inverse.TryTransform(new Point(0, 1), out Point yAxis))
+            {
+                continue;
+            }
 
-    private bool EraserIntersects(Rect annotationBounds, Rect eraserBounds)
-    {
-        if (_eraserMode == EraserMode.Square)
-        {
-            return annotationBounds.IntersectsWith(eraserBounds);
-        }
+            Rect localBounds = VisualTreeHelper.GetDescendantBounds(annotation);
+            if ((localBounds.IsEmpty || localBounds.Width <= 0 || localBounds.Height <= 0) &&
+                annotation is FrameworkElement frameworkElement)
+            {
+                localBounds = new Rect(0, 0,
+                    Math.Max(0, frameworkElement.ActualWidth),
+                    Math.Max(0, frameworkElement.ActualHeight));
+            }
 
-        Point center = new(eraserBounds.Left + eraserBounds.Width / 2, eraserBounds.Top + eraserBounds.Height / 2);
-        Point nearest = new(
-            Math.Clamp(center.X, annotationBounds.Left, annotationBounds.Right),
-            Math.Clamp(center.Y, annotationBounds.Top, annotationBounds.Bottom));
-        return (nearest - center).Length <= eraserBounds.Width / 2;
+            if (localBounds.IsEmpty)
+            {
+                continue;
+            }
+
+            _eraserOriginalClips.TryAdd(annotation, annotation.Clip);
+            Geometry localStroke = stroke.Clone();
+            localStroke.Transform = new MatrixTransform(new Matrix(
+                xAxis.X - origin.X, xAxis.Y - origin.Y,
+                yAxis.X - origin.X, yAxis.Y - origin.Y,
+                origin.X, origin.Y));
+            annotation.Clip = new CombinedGeometry(GeometryCombineMode.Exclude,
+                annotation.Clip ?? new RectangleGeometry(localBounds), localStroke);
+        }
     }
 
     private void CompleteErasing()
@@ -980,19 +1073,28 @@ public partial class EditorWindow : Window
             _eraserPreview = null;
         }
 
-        if (_erasedAnnotations.Count == 0)
+        if (_eraserOriginalClips.Count == 0)
         {
-            EditorStatus.Text = "Nenhuma anotação encontrada para apagar.";
+            EditorStatus.Text = "Nada encontrado no caminho da borracha.";
             return;
         }
 
-        RemovedAnnotation[] removed = [.. _erasedAnnotations.OrderBy(item => item.Index)];
+        ClippedAnnotation[] clipped = [.. _eraserOriginalClips.Select(item =>
+            new ClippedAnnotation(item.Key, item.Value, item.Key.Clip))];
         _history.Add(new EditorAction(
-            () => RestoreAnnotations(removed),
-            () => RemoveAnnotations(removed.Select(item => item.Element))));
-        _erasedAnnotations.Clear();
-        EditorStatus.Text = $"{removed.Length} objeto(s) apagado(s).";
+            () => ApplyClips(clipped, restoreOriginal: true),
+            () => ApplyClips(clipped, restoreOriginal: false)));
+        _eraserOriginalClips.Clear();
+        EditorStatus.Text = "Área percorrida apagada. Ctrl+Z para desfazer.";
         UpdateHistoryButtons();
+    }
+
+    private static void ApplyClips(IEnumerable<ClippedAnnotation> annotations, bool restoreOriginal)
+    {
+        foreach (ClippedAnnotation annotation in annotations)
+        {
+            annotation.Element.Clip = restoreOriginal ? annotation.Before : annotation.After;
+        }
     }
 
     private void RestoreAnnotations(IEnumerable<RemovedAnnotation> annotations)
@@ -1017,6 +1119,25 @@ public partial class EditorWindow : Window
         }
 
         UpdateSelectionOutline();
+    }
+
+    private void DeleteSelectedAnnotations()
+    {
+        RemovedAnnotation[] removed = [.. _selectedElements
+            .Where(AnnotationCanvas.Children.Contains)
+            .Select(element => new RemovedAnnotation(element, AnnotationCanvas.Children.IndexOf(element)))
+            .OrderBy(item => item.Index)];
+        if (removed.Length == 0)
+        {
+            return;
+        }
+
+        RemoveAnnotations(removed.Select(item => item.Element));
+        _history.Add(new EditorAction(
+            () => RestoreAnnotations(removed),
+            () => RemoveAnnotations(removed.Select(item => item.Element))));
+        EditorStatus.Text = $"{removed.Length} objeto(s) excluído(s). Ctrl+Z para desfazer.";
+        UpdateHistoryButtons();
     }
 
     private void BeginTextRegionSelection()
@@ -1690,6 +1811,13 @@ public partial class EditorWindow : Window
             EditorStatus.Text = "Seleção de objetos cancelada.";
             e.Handled = true;
         }
+        else if (e.Key == Key.Delete && Keyboard.Modifiers == ModifierKeys.None &&
+                 _currentTool == EditorTool.Select &&
+                 Keyboard.FocusedElement is not System.Windows.Controls.Primitives.TextBoxBase)
+        {
+            DeleteSelectedAnnotations();
+            e.Handled = true;
+        }
         else if (Keyboard.Modifiers == ModifierKeys.None && TrySelectToolByNumber(e.Key))
         {
             e.Handled = true;
@@ -1723,4 +1851,5 @@ public partial class EditorWindow : Window
     }
 
     private sealed record RemovedAnnotation(UIElement Element, int Index);
+    private sealed record ClippedAnnotation(UIElement Element, Geometry? Before, Geometry? After);
 }
